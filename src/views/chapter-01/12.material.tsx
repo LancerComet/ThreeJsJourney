@@ -1,6 +1,7 @@
 import {
-  Mesh, MeshMatcapMaterial,
-  PlaneGeometry,
+  AmbientLight, BufferAttribute, CubeTextureLoader, DoubleSide,
+  Mesh, MeshMatcapMaterial, MeshStandardMaterial,
+  PlaneGeometry, PointLight,
   SphereGeometry, TextureLoader,
   TorusGeometry
 } from 'three'
@@ -11,45 +12,59 @@ const Material = defineComponent({
   name: 'Material',
   setup () {
     const { ThreeScene, scene, onTick, clock, gui } = useThreeScene({
-      backgroundColor: 0
+      backgroundColor: 0xaaaaaa
     })
+
+    const ambientLight = new AmbientLight(0xffffff, 0.5)
+    scene.add(ambientLight)
+
+    const pointLight = new PointLight(0xffffff, 0.5)
+    pointLight.position.set(2, 3, 4)
+    scene.add(pointLight)
 
     const textureLoader = new TextureLoader()
-    // const doorColorTexture = textureLoader.load('/textures/door/color.jpg')
-    // const doorAlphaTexture = textureLoader.load('/textures/door/alpha.jpg')
-    // const doorAmbientOcclusionTexture = textureLoader.load('/textures/door/ambientOcclusion.jpg')
-    // const doorHeightTexture = textureLoader.load('/textures/door/height.jpg')
-    // const doorNormalTexture = textureLoader.load('/textures/door/normal.jpg')
-    // const doorMetalnessTexture = textureLoader.load('/textures/door/metalness.jpg')
-    // const doorRoughnessTexture = textureLoader.load('/textures/door/roughness.jpg')
-    const matcapTexture = textureLoader.load('/textures/matcaps/1.png')
-    // const gradientTexture = textureLoader.load('/textures/gradients/3.jpg')
-
-    // const material = new MeshBasicMaterial({
-    //   map: doorColorTexture,
-    //   alphaMap: doorAlphaTexture,
-    //   transparent: true
-    // })
-    const material = new MeshMatcapMaterial({
-      matcap: matcapTexture
-    })
-
-    gui.add(material, 'wireframe')
 
     const sphere = new Mesh(
-      new SphereGeometry(0.5, 16, 16),
-      material
+      new SphereGeometry(0.5, 64, 64),
+      new MeshStandardMaterial({
+        roughness: 0,
+        metalness: 0.8,
+        envMap: new CubeTextureLoader().load([
+          '/textures/environmentMaps/0/px.jpg',
+          '/textures/environmentMaps/0/nx.jpg',
+          '/textures/environmentMaps/0/py.jpg',
+          '/textures/environmentMaps/0/ny.jpg',
+          '/textures/environmentMaps/0/pz.jpg',
+          '/textures/environmentMaps/0/nz.jpg'
+        ])
+      })
     )
     sphere.position.x = -1.5
 
     const plane = new Mesh(
-      new PlaneGeometry(1, 1),
-      material
+      new PlaneGeometry(1, 1, 100, 100),
+      new MeshStandardMaterial({
+        map: textureLoader.load('/textures/door/color.jpg'),
+
+        alphaMap: textureLoader.load('/textures/door/alpha.jpg'),
+        transparent: true,
+
+        aoMap: textureLoader.load('/textures/door/ambientOcclusion.jpg'),
+        aoMapIntensity: 1,
+
+        displacementMap: textureLoader.load('/textures/door/height.jpg'),
+        displacementScale: 0.05,
+
+        side: DoubleSide
+      })
     )
+    plane.geometry.setAttribute('uv2', new BufferAttribute(plane.geometry.attributes.uv.array, 2))
 
     const torus = new Mesh(
-      new TorusGeometry(0.3, 0.2, 16, 32),
-      material
+      new TorusGeometry(0.3, 0.2, 16, 128),
+      new MeshMatcapMaterial({
+        matcap: textureLoader.load('/textures/matcaps/1.png')
+      })
     )
     torus.position.x = 1.5
 

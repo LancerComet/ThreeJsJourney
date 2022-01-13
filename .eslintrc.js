@@ -26,11 +26,7 @@ module.exports = {
   rules: {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
 
-    '@typescript-eslint/no-unused-vars': ['error', {
-      vars: 'all',
-      args: 'after-used',
-      ignoreRestSiblings: false
-    }],
+    '@typescript-eslint/no-unused-vars': 'off',
 
     '@typescript-eslint/no-inferrable-types': 'off',
 
