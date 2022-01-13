@@ -1,0 +1,11 @@
+{
+  "data": {
+    "username": "John Smith",
+    "password": "",
+    "gender": "",
+    "birthday": "1926-08-17T00:00:00Z",
+    "country": ""
+  },
+  "code": 0,
+  "msg": "OK"
+}
