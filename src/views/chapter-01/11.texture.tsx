@@ -1,8 +1,6 @@
 import { BoxGeometry, Mesh, MeshBasicMaterial, NearestFilter, TextureLoader } from 'three'
 import { defineComponent, onMounted } from 'vue'
-import { useThreeScene } from '../../components/three-scene'
-
-import colorTextureImg from './assets/Door_Wood_001_basecolor.jpg'
+import { useThreeScene } from '../../hooks/three-scene'
 
 const Textures = defineComponent({
   name: 'Texture',
@@ -12,7 +10,7 @@ const Textures = defineComponent({
     onMounted(async () => {
       const textureLoader = new TextureLoader()
 
-      const colorTexture = await textureLoader.loadAsync(colorTextureImg)
+      const colorTexture = await textureLoader.loadAsync('/texture/door/color.jpg')
       colorTexture.needsUpdate = true
       colorTexture.minFilter = NearestFilter
 
