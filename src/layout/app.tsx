@@ -1,11 +1,11 @@
 import { defineComponent } from 'vue'
+import { RouterView } from 'vue-router'
 
 const AppLayout = defineComponent({
   setup () {
     return () => (
       <div>
-        <h1>THIS IS SPARTA!!🐸🐸🐸🐸</h1>
-        <h2>🐸🎺💩🚽</h2>
+        <RouterView />
       </div>
     )
   }

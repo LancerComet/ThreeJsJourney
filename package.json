@@ -1,20 +1,18 @@
 {
   "name": "threejs-journey",
   "version": "1.0.0",
-  "description": "Threejs Journey course playgorund.",
+  "description": "Threejs Journey course playground.",
   "private": true,
   "scripts": {
-    "dev:uat": "cross-env NODE_ENV=development BILI_ENV=uat vite",
-    "dev:prod": "cross-env NODE_ENV=development BILI_ENV=prod vite",
-    "build:uat": "vue-tsc --noEmit && cross-env BILI_ENV=uat NODE_ENV=production vite build",
-    "build:prod": "vue-tsc --noEmit && cross-env BILI_ENV=prod NODE_ENV=production vite build",
+    "dev": "cross-env NODE_ENV=development vite",
+    "build": "vue-tsc --noEmit && cross-env NODE_ENV=production vite build",
     "serve": "vite preview"
   },
   "dependencies": {
-    "@bilibili-firebird/style": "^1.0.2",
     "dayjs": "^1.10.7",
-    "reflect-metadata": "^0.1.13",
-    "vue": "^3.2.20"
+    "three": "^0.136.0",
+    "vue": "^3.2.20",
+    "vue-router": "^4.0.12"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.14.5",
@@ -22,6 +20,7 @@
     "@babel/preset-env": "^7.15.8",
     "@types/color": "^3.0.2",
     "@types/node": "^16.11.0",
+    "@types/three": "^0.136.1",
     "@types/underscore": "^1.11.3",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
