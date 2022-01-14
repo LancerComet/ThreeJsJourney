@@ -17,6 +17,13 @@ const pageConfig: { [sectionName: string]: RouteRecordRaw[] } = {
       path: 'fonts',
       component: () => import('../views/chapter-01/13.fonts').then(item => item.Fonts)
     }
+  ],
+  'Chapter 02': [
+    {
+      name: 'Lights',
+      path: 'lights',
+      component: () => import('../views/chapter-02/15.lights').then(item => item.Lights)
+    }
   ]
 }
 

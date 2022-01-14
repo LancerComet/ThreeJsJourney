@@ -1,7 +1,7 @@
-import { Mesh, MeshBasicMaterial, MeshMatcapMaterial, TextureLoader, TorusGeometry, Vector3 } from 'three'
+import { Mesh, MeshMatcapMaterial, TextureLoader, TorusGeometry, Vector3 } from 'three'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader'
-import { defineComponent, onBeforeMount, onMounted } from 'vue'
+import { defineComponent, onBeforeMount } from 'vue'
 import { useThreeScene } from '../../hooks/three-scene'
 
 // Use this to convert a regular font into the TypeFace font.
