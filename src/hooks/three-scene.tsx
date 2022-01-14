@@ -6,11 +6,14 @@ import { defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 const useThreeScene = (param?: {
   backgroundColor?: number
   useAxesHelper?: boolean
+  useControl?: boolean
 }) => {
+  const onTickCallbacks: (() => void)[] = []
+
   const scene = new Scene()
   scene.background = new Color(param?.backgroundColor ?? 0xaaaaaa)
 
-  const onTickCallbacks: (() => void)[] = []
+  const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
 
   const gui = new dat.GUI()
   const clock = new Clock()
@@ -24,13 +27,15 @@ const useThreeScene = (param?: {
       const renderer = new WebGLRenderer()
       renderer.setSize(window.innerWidth, window.innerHeight)
 
-      const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
       camera.position.set(5, 5, 5)
       scene.add(camera)
 
-      const controls = new OrbitControls(camera, renderer.domElement)
-      controls.enableDamping = true
-      controls.dampingFactor = 0.1
+      let controls: OrbitControls
+      if (param?.useControl ?? true) {
+        controls = new OrbitControls(camera, renderer.domElement)
+        controls.enableDamping = true
+        controls.dampingFactor = 0.1
+      }
 
       const useAxesHelper = param?.useAxesHelper ?? true
       if (useAxesHelper) {
@@ -39,7 +44,7 @@ const useThreeScene = (param?: {
       }
 
       const tick = () => {
-        controls.update()
+        controls?.update()
         renderer.render(scene, camera)
         onTickCallbacks.forEach(item => item())
         if (isTickStart) {
@@ -81,7 +86,8 @@ const useThreeScene = (param?: {
     scene,
     gui,
     onTick,
-    clock
+    clock,
+    camera
   }
 }
 
