@@ -1,4 +1,4 @@
-import { AmbientLight, DirectionalLight, PointLight } from 'three'
+import { AmbientLight, CameraHelper, DirectionalLight, PointLight } from 'three'
 import { Object3DPosition } from '../types'
 import { useThreeObject } from './three-object'
 
@@ -7,9 +7,6 @@ interface ILightBaseConfig {
   intensity: number
   castShadow?: boolean
   position?: Object3DPosition
-  shadowConfig?: {
-    mapSize?: [number, number]
-  }
 }
 
 const useAmbientLight = (param: {
@@ -20,7 +17,8 @@ const useAmbientLight = (param: {
   return {
     AmbientLight: useThreeObject({
       threeObject: ambientLight
-    })
+    }),
+    light: ambientLight
   }
 }
 
@@ -36,17 +34,32 @@ const usePointLight = (param: IUsePointLight) => {
       threeObject: pointLight,
       castShadow: param.castShadow,
       position: param.position
-    })
+    }),
+    light: pointLight
   }
 }
 
-type IUseDirectionalLight = ILightBaseConfig
+interface IUseDirectionalLight extends ILightBaseConfig {
+  shadowConfig?: {
+    mapSize?: [number, number]
+    camera?: {
+      near: number
+      far: number
+    }
+  }
+}
 
 const useDirectionalLight = (param: IUseDirectionalLight) => {
   const directionalLight = new DirectionalLight(param.color, param.intensity)
+
   if (param.shadowConfig?.mapSize) {
     directionalLight.shadow.mapSize.width = param.shadowConfig.mapSize[0]
     directionalLight.shadow.mapSize.height = param.shadowConfig.mapSize[1]
+  }
+
+  if (param.shadowConfig?.camera) {
+    directionalLight.shadow.camera.near = param.shadowConfig.camera.near
+    directionalLight.shadow.camera.far = param.shadowConfig.camera.far
   }
 
   return {
@@ -54,7 +67,8 @@ const useDirectionalLight = (param: IUseDirectionalLight) => {
       threeObject: directionalLight,
       castShadow: param.castShadow,
       position: param.position
-    })
+    }),
+    light: directionalLight
   }
 }
 
