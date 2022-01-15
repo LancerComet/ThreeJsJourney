@@ -7,7 +7,7 @@ const IndexPage = defineComponent({
 
   setup () {
     return () => (
-      <div>{
+      <div style={{ margin: '0 20px' }}>{
         Object.keys(pageConfig).map(sectionName => {
           const configItem = pageConfig[sectionName]
           return (
