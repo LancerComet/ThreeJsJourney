@@ -1,4 +1,4 @@
-import { AmbientLight, DirectionalLight, PlaneGeometry, PointLight } from 'three'
+import { AmbientLight, CameraHelper, DirectionalLight, PlaneGeometry, PointLight } from 'three'
 import { defineComponent } from 'vue'
 import { useBoxGeometry, usePlaneGeometry } from '../../core/geometries'
 import { useAmbientLight, useDirectionalLight, usePointLight } from '../../core/lights'
@@ -8,6 +8,12 @@ const Shadow = defineComponent({
   name: 'Shadow',
 
   setup () {
+    const { ThreeScene, scene } = useThreeScene({
+      backgroundColor: 0,
+      useShadow: true,
+      antialias: true
+    })
+
     const { Geometry: Cube1 } = useBoxGeometry({
       position: [2, 0, 0],
       castShadow: true
@@ -23,8 +29,8 @@ const Shadow = defineComponent({
     })
 
     const { Geometry: PlaneGeometry, mesh: plane } = usePlaneGeometry({
-      width: 10,
-      height: 10,
+      width: 20,
+      height: 20,
       position: [0, -0.5, 0],
       receiveShadow: true
     })
@@ -44,21 +50,31 @@ const Shadow = defineComponent({
       position: [-4, 2, 4]
     })
 
-    const { DirectionalLight } = useDirectionalLight({
+    const {
+      DirectionalLight,
+      light: directionalLight
+    } = useDirectionalLight({
       color: 0xb6e5fb,
       intensity: 0.3,
       castShadow: true,
       position: [4, 4, 4],
       shadowConfig: {
-        mapSize: [2048, 2048] // Higher number gives the smoother shadow.
+        // Higher number gives the smoother shadow.
+        mapSize: [2048, 2048],
+        camera: {
+          near: 1,
+          far: 10
+        }
       }
     })
 
-    const { ThreeScene } = useThreeScene({
-      backgroundColor: 0,
-      useShadow: true,
-      antialias: true
-    })
+    // directionalLight.shadow.camera.top = 1
+    // directionalLight.shadow.camera.right = 1
+    // directionalLight.shadow.camera.bottom = -1
+    // directionalLight.shadow.camera.left = -1
+
+    const shadowCameraHelper = new CameraHelper(directionalLight.shadow.camera)
+    scene.add(shadowCameraHelper)
 
     return () => (
       <ThreeScene>
