@@ -10,7 +10,7 @@ import {
 } from 'three'
 import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper'
 import { defineComponent, ssrContextKey } from 'vue'
-import { useThreeScene } from '../../hooks/three-scene'
+import { useThreeScene } from '../../core/three-scene'
 
 const Lights = defineComponent({
   name: 'Lights',

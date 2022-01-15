@@ -6,7 +6,7 @@ import {
   TorusGeometry
 } from 'three'
 import { defineComponent } from 'vue'
-import { useThreeScene } from '../../hooks/three-scene'
+import { useThreeScene } from '../../core/three-scene'
 
 const Material = defineComponent({
   name: 'Material',

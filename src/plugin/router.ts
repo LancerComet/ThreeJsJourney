@@ -7,7 +7,7 @@ Object.keys(pageConfig).forEach(sectionName => {
   pageConfig[sectionName].forEach(item => {
     pages.push({
       ...item,
-      name: `${sectionName}.${item.name}`,
+      name: `${sectionName}.${item.name as string}`,
       path: '/' + baseUrl + '/' + item.path
     })
   })
