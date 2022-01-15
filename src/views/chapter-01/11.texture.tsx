@@ -1,6 +1,6 @@
 import { BoxGeometry, Mesh, MeshBasicMaterial, NearestFilter, TextureLoader } from 'three'
 import { defineComponent, onMounted } from 'vue'
-import { useThreeScene } from '../../hooks/three-scene'
+import { useThreeScene } from '../../core/three-scene'
 
 const Textures = defineComponent({
   name: 'Texture',

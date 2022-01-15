@@ -2,7 +2,7 @@ import { Mesh, MeshMatcapMaterial, TextureLoader, TorusGeometry, Vector3 } from 
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader'
 import { defineComponent, onBeforeMount } from 'vue'
-import { useThreeScene } from '../../hooks/three-scene'
+import { useThreeScene } from '../../core/three-scene'
 
 // Use this to convert a regular font into the TypeFace font.
 // http://gero3.github.io/facetype.js/

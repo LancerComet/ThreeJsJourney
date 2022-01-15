@@ -16,7 +16,7 @@ const IndexPage = defineComponent({
               <ul>{
                 configItem.map(item => (
                   <li><RouterLink to={{
-                    name: `${sectionName}.${item.name}`
+                    name: `${sectionName}.${item.name as string}`
                   }}>{item.name}</RouterLink></li>
                 ))
               }</ul>
