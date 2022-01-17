@@ -1,9 +1,11 @@
+import * as THREE from 'three'
+import { BufferAttribute } from 'three'
 import { defineComponent } from 'vue'
-import { useBoxGeometry, usePlaneGeometry } from '../../core.v2/geometries'
+import { useBufferGeometry, useSphereGeometry } from '../../core.v2/geometries'
 import { useAxesHelper } from '../../core.v2/helpers'
 import { useAmbientLight, usePointLight } from '../../core.v2/lights'
-import { useStandardMaterial } from '../../core.v2/materials'
-import { useMesh } from '../../core.v2/mesh'
+import { usePointsMaterial } from '../../core.v2/materials'
+import { usePoints } from '../../core.v2/points'
 import { useScene } from '../../core.v2/scene'
 
 const TestPage = defineComponent({
@@ -13,36 +15,71 @@ const TestPage = defineComponent({
       useShadow: true,
       useControl: true
     })
-    const { Mesh } = useMesh()
-    const { StandardMaterial } = useStandardMaterial()
-    const { BoxGeometry } = useBoxGeometry()
+    const { SphereGeometry } = useSphereGeometry()
     const { AmbientLight } = useAmbientLight()
     const { PointLight } = usePointLight()
-    const { PlaneGeometry } = usePlaneGeometry()
     const { AxesHelper } = useAxesHelper()
+    const { Points } = usePoints()
+    const { PointsMaterial } = usePointsMaterial()
 
-    const Plane = () => (
-      <Mesh
-        receiveShadow
-        position={{ y: -0.5 }}
-        rotation={{ x: (-90 / 180) * Math.PI }}
-      >
-        <PlaneGeometry width={10} height={10} />
-        <StandardMaterial />
-      </Mesh>
+    const SphereParticle = () => (
+      <Points>
+        <SphereGeometry radius={5} />
+        <PointsMaterial params={{
+          size: 0.1,
+          sizeAttenuation: true,
+          transparent: true,
+          depthWrite: false
+        }} />
+      </Points>
     )
 
-    const Cube = () => (
-      <Mesh castShadow={true} receiveShadow={true}>
-        <BoxGeometry />
-        <StandardMaterial />
-      </Mesh>
-    )
+    const WaveParticles = () => {
+      const { BufferGeometry, geometry } = useBufferGeometry()
+
+      const count = 500000
+      const areaSize = 50
+      const positions = new Float32Array(count * 3)
+      for (let i = 0, length = positions.length; i < length; i++) {
+        positions[i] = Math.random() * areaSize * (Math.random() > 0.5 ? 1 : -1)
+      }
+      geometry.setAttribute('position', new BufferAttribute(positions, 3))
+
+      const clock = new THREE.Clock()
+      const tick = () => {
+        const elapsedTime = clock.getElapsedTime()
+        for (let i = 0; i < count; i++) {
+          const index = i * 3
+          const x = geometry.attributes.position.array[index]
+          const y = Math.sin(elapsedTime + x)
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          geometry.attributes.position.array[index + 1] = y
+        }
+        geometry.attributes.position.needsUpdate = true
+        requestAnimationFrame(tick)
+      }
+      tick()
+
+      return (
+        <Points>
+          <BufferGeometry />
+          <PointsMaterial
+            params={{
+              size: 0.01,
+              sizeAttenuation: true,
+              transparent: true,
+              depthWrite: false
+            }}
+          />
+        </Points>
+      )
+    }
 
     return () => (
       <Scene>
-        <Cube />
-        <Plane />
+        <SphereParticle />
+        <WaveParticles />
         <AmbientLight castShadow/>
         <PointLight castShadow showHelper position={{ x: 4, y: 4, z: 4 }} />
         <AxesHelper />

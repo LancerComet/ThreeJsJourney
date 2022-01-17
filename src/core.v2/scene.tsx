@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
-  AxesHelper,
   Color, OrthographicCamera,
   PerspectiveCamera, Scene, Vector3,
   WebGLRenderer
