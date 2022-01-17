@@ -18,6 +18,10 @@ const router = createRouter({
   routes: [
     ...pages,
     {
+      path: '/test',
+      component: () => import('../views/test/index').then(item => item.TestPage)
+    },
+    {
       path: '/',
       component: () => import('../views/index/index').then(item => item.IndexPage)
     }

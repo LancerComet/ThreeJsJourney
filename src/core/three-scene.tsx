@@ -1,5 +1,5 @@
 import * as dat from 'lil-gui'
-import { AxesHelper, Clock, Color, PerspectiveCamera, Scene, WebGLRenderer } from 'three'
+import { AxesHelper, Clock, Color, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 
@@ -26,6 +26,7 @@ const useThreeScene = (param?: {
 
   const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
   camera.position.set(5, 5, 5)
+  camera.lookAt(new Vector3(0, 0, 0))
   scene.add(camera)
 
   const gui = new dat.GUI()

@@ -1,6 +1,6 @@
 import { BoxGeometry, BufferGeometry, Material, Mesh, MeshStandardMaterial, PlaneGeometry } from 'three'
-import { Object3DPosition } from '../types'
 import { useThreeObject } from './three-object'
+import { Object3DPosition } from './type'
 
 interface IUseGeometry {
   material?: Material

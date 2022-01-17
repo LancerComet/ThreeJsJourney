@@ -1,6 +1,6 @@
 import { Object3D } from 'three'
 import { defineComponent } from 'vue'
-import { Object3DPosition } from '../types'
+import { Object3DPosition } from './type'
 
 const useThreeObject = (param: {
   threeObject: Object3D
