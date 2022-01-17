@@ -1,12 +1,13 @@
-import { MeshStandardMaterial } from 'three'
+import { MeshStandardMaterial, PointsMaterial, PointsMaterialParameters } from 'three'
 import { MeshStandardMaterialParameters } from 'three/src/materials/MeshStandardMaterial'
 import { defineComponent, onBeforeUnmount, PropType, watch } from 'vue'
 import { getSetMaterial } from './mesh'
+import { getSetPointsMaterial } from './points'
 
 const useStandardMaterial = () => {
   const StandardMaterial = defineComponent({
     props: {
-      config: Object as PropType<MeshStandardMaterialParameters>
+      params: Object as PropType<MeshStandardMaterialParameters>
     },
 
     setup (props) {
@@ -15,7 +16,7 @@ const useStandardMaterial = () => {
 
       const createMaterial = () => {
         dispose()
-        material = new MeshStandardMaterial()
+        material = new MeshStandardMaterial(props.params)
         setMaterial(material)
       }
 
@@ -41,6 +42,43 @@ const useStandardMaterial = () => {
   }
 }
 
+const usePointsMaterial = () => {
+  return {
+    PointsMaterial: defineComponent({
+      props: {
+        params: Object as PropType<PointsMaterialParameters>
+      },
+
+      setup (props) {
+        let material: PointsMaterial
+        const setMaterial = getSetPointsMaterial()
+
+        const createMaterial = () => {
+          dispose()
+          material = new PointsMaterial(props.params)
+          setMaterial(material)
+        }
+
+        const dispose = () => {
+          material?.dispose()
+        }
+
+        onBeforeUnmount(dispose)
+
+        watch(props, createMaterial, {
+          deep: true,
+          immediate: true
+        })
+
+        return () => (
+          <div class='points-material' data-uuid={material?.uuid} />
+        )
+      }
+    })
+  }
+}
+
 export {
-  useStandardMaterial
+  useStandardMaterial,
+  usePointsMaterial
 }
