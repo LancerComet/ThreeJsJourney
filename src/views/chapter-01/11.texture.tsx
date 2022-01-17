@@ -10,7 +10,7 @@ const Textures = defineComponent({
     onMounted(async () => {
       const textureLoader = new TextureLoader()
 
-      const colorTexture = await textureLoader.loadAsync('/texture/door/color.jpg')
+      const colorTexture = await textureLoader.loadAsync('/textures/door/color.jpg')
       colorTexture.needsUpdate = true
       colorTexture.minFilter = NearestFilter
 
