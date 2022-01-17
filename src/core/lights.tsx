@@ -1,6 +1,6 @@
-import { AmbientLight, CameraHelper, DirectionalLight, PointLight } from 'three'
-import { Object3DPosition } from '../types'
+import { AmbientLight, DirectionalLight, PointLight } from 'three'
 import { useThreeObject } from './three-object'
+import { Object3DPosition } from './type'
 
 interface ILightBaseConfig {
   color: number
