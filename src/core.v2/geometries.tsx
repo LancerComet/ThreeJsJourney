@@ -1,4 +1,12 @@
-import { BoxGeometry, BufferAttribute, BufferGeometry, PlaneGeometry, SphereGeometry } from 'three'
+import {
+  BoxGeometry,
+  BufferAttribute,
+  BufferGeometry,
+  BuiltinShaderAttributeName,
+  PlaneGeometry,
+  SphereGeometry
+} from 'three'
+import { InterleavedBufferAttribute } from 'three/src/core/InterleavedBufferAttribute'
 import { defineComponent, onBeforeUnmount, popScopeId, PropType, watch } from 'vue'
 import { getSetGeometry } from './mesh'
 
@@ -123,8 +131,13 @@ const useSphereGeometry = () => {
 const useBufferGeometry = () => {
   const geometry = new BufferGeometry()
 
+  const setAttribute = (name: BuiltinShaderAttributeName | string, attribute: BufferAttribute | InterleavedBufferAttribute) => {
+    geometry.setAttribute(name, attribute)
+  }
+
   return {
     geometry,
+    setAttribute,
     BufferGeometry: defineComponent({
       setup () {
         const setGeometry = getSetGeometry()
