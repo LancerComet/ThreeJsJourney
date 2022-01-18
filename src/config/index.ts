@@ -32,7 +32,12 @@ const pageConfig: { [sectionName: string]: RouteRecordRaw[] } = {
     {
       name: 'Particles',
       path: 'particles',
-      component: () => import('../views/chapter-02/17.particles').then(item => item.Particles)
+      component: () => import('../views/chapter-02/18.particles').then(item => item.Particles)
+    },
+    {
+      name: 'Galaxy',
+      path: 'galaxy',
+      component: () => import('../views/chapter-02/19.galaxy').then(item => item.Galaxy)
     }
   ]
 }
