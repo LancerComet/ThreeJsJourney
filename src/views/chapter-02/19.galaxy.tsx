@@ -1,4 +1,4 @@
-import { AdditiveBlending, BufferAttribute, Color } from 'three'
+import { AdditiveBlending, BufferAttribute, Color, PerspectiveCamera, Vector3 } from 'three'
 import { computed, defineComponent, ref, watch } from 'vue'
 import { useBufferGeometry } from '../../core.v2/geometries'
 import { usePointsMaterial } from '../../core.v2/materials'
@@ -8,7 +8,9 @@ import { useScene } from '../../core.v2/scene'
 const Galaxy = defineComponent({
   name: 'Galaxy',
   setup () {
-    const { Scene, gui } = useScene()
+    const { Scene, gui, camera, onTick } = useScene({
+      useControl: false
+    })
     const { PointsMaterial } = usePointsMaterial()
     const { Points } = usePoints()
     const { BufferGeometry, setAttribute } = useBufferGeometry()
@@ -76,6 +78,16 @@ const Galaxy = defineComponent({
       } else {
         gui.add(configRef.value, key)
       }
+    })
+
+    let angle = 0
+    const radius = 8
+    onTick(() => {
+      // Use Math.cos and Math.sin to set camera X and Z values based on angle.
+      camera.position.x = radius * Math.cos(angle)
+      camera.position.z = radius * Math.sin(angle)
+      camera.lookAt(new Vector3(0, 0, 0))
+      angle += 0.001
     })
 
     const Galaxy = () => (

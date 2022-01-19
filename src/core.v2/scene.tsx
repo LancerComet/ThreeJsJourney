@@ -25,6 +25,13 @@ const useScene = (param?: {
     }
   }
 
+  let camera = param?.camera
+  if (!camera) {
+    camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+    camera.position.set(5, 5, 5)
+    camera.lookAt(new Vector3(0, 0, 0))
+  }
+
   const gui = new dat.GUI()
 
   const SceneComponent = defineComponent({
@@ -37,13 +44,7 @@ const useScene = (param?: {
       scene.background = new Color(param?.backgroundColor ?? 0)
       provide(injectKey, scene)
 
-      let camera = param?.camera
-      if (!camera) {
-        camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-        camera.position.set(5, 5, 5)
-        camera.lookAt(new Vector3(0, 0, 0))
-      }
-      scene.add(camera)
+      scene.add(camera!)
 
       const renderer = new WebGLRenderer({
         antialias: param?.antialias === true
@@ -52,7 +53,7 @@ const useScene = (param?: {
 
       let controls: OrbitControls
       if (param?.useControl ?? true) {
-        controls = new OrbitControls(camera, renderer.domElement)
+        controls = new OrbitControls(camera!, renderer.domElement)
         controls.enableDamping = true
         controls.dampingFactor = 0.1
       }
@@ -97,7 +98,8 @@ const useScene = (param?: {
   return {
     Scene: SceneComponent,
     onTick,
-    gui
+    gui,
+    camera
   }
 }
 
