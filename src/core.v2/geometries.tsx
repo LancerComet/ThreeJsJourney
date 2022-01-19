@@ -7,7 +7,7 @@ import {
   SphereGeometry
 } from 'three'
 import { InterleavedBufferAttribute } from 'three/src/core/InterleavedBufferAttribute'
-import { defineComponent, onBeforeUnmount, popScopeId, PropType, watch } from 'vue'
+import { defineComponent, onBeforeUnmount, PropType, watch } from 'vue'
 import { getSetGeometry } from './mesh'
 
 const usePlaneGeometry = () => {
