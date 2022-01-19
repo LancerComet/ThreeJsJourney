@@ -1,5 +1,5 @@
-import { AdditiveBlending, BufferAttribute } from 'three'
-import { computed, defineComponent, ref } from 'vue'
+import { AdditiveBlending, BufferAttribute, Color } from 'three'
+import { computed, defineComponent, ref, watch } from 'vue'
 import { useBufferGeometry } from '../../core.v2/geometries'
 import { usePointsMaterial } from '../../core.v2/materials'
 import { usePoints } from '../../core.v2/points'
@@ -9,43 +9,81 @@ const Galaxy = defineComponent({
   name: 'Galaxy',
   setup () {
     const { Scene, gui } = useScene()
+    const { PointsMaterial } = usePointsMaterial()
+    const { Points } = usePoints()
+    const { BufferGeometry, setAttribute } = useBufferGeometry()
+
     const configRef = ref({
       size: 0.02,
-      radius: 5
+      count: 10000,
+      radius: 5,
+      branches: 3,
+      spin: 1,
+      randomness: 0.2,
+      randomnessPower: 3,
+      insideColor: '#ff6030',
+      outsideColor: '#1b3984'
     })
 
-    gui.add(configRef.value, 'size')
-
-    const Galaxy = (() => {
-      const { BufferGeometry, setAttribute } = useBufferGeometry()
-      const count = 1000
+    const updateGalaxy = () => {
+      const count = configRef.value.count
       const positions = new Float32Array(count * 3)
+      const colors = new Float32Array(count * 3)
+      const insideColor = new Color(configRef.value.insideColor)
+      const outsideColor = new Color(configRef.value.outsideColor)
       for (let i = 0; i < count; i++) {
         const index = i * 3
         const radius = Math.random() * configRef.value.radius
-        positions[index] = radius
-        positions[index + 1] = (Math.random() - 0.5) * 3 // -1.5 - 1.5
-        positions[index + 2] = (Math.random() - 0.5) * 3 // -1.5 - 1.5
+        const branchAngle = (i % configRef.value.branches) / configRef.value.branches * Math.PI * 2
+        const spinAngle = radius * configRef.value.spin
+
+        const randomnessPower = configRef.value.randomnessPower
+        const randomness = configRef.value.randomness
+        const randomX = Math.pow(Math.random(), randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * randomness * radius
+        const randomY = Math.pow(Math.random(), randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * randomness * radius
+        const randomZ = Math.pow(Math.random(), randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * randomness * radius
+
+        positions[index] = Math.cos(branchAngle + spinAngle) * radius + randomX
+        positions[index + 1] = randomY
+        positions[index + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ
+
+        const mixedColor = insideColor.clone()
+        mixedColor.lerp(outsideColor, radius / configRef.value.radius)
+
+        colors[index] = mixedColor.r
+        colors[index + 1] = mixedColor.g
+        colors[index + 2] = mixedColor.b
       }
       setAttribute('position', new BufferAttribute(positions, 3))
+      setAttribute('color', new BufferAttribute(colors, 3))
+    }
 
-      const { PointsMaterial } = usePointsMaterial()
-      const { Points } = usePoints()
+    watch(configRef.value, updateGalaxy, {
+      immediate: true
+    })
 
-      const materialParam = computed(() => ({
-        size: configRef.value.size,
-        sizeAttenuation: true,
-        depthWrite: false,
-        blending: AdditiveBlending
-      }))
+    const materialParam = computed(() => ({
+      size: configRef.value.size,
+      sizeAttenuation: true,
+      depthWrite: false,
+      blending: AdditiveBlending,
+      vertexColors: true
+    }))
 
-      return () => (
-        <Points>
-          <BufferGeometry/>
-          <PointsMaterial params={materialParam.value}/>
-        </Points>
-      )
-    })()
+    Object.keys(configRef.value).forEach(key => {
+      if (/color/i.test(key)) {
+        gui.addColor(configRef.value, key)
+      } else {
+        gui.add(configRef.value, key)
+      }
+    })
+
+    const Galaxy = () => (
+      <Points>
+        <BufferGeometry/>
+        <PointsMaterial params={materialParam.value}/>
+      </Points>
+    )
 
     return () => (
       <Scene>
