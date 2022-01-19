@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import * as dat from 'lil-gui'
 import {
   Color, OrthographicCamera,
   PerspectiveCamera, Scene, Vector3,
@@ -24,73 +25,79 @@ const useScene = (param?: {
     }
   }
 
-  return {
-    Scene: defineComponent({
-      name: 'Scene',
-      setup (props, { slots }) {
-        let isTickStart = true
-        const element = ref<HTMLElement>()
+  const gui = new dat.GUI()
 
-        const scene = new Scene()
-        scene.background = new Color(param?.backgroundColor ?? 0)
-        provide(injectKey, scene)
+  const SceneComponent = defineComponent({
+    name: 'Scene',
+    setup (props, { slots }) {
+      let isTickStart = true
+      const element = ref<HTMLElement>()
 
-        let camera = param?.camera
-        if (!camera) {
-          camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-          camera.position.set(5, 5, 5)
-          camera.lookAt(new Vector3(0, 0, 0))
-        }
-        scene.add(camera)
+      const scene = new Scene()
+      scene.background = new Color(param?.backgroundColor ?? 0)
+      provide(injectKey, scene)
 
-        const renderer = new WebGLRenderer({
-          antialias: param?.antialias === true
-        })
-        renderer.setSize(window.innerWidth, window.innerHeight)
-
-        let controls: OrbitControls
-        if (param?.useControl ?? true) {
-          controls = new OrbitControls(camera, renderer.domElement)
-          controls.enableDamping = true
-          controls.dampingFactor = 0.1
-        }
-
-        const tick = () => {
-          controls?.update()
-          renderer.render(scene, camera!)
-          onTickCallbacks.forEach(item => item())
-          if (isTickStart) {
-            requestAnimationFrame(tick)
-          }
-        }
-
-        const onResize = () => {
-          if (camera instanceof PerspectiveCamera) {
-            camera.aspect = window.innerWidth / window.innerHeight
-          }
-          camera?.updateProjectionMatrix()
-          renderer.setSize(window.innerWidth, window.innerHeight)
-        }
-
-        window.addEventListener('resize', onResize)
-
-        onMounted(() => {
-          element.value?.appendChild(renderer.domElement)
-        })
-
-        onBeforeUnmount(() => {
-          isTickStart = false
-          window.removeEventListener('resize', onResize)
-        })
-
-        tick()
-
-        return () => (
-          <div class='scene' data-uuid={scene.uuid} ref={element}>{slots.default?.()}</div>
-        )
+      let camera = param?.camera
+      if (!camera) {
+        camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+        camera.position.set(5, 5, 5)
+        camera.lookAt(new Vector3(0, 0, 0))
       }
-    }),
-    onTick
+      scene.add(camera)
+
+      const renderer = new WebGLRenderer({
+        antialias: param?.antialias === true
+      })
+      renderer.setSize(window.innerWidth, window.innerHeight)
+
+      let controls: OrbitControls
+      if (param?.useControl ?? true) {
+        controls = new OrbitControls(camera, renderer.domElement)
+        controls.enableDamping = true
+        controls.dampingFactor = 0.1
+      }
+
+      const tick = () => {
+        controls?.update()
+        renderer.render(scene, camera!)
+        onTickCallbacks.forEach(item => item())
+        if (isTickStart) {
+          requestAnimationFrame(tick)
+        }
+      }
+
+      const onResize = () => {
+        if (camera instanceof PerspectiveCamera) {
+          camera.aspect = window.innerWidth / window.innerHeight
+        }
+        camera?.updateProjectionMatrix()
+        renderer.setSize(window.innerWidth, window.innerHeight)
+      }
+
+      window.addEventListener('resize', onResize)
+
+      onMounted(() => {
+        element.value?.appendChild(renderer.domElement)
+      })
+
+      onBeforeUnmount(() => {
+        isTickStart = false
+        window.removeEventListener('resize', onResize)
+        gui.destroy()
+      })
+
+      tick()
+
+      return () => (
+        <div class='scene' data-uuid={scene.uuid} ref={element}>{slots.default?.()}</div>
+      )
+    }
+  })
+
+  return {
+    Scene: SceneComponent,
+    onTick,
+    gui
   }
 }
 
