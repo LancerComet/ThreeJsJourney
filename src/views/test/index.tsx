@@ -12,7 +12,6 @@ const TestPage = defineComponent({
   name: 'TestPage',
   setup () {
     const { Scene } = useScene({
-      useShadow: true,
       useControl: true
     })
     const { SphereGeometry } = useSphereGeometry()
