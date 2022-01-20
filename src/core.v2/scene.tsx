@@ -17,6 +17,7 @@ const useScene = (param?: {
   antialias?: boolean
   useShadow?: boolean
 }) => {
+  let isTickStart = true
   const onTickCallbacks: (() => void)[] = []
 
   const onTick = (callback: () => void) => {
@@ -25,26 +26,24 @@ const useScene = (param?: {
     }
   }
 
+  const scene = new Scene()
+  scene.background = new Color(param?.backgroundColor ?? 0)
+  provide(injectKey, scene)
+
   let camera = param?.camera
   if (!camera) {
     camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
     camera.position.set(5, 5, 5)
     camera.lookAt(new Vector3(0, 0, 0))
   }
+  scene.add(camera!)
 
   const gui = new dat.GUI()
 
   const SceneComponent = defineComponent({
     name: 'Scene',
     setup (props, { slots }) {
-      let isTickStart = true
       const element = ref<HTMLElement>()
-
-      const scene = new Scene()
-      scene.background = new Color(param?.backgroundColor ?? 0)
-      provide(injectKey, scene)
-
-      scene.add(camera!)
 
       const renderer = new WebGLRenderer({
         antialias: param?.antialias === true
@@ -99,7 +98,8 @@ const useScene = (param?: {
     Scene: SceneComponent,
     onTick,
     gui,
-    camera
+    camera,
+    scene
   }
 }
 
