@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { defineComponent, inject, PropType, provide, ref, watch } from 'vue'
+import { computed, defineComponent, inject, PropType, provide, ref, watch } from 'vue'
 import { getScene } from './scene'
 import { isNumber } from './utils'
 
@@ -21,7 +21,7 @@ const useMesh = () => {
       }
     },
 
-    setup (props, { slots }) {
+    setup (props, { slots, expose }) {
       let mesh: THREE.Mesh
       let _material: THREE.Material
       let _geometry: THREE.BufferGeometry
@@ -75,6 +75,10 @@ const useMesh = () => {
       watch(props, setProps, {
         deep: true,
         immediate: true
+      })
+
+      expose({
+        meshRef: computed(() => mesh)
       })
 
       return () => (
