@@ -38,6 +38,11 @@ const pageConfig: { [sectionName: string]: RouteRecordRaw[] } = {
       name: 'Galaxy',
       path: 'galaxy',
       component: () => import('../views/chapter-02/19.galaxy').then(item => item.Galaxy)
+    },
+    {
+      name: 'RayCaster',
+      path: 'ray-caster',
+      component: () => import('../views/chapter-02/20.raycaster').then(item => item.RayCasterPage)
     }
   ]
 }
