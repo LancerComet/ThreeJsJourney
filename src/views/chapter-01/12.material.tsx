@@ -11,7 +11,7 @@ import { useThreeScene } from '../../core/three-scene'
 const Material = defineComponent({
   name: 'Material',
   setup () {
-    const { ThreeScene, scene, onTick, clock, gui } = useThreeScene({
+    const { ThreeScene, scene, onTick, clock } = useThreeScene({
       backgroundColor: 0xaaaaaa
     })
 
