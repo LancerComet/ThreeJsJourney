@@ -43,6 +43,16 @@ const pageConfig: { [sectionName: string]: RouteRecordRaw[] } = {
       name: 'RayCaster',
       path: 'ray-caster',
       component: () => import('../views/chapter-02/20.raycaster').then(item => item.RayCasterPage)
+    },
+    {
+      name: 'Physics',
+      path: 'physics',
+      component: () => import('../views/chapter-03/22.physics').then(item => item.Physics)
+    },
+    {
+      name: 'Realistic Render',
+      path: 'realistic-render',
+      component: () => import('../views/chapter-03/25.realistic-render').then(item => item.RealisticRender)
     }
   ]
 }
