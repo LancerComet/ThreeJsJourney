@@ -3,12 +3,13 @@ import * as dat from 'lil-gui'
 import {
   Color, OrthographicCamera,
   PerspectiveCamera, Scene, Vector3,
-  WebGLRenderer
+  WebGLRenderer,
+  ShadowMapType, PCFSoftShadowMap
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { defineComponent, inject, onBeforeUnmount, onMounted, provide, ref } from 'vue'
 
-const injectKey = 'scene'
+const injectKey = 'three:scene'
 
 const useScene = (param?: {
   camera?: PerspectiveCamera | OrthographicCamera
@@ -16,15 +17,11 @@ const useScene = (param?: {
   useControl?: boolean
   antialias?: boolean
   useShadow?: boolean
+  shadowType?: ShadowMapType
 }) => {
   let isTickStart = true
-  const onTickCallbacks: (() => void)[] = []
 
-  const onTick = (callback: () => void) => {
-    if (!onTickCallbacks.includes(callback)) {
-      onTickCallbacks.push(callback)
-    }
-  }
+  const gui = new dat.GUI()
 
   const scene = new Scene()
   scene.background = new Color(param?.backgroundColor ?? 0)
@@ -38,11 +35,15 @@ const useScene = (param?: {
   }
   scene.add(camera!)
 
-  const gui = new dat.GUI()
-
   const renderer = new WebGLRenderer({
     antialias: param?.antialias === true
   })
+
+  const useShadow = param?.useShadow === true
+  if (useShadow) {
+    renderer.shadowMap.enabled = true
+    renderer.shadowMap.type = param?.shadowType ?? PCFSoftShadowMap
+  }
   renderer.setSize(window.innerWidth, window.innerHeight)
 
   const SceneComponent = defineComponent({
@@ -93,6 +94,13 @@ const useScene = (param?: {
       )
     }
   })
+
+  const onTickCallbacks: (() => void)[] = []
+  const onTick = (callback: () => void) => {
+    if (!onTickCallbacks.includes(callback)) {
+      onTickCallbacks.push(callback)
+    }
+  }
 
   return {
     Scene: SceneComponent,
