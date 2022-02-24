@@ -1,91 +1,82 @@
 import { AmbientLight, CameraHelper, DirectionalLight, PlaneGeometry, PointLight } from 'three'
 import { defineComponent } from 'vue'
-import { useBoxGeometry, usePlaneGeometry } from '../../core/geometries'
-import { useAmbientLight, useDirectionalLight, usePointLight } from '../../core/lights'
-import { useThreeScene } from '../../core/three-scene'
+import { useBoxGeometry, usePlaneGeometry } from '../../core.v2/geometries'
+import { useAmbientLight, useDirectionalLight, usePointLight } from '../../core.v2/lights'
+import { useStandardMaterial } from '../../core.v2/materials'
+import { useMesh } from '../../core.v2/mesh'
+import { useScene } from '../../core.v2/scene'
 
 const Shadow = defineComponent({
   name: 'Shadow',
 
   setup () {
-    const { ThreeScene, scene } = useThreeScene({
+    const { Scene, scene } = useScene({
       backgroundColor: 0,
       useShadow: true,
       antialias: true
     })
+    const { Mesh } = useMesh()
+    const { BoxGeometry } = useBoxGeometry()
+    const { StandardMaterial } = useStandardMaterial()
+    const { PlaneGeometry } = usePlaneGeometry()
 
-    const { Geometry: Cube1 } = useBoxGeometry({
-      position: [2, 0, 0],
-      castShadow: true
-    })
+    const Cube1 = () => {
+      return (
+        <Mesh position={{ x: 2, y: 0, z: 0 }} castShadow>
+          <StandardMaterial />
+          <BoxGeometry />
+        </Mesh>
+      )
+    }
 
-    const { Geometry: Cube2 } = useBoxGeometry({
-      castShadow: true
-    })
+    const Cube2 = () => {
+      return (
+        <Mesh castShadow>
+          <StandardMaterial />
+          <BoxGeometry />
+        </Mesh>
+      )
+    }
 
-    const { Geometry: Cube3 } = useBoxGeometry({
-      position: [-2, 0, 0],
-      castShadow: true
-    })
+    const Cube3 = () => {
+      return (
+        <Mesh position={{ x: -2, y: 0, z: 0 }} castShadow>
+          <StandardMaterial />
+          <BoxGeometry />
+        </Mesh>
+      )
+    }
 
-    const { Geometry: PlaneGeometry, mesh: plane } = usePlaneGeometry({
-      width: 20,
-      height: 20,
-      position: [0, -0.5, 0],
-      receiveShadow: true
-    })
-    plane.rotation.x = (-90 / 180) * Math.PI
+    const Ground = () => {
+      return (
+        <Mesh receiveShadow position={{ x: 0, y: -0.5, z: 0 }} rotation={{ x: (-90 / 180) * Math.PI }}>
+          <PlaneGeometry width={20} height={20} />
+          <StandardMaterial />
+        </Mesh>
+      )
+    }
 
-    const { AmbientLight } = useAmbientLight({
-      color: 0xffffff,
-      intensity: 0.5
-    })
-
-    const { PointLight } = usePointLight({
-      color: 0xffd9a0,
-      intensity: 0.5,
-      distance: 10,
-      decay: 1,
-      castShadow: true,
-      position: [-4, 2, 4]
-    })
-
-    const {
-      DirectionalLight,
-      light: directionalLight
-    } = useDirectionalLight({
-      color: 0xb6e5fb,
-      intensity: 0.3,
-      castShadow: true,
-      position: [4, 4, 4],
-      shadowConfig: {
-        // Higher number gives the smoother shadow.
-        mapSize: [2048, 2048],
-        camera: {
-          near: 1,
-          far: 10
-        }
-      }
-    })
-
-    // directionalLight.shadow.camera.top = 1
-    // directionalLight.shadow.camera.right = 1
-    // directionalLight.shadow.camera.bottom = -1
-    // directionalLight.shadow.camera.left = -1
-
-    const shadowCameraHelper = new CameraHelper(directionalLight.shadow.camera)
-    scene.add(shadowCameraHelper)
+    const { AmbientLight } = useAmbientLight()
+    const { PointLight } = usePointLight()
+    const { DirectionalLight } = useDirectionalLight()
 
     return () => (
-      <ThreeScene>
+      <Scene>
         <Cube1 />
         <Cube2 />
         <Cube3 />
-        <AmbientLight />
-        <PointLight />
-        <DirectionalLight />
-        <PlaneGeometry />
-      </ThreeScene>
+        <AmbientLight color={0xffffff} intensity={0.5} />
+        <PointLight
+          color={0xffd9a0} intensity={0.5} distance={10} decay={1}
+          castShadow position={{ x: -4, y: 2, z: 4 }} showHelper
+        />
+        <DirectionalLight
+          color={0xb6e5fb} intensity={0.3}
+          castShadow position={{ x: 4, y: 4, z: 4 }}
+          shadowSize={2048} showHelper shadowCamera={{ near: 1, far: 10 }}
+        />
+        <Ground />
+      </Scene>
     )
   }
 })

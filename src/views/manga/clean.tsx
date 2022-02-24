@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-named-as-default
 import gsap from 'gsap'
 import {
-  DoubleSide, FrontSide, Group,
+  DoubleSide, Group,
   Mesh, MeshPhongMaterial,
   MeshStandardMaterial,
   PerspectiveCamera,
@@ -203,7 +203,7 @@ const CleanScene = defineComponent({
     return () => (
       <div>
         <Scene>
-          <AmbientLight castShadow intensity={1}/>
+          <AmbientLight intensity={1}/>
           <PointLight showHelper position={{ x: 4, y: 3, z: 4 }} intensity={0} castShadow/>
         </Scene>
 

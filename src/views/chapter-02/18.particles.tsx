@@ -9,15 +9,14 @@ import {
   TextureLoader
 } from 'three'
 import { defineComponent } from 'vue'
-import { useThreeScene } from '../../core/three-scene'
+import { useScene } from '../../core.v2/scene'
 
 const Particles = defineComponent({
   name: 'Particles',
   setup () {
-    const { ThreeScene, scene, onTick } = useThreeScene({
+    const { Scene, scene, onTick } = useScene({
       backgroundColor: 0,
-      antialias: true,
-      useAxesHelper: false
+      antialias: true
     })
 
     const textureLoader = new TextureLoader()
@@ -73,7 +72,7 @@ const Particles = defineComponent({
     })
 
     return () => (
-      <ThreeScene />
+      <Scene />
     )
   }
 })

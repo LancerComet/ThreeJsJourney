@@ -2,20 +2,21 @@ import { Mesh, MeshMatcapMaterial, TextureLoader, TorusGeometry, Vector3 } from 
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader'
 import { defineComponent, onBeforeMount } from 'vue'
-import { useThreeScene } from '../../core/three-scene'
+import { useAxesHelper } from '../../core.v2/helpers'
+import { useScene } from '../../core.v2/scene'
 
 // Use this to convert a regular font into the TypeFace font.
 // http://gero3.github.io/facetype.js/
 const Fonts = defineComponent({
   name: 'Fonts',
   setup () {
-    const { ThreeScene, scene, gui, onTick, camera } = useThreeScene({
+    const { Scene, scene, onTick, camera } = useScene({
       backgroundColor: 0,
-      useAxesHelper: false,
       useControl: false
     })
     const fontLoader = new FontLoader()
     const textureLoader = new TextureLoader()
+    const { AxesHelper } = useAxesHelper()
 
     onBeforeMount(async () => {
       const font = await fontLoader.loadAsync('/fonts/kenpixel.json')
@@ -87,7 +88,9 @@ const Fonts = defineComponent({
     })
 
     return () => (
-      <ThreeScene />
+      <Scene>
+        <AxesHelper />
+      </Scene>
     )
   }
 })

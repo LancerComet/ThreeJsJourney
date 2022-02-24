@@ -1,54 +1,26 @@
-import {
-  AmbientLight,
-  BoxGeometry,
-  DirectionalLight,
-  DirectionalLightHelper, HemisphereLight, HemisphereLightHelper,
-  Mesh,
-  MeshStandardMaterial,
-  PlaneGeometry, PointLight, PointLightHelper, RectAreaLight,
-  Vector3
-} from 'three'
+import { HemisphereLight, HemisphereLightHelper, RectAreaLight } from 'three'
 import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper'
-import { defineComponent, ssrContextKey } from 'vue'
-import { useThreeScene } from '../../core/three-scene'
+import { defineComponent } from 'vue'
+
+import { useBoxGeometry, usePlaneGeometry } from '../../core.v2/geometries'
+import { useAmbientLight, useDirectionalLight, usePointLight } from '../../core.v2/lights'
+import { useStandardMaterial } from '../../core.v2/materials'
+import { useMesh } from '../../core.v2/mesh'
+import { useScene } from '../../core.v2/scene'
 
 const Lights = defineComponent({
   name: 'Lights',
   setup () {
-    const { ThreeScene, scene } = useThreeScene({
+    const { Scene, scene } = useScene({
       backgroundColor: 0
     })
-
-    const plane = new Mesh(
-      new PlaneGeometry(10, 10),
-      new MeshStandardMaterial()
-    )
-    plane.position.set(0, -0.5, 0)
-    plane.rotation.x = (-90 / 180) * Math.PI
-    scene.add(plane)
-
-    const cube = new Mesh(
-      new BoxGeometry(),
-      new MeshStandardMaterial()
-    )
-    scene.add(cube)
-
-    const ambientLight = new AmbientLight(0xffffff, 0.5)
-    scene.add(ambientLight)
-
-    const directionalLight = new DirectionalLight(0xb6e5fb, 0.3)
-    directionalLight.position.set(4, 4, 4)
-    scene.add(directionalLight)
-
-    const directionalLightHelper = new DirectionalLightHelper(directionalLight)
-    scene.add(directionalLightHelper)
-
-    const pointLight = new PointLight(0xffff00, 0.5, 10, 1)
-    scene.add(pointLight)
-    pointLight.position.set(-4, 2, 4)
-
-    const pointLightHelper = new PointLightHelper(pointLight)
-    scene.add(pointLightHelper)
+    const { AmbientLight } = useAmbientLight()
+    const { DirectionalLight } = useDirectionalLight()
+    const { PointLight } = usePointLight()
+    const { Mesh } = useMesh()
+    const { BoxGeometry } = useBoxGeometry()
+    const { StandardMaterial } = useStandardMaterial()
+    const { PlaneGeometry } = usePlaneGeometry()
 
     const hemisphereLight = new HemisphereLight(0xff0000, 0x0000ff, 0.3)
     hemisphereLight.position.set(3, 1, 1)
@@ -65,7 +37,19 @@ const Lights = defineComponent({
     scene.add(rectAreaLightHelper)
 
     return () => (
-      <ThreeScene />
+      <Scene>
+        <AmbientLight color={0xffffff} intensity={0.5}/>
+        <DirectionalLight showHelper color={0xb6e5fb} intensity={0.3} position={{ x: 4, y: 4, z: 4 }} />
+        <PointLight color={0xffff00} intensity={0.5} distance={10} decay={1} position={{ x: -4, y: 2, z: 4 }} />
+        <Mesh>
+          <BoxGeometry />
+          <StandardMaterial />
+        </Mesh>
+        <Mesh position={{ x: 0, y: -0.5, z: 0 }} rotation={{ x: (-90 / 180) * Math.PI }}>
+          <PlaneGeometry width={10} height={10} />
+          <StandardMaterial />
+        </Mesh>
+      </Scene>
     )
   }
 })
