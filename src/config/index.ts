@@ -54,6 +54,18 @@ const pageConfig: { [sectionName: string]: RouteRecordRaw[] } = {
       path: 'realistic-render',
       component: () => import('../views/chapter-03/25.realistic-render').then(item => item.RealisticRender)
     }
+  ],
+  Manga: [
+    {
+      name: 'Clean',
+      path: 'clean',
+      component: () => import('../views/manga/clean').then(item => item.CleanScene)
+    },
+    {
+      name: 'Tiger',
+      path: 'tiger',
+      component: () => import('../views/manga/tiger').then(item => item.TigerScene)
+    }
   ]
 }
 
