@@ -6,12 +6,12 @@ import {
   TorusGeometry
 } from 'three'
 import { defineComponent } from 'vue'
-import { useThreeScene } from '../../core/three-scene'
+import { useScene } from '../../core.v2/scene'
 
 const Material = defineComponent({
   name: 'Material',
   setup () {
-    const { ThreeScene, scene, onTick, clock } = useThreeScene({
+    const { Scene, scene, onTick, clock } = useScene({
       backgroundColor: 0xaaaaaa
     })
 
@@ -82,7 +82,7 @@ const Material = defineComponent({
     scene.add(sphere, plane, torus)
 
     return () => (
-      <ThreeScene />
+      <Scene />
     )
   }
 })

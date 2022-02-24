@@ -4,7 +4,7 @@ import {
   Color, OrthographicCamera,
   PerspectiveCamera, Scene, Vector3,
   WebGLRenderer,
-  ShadowMapType, PCFSoftShadowMap
+  ShadowMapType, PCFSoftShadowMap, Clock
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { defineComponent, inject, onBeforeUnmount, onMounted, provide, ref } from 'vue'
@@ -22,6 +22,7 @@ const useScene = (param?: {
   let isTickStart = true
 
   const gui = new dat.GUI()
+  const clock = new Clock()
 
   const scene = new Scene()
   scene.background = new Color(param?.backgroundColor ?? 0)
@@ -84,6 +85,7 @@ const useScene = (param?: {
       onBeforeUnmount(() => {
         isTickStart = false
         window.removeEventListener('resize', onResize)
+        clock.stop()
         gui.destroy()
       })
 
@@ -108,7 +110,8 @@ const useScene = (param?: {
     gui,
     camera,
     scene,
-    renderer
+    renderer,
+    clock
   }
 }
 
