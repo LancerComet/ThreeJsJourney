@@ -40,15 +40,15 @@ const useScene = (param?: {
 
   const gui = new dat.GUI()
 
+  const renderer = new WebGLRenderer({
+    antialias: param?.antialias === true
+  })
+  renderer.setSize(window.innerWidth, window.innerHeight)
+
   const SceneComponent = defineComponent({
     name: 'Scene',
     setup (props, { slots }) {
       const element = ref<HTMLElement>()
-
-      const renderer = new WebGLRenderer({
-        antialias: param?.antialias === true
-      })
-      renderer.setSize(window.innerWidth, window.innerHeight)
 
       let controls: OrbitControls
       if (param?.useControl ?? true) {
@@ -99,7 +99,8 @@ const useScene = (param?: {
     onTick,
     gui,
     camera,
-    scene
+    scene,
+    renderer
   }
 }
 
