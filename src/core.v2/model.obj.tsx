@@ -1,7 +1,7 @@
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import { defineComponent, PropType, ref, watch } from 'vue'
-import { getScene } from './scene'
+import { injectContainer } from './providers/container'
 import { setObjectShadow } from './utils'
 
 const ObjModel = defineComponent({
@@ -34,7 +34,7 @@ const ObjModel = defineComponent({
 
   setup (props) {
     const uuid = ref('')
-    const scene = getScene()
+    const container = injectContainer()
 
     const init = async () => {
       const { objUrl, mtlUrl } = props
@@ -54,7 +54,7 @@ const ObjModel = defineComponent({
       model.scale.set(props.scale.x ?? 1, props.scale?.y ?? 1, props.scale.z ?? 1)
       setObjectShadow(model, props.castShadow === true, props.receiveShadow === true)
 
-      scene?.add(model)
+      container?.add(model)
     }
 
     watch(props, init, {

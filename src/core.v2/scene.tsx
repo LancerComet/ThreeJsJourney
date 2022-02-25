@@ -7,10 +7,9 @@ import {
   ShadowMapType, PCFSoftShadowMap, Clock, Texture
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { defineComponent, inject, onBeforeUnmount, onMounted, PropType, provide, ref, watch } from 'vue'
+import { defineComponent, onBeforeUnmount, onMounted, PropType, provide, ref, watch } from 'vue'
+import { provideContainer } from './providers/container'
 import { isNumber } from './utils/type'
-
-const injectKey = 'three:scene'
 
 const useScene = (param?: {
   camera?: PerspectiveCamera | OrthographicCamera
@@ -25,7 +24,7 @@ const useScene = (param?: {
   const clock = new Clock()
 
   const scene = new Scene()
-  provide(injectKey, scene)
+  provideContainer(scene)
 
   let camera = param?.camera
   if (!camera) {
@@ -46,25 +45,26 @@ const useScene = (param?: {
   }
   renderer.setSize(window.innerWidth, window.innerHeight)
 
+  const controls = new OrbitControls(camera!, renderer.domElement)
+  controls.enableDamping = true
+  controls.dampingFactor = 0.1
+
+  if (!param?.useControl) {
+    controls.enabled = false
+  }
+
   const SceneComponent = defineComponent({
     name: 'Scene',
 
     props: {
       background: {
-        type: Object as PropType<Color | Texture | number>,
+        type: [Object, Number] as PropType<Color | Texture | number>,
         default: () => new Color(0)
       }
     },
 
     setup (props, { slots }) {
       const element = ref<HTMLElement>()
-
-      let controls: OrbitControls
-      if (param?.useControl ?? true) {
-        controls = new OrbitControls(camera!, renderer.domElement)
-        controls.enableDamping = true
-        controls.dampingFactor = 0.1
-      }
 
       const tick = () => {
         controls?.update()
@@ -146,18 +146,11 @@ const useScene = (param?: {
     camera,
     scene,
     renderer,
-    clock
+    clock,
+    controls
   }
 }
 
-const getScene = () => {
-  return inject<Scene | undefined>(injectKey, () => {
-    console.warn('You should use this component under <Scene/>.')
-    return undefined
-  }, true)
-}
-
 export {
-  useScene,
-  getScene
+  useScene
 }
