@@ -8,13 +8,18 @@ const injectKeySetGeometry = 'setGeometry'
 
 const useMesh = () => {
   const Mesh = defineComponent({
+    name: 'Mesh',
+
     props: {
       receiveShadow: Boolean as PropType<boolean>,
+
       castShadow: Boolean as PropType<boolean>,
+
       position: {
         type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
         default: () => ({})
       },
+
       rotation: {
         type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
         default: () => ({})
@@ -40,23 +45,6 @@ const useMesh = () => {
       }
       provide(injectKeySetGeometry, setGeometry)
 
-      const setProps = () => {
-        if (!mesh) {
-          return
-        }
-
-        mesh.castShadow = props.castShadow === true
-        mesh.receiveShadow = props.receiveShadow === true
-
-        if (isNumber(props.position.x)) { mesh.position.x = props.position.x }
-        if (isNumber(props.position.y)) { mesh.position.y = props.position.y }
-        if (isNumber(props.position.z)) { mesh.position.z = props.position.z }
-
-        if (isNumber(props.rotation.x)) { mesh.rotation.x = props.rotation.x }
-        if (isNumber(props.rotation.y)) { mesh.rotation.y = props.rotation.y }
-        if (isNumber(props.rotation.z)) { mesh.rotation.z = props.rotation.z }
-      }
-
       const updateMesh = () => {
         if (!scene) {
           return
@@ -70,6 +58,34 @@ const useMesh = () => {
           scene.add(mesh)
           uuid.value = mesh.uuid
         }
+      }
+
+      const setProps = () => {
+        if (!mesh) {
+          return
+        }
+
+        if (mesh.castShadow !== props.castShadow) {
+          mesh.castShadow = props.castShadow === true
+        }
+
+        if (mesh.receiveShadow !== props.receiveShadow) {
+          mesh.receiveShadow = props.receiveShadow === true
+        }
+
+        ['x', 'y', 'z'].forEach(item => {
+          const key = item as 'x' | 'y' | 'z'
+
+          const positionValue = props.position?.[key] ?? 0
+          if (positionValue !== mesh.position[key]) {
+            mesh.position[key] = positionValue
+          }
+
+          const rotationValue = props.rotation?.[key] ?? 0
+          if (rotationValue !== mesh.rotation[key]) {
+            mesh.rotation[key] = rotationValue
+          }
+        })
       }
 
       watch(props, setProps, {

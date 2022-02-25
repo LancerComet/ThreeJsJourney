@@ -1,7 +1,7 @@
 import { AmbientLight, Color, DirectionalLight, DirectionalLightHelper, PointLight, PointLightHelper } from 'three'
 import { defineComponent, onBeforeUnmount, PropType, watch } from 'vue'
 import { getScene } from './scene'
-import { checkObjEqual } from './utils'
+import { isEqual } from './utils/equal'
 
 const useAmbientLight = () => {
   return {
@@ -20,12 +20,13 @@ const useAmbientLight = () => {
       setup (props) {
         const ambientLight = new AmbientLight()
 
-        watch(props, (_, oldVal) => {
-          if (oldVal?.color !== props.color) {
-            ambientLight.color = new Color(props.color)
+        watch(props, () => {
+          const newColor = new Color(props.color)
+          if (!ambientLight.color.equals(newColor)) {
+            ambientLight.color = newColor
           }
 
-          if (oldVal?.intensity !== props.intensity) {
+          if (ambientLight.intensity !== props.intensity) {
             ambientLight.intensity = props.intensity
           }
         }, {
@@ -93,42 +94,41 @@ const usePointLight = () => {
           pointLight.shadow.mapSize.height = props.shadowSize ?? 512
         }
 
-        const setPosition = () => {
-          const { x, y, z } = props.position
-          pointLight.position.set(x, y, z)
-        }
-
-        watch(props, (_, oldVal) => {
-          const isPositionChanged = !checkObjEqual(oldVal?.position, props.position)
+        watch(props, () => {
+          const isPositionChanged = !isEqual({
+            x: pointLight.position.x,
+            y: pointLight.position.y,
+            z: pointLight.position.z
+          }, props.position)
           if (isPositionChanged) {
-            setPosition()
+            const { x, y, z } = props.position
+            pointLight.position.set(x, y, z)
           }
 
-          const isShadowChanged = (oldVal?.castShadow !== props.castShadow) ||
-            (oldVal?.shadowSize !== props.shadowSize)
+          const isShadowChanged = (pointLight.castShadow !== props.castShadow) ||
+            (pointLight.shadow.mapSize.width !== props.shadowSize)
           if (isShadowChanged) {
             setShadow()
           }
 
-          if (oldVal?.intensity !== props.intensity) {
+          if (pointLight.intensity !== props.intensity) {
             pointLight.intensity = props.intensity
           }
 
-          if (oldVal?.color !== props.color) {
-            pointLight.color = new Color(props.color)
+          const newColor = new Color(props.color)
+          if (!pointLight.color.equals(newColor)) {
+            pointLight.color = newColor
           }
 
-          if (oldVal?.distance !== props.distance) {
+          if (pointLight.distance !== props.distance) {
             pointLight.distance = props.distance ?? 0
           }
 
-          if (oldVal?.decay !== props.decay) {
+          if (pointLight.decay !== props.decay) {
             pointLight.decay = props.decay ?? 1
           }
 
-          if (oldVal?.showHelper !== props.showHelper) {
-            pointLightHelper.visible = props.showHelper === true
-          }
+          pointLightHelper.visible = props.showHelper === true
         }, {
           deep: true,
           immediate: true
@@ -194,48 +194,46 @@ const useDirectionalLight = () => {
         const light = new DirectionalLight(0xffffff, 0.5)
         const lightHelper = new DirectionalLightHelper(light)
 
-        const setShadow = () => {
-          light.castShadow = props.castShadow === true
-          light.shadow.mapSize.width = props.shadowSize ?? 512
-          light.shadow.mapSize.height = props.shadowSize ?? 512
-
-          // light.shadow.camera.top = props.shadowCamera?.top ?? 1
-          // light.shadow.camera.bottom = props.shadowCamera?.bottom ?? -1
-          // light.shadow.camera.left = props.shadowCamera?.left ?? -1
-          // light.shadow.camera.right = props.shadowCamera?.right ?? 1
-          light.shadow.camera.near = props.shadowCamera?.near ?? 0.1
-          light.shadow.camera.far = props.shadowCamera?.far ?? 2000
-        }
-
-        const setPosition = () => {
-          const { x, y, z } = props.position
-          light.position.set(x, y, z)
-        }
-
-        watch(props, (_, oldVal) => {
-          const isPositionChanged = !checkObjEqual(oldVal?.position, props.position)
+        watch(props, () => {
+          const isPositionChanged = !isEqual({
+            x: light.position.x,
+            y: light.position.y,
+            z: light.position.z
+          }, props.position)
           if (isPositionChanged) {
-            setPosition()
+            const { x, y, z } = props.position
+            light.position.set(x, y, z)
           }
 
-          const isShadowChanged = (oldVal?.castShadow !== props.castShadow) ||
-            (oldVal?.shadowSize !== props.shadowSize) ||
-            (!checkObjEqual(oldVal?.shadowCamera, props.shadowCamera))
-          if (isShadowChanged) {
-            setShadow()
+          if (light.castShadow !== props.castShadow) {
+            light.castShadow = props.castShadow === true
           }
 
-          if (oldVal?.intensity !== props.intensity) {
+          if (light.shadow.mapSize.width !== props.shadowSize) {
+            light.shadow.mapSize.width = props.shadowSize ?? 512
+            light.shadow.mapSize.height = props.shadowSize ?? 512
+          }
+
+          const near = props.shadowCamera?.near ?? 0.1
+          if (near !== light.shadow.camera.near) {
+            light.shadow.camera.near = near
+          }
+
+          const far = props.shadowCamera?.far ?? 2000
+          if (far !== light.shadow.camera.far) {
+            light.shadow.camera.far = far
+          }
+
+          if (light.intensity !== props.intensity) {
             light.intensity = props.intensity
           }
 
-          if (oldVal?.color !== props.color) {
-            light.color = new Color(props.color)
+          const newColor = new Color(props.color)
+          if (!light.color.equals(newColor)) {
+            light.color = newColor
           }
 
-          if (oldVal?.showHelper !== props.showHelper) {
-            lightHelper.visible = props.showHelper === true
-          }
+          lightHelper.visible = props.showHelper === true
         }, {
           deep: true,
           immediate: true
