@@ -1,7 +1,6 @@
 import { AxesHelper } from 'three'
 import { defineComponent, PropType, watch } from 'vue'
 import { getScene } from './scene'
-import { isNumber } from './utils'
 
 const useAxesHelper = () => {
   return {
@@ -23,12 +22,19 @@ const useAxesHelper = () => {
         scene?.add(axesHelper)
 
         const setProps = () => {
-          if (isNumber(props.position.x)) { axesHelper.position.x = props.position.x }
-          if (isNumber(props.position.y)) { axesHelper.position.y = props.position.y }
-          if (isNumber(props.position.z)) { axesHelper.position.z = props.position.z }
-          if (isNumber(props.rotation.x)) { axesHelper.rotation.x = props.rotation.x }
-          if (isNumber(props.rotation.y)) { axesHelper.rotation.y = props.rotation.y }
-          if (isNumber(props.rotation.z)) { axesHelper.rotation.z = props.rotation.z }
+          ['x', 'y', 'z'].forEach(item => {
+            const key = item as 'x' | 'y' | 'z'
+
+            const positionValue = props.position?.[key] ?? 0
+            if (positionValue !== axesHelper.position[key]) {
+              axesHelper.position[key] = positionValue
+            }
+
+            const rotationValue = props.rotation?.[key] ?? 0
+            if (rotationValue !== axesHelper.rotation[key]) {
+              axesHelper.rotation[key] = rotationValue
+            }
+          })
         }
 
         watch(props, setProps, {

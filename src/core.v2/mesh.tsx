@@ -1,7 +1,6 @@
 import * as THREE from 'three'
 import { computed, defineComponent, inject, PropType, provide, ref, watch } from 'vue'
 import { getScene } from './scene'
-import { isNumber } from './utils'
 
 const injectKeySetMaterial = 'setMaterial'
 const injectKeySetGeometry = 'setGeometry'

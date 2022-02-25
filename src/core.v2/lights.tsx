@@ -1,7 +1,6 @@
 import { AmbientLight, Color, DirectionalLight, DirectionalLightHelper, PointLight, PointLightHelper } from 'three'
 import { defineComponent, onBeforeUnmount, PropType, watch } from 'vue'
 import { getScene } from './scene'
-import { isEqual } from './utils/equal'
 
 const useAmbientLight = () => {
   return {
@@ -20,7 +19,7 @@ const useAmbientLight = () => {
       setup (props) {
         const ambientLight = new AmbientLight()
 
-        watch(props, () => {
+        const setProps = () => {
           const newColor = new Color(props.color)
           if (!ambientLight.color.equals(newColor)) {
             ambientLight.color = newColor
@@ -29,7 +28,9 @@ const useAmbientLight = () => {
           if (ambientLight.intensity !== props.intensity) {
             ambientLight.intensity = props.intensity
           }
-        }, {
+        }
+
+        watch(props, setProps, {
           deep: true,
           immediate: true
         })
@@ -38,6 +39,7 @@ const useAmbientLight = () => {
         if (scene) {
           scene.add(ambientLight)
         }
+
         return () => (
           <div class='ambient-light' data-uuid={ambientLight.uuid} />
         )
@@ -75,8 +77,8 @@ const usePointLight = () => {
           default: 1
         },
         position: {
-          type: Object as PropType<{ x: number, y: number, z: number }>,
-          default: () => ({ x: 0, y: 0, z: 0 })
+          type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+          default: () => ({})
         },
         showHelper: {
           type: Boolean as PropType<boolean>,
@@ -95,15 +97,14 @@ const usePointLight = () => {
         }
 
         watch(props, () => {
-          const isPositionChanged = !isEqual({
-            x: pointLight.position.x,
-            y: pointLight.position.y,
-            z: pointLight.position.z
-          }, props.position)
-          if (isPositionChanged) {
-            const { x, y, z } = props.position
-            pointLight.position.set(x, y, z)
-          }
+          ['x', 'y', 'z'].forEach(item => {
+            const key = item as 'x' | 'y' | 'z'
+
+            const positionValue = props.position?.[key] ?? 0
+            if (positionValue !== pointLight.position[key]) {
+              pointLight.position[key] = positionValue
+            }
+          })
 
           const isShadowChanged = (pointLight.castShadow !== props.castShadow) ||
             (pointLight.shadow.mapSize.width !== props.shadowSize)
@@ -175,8 +176,8 @@ const useDirectionalLight = () => {
           default: 0.5
         },
         position: {
-          type: Object as PropType<{ x: number, y: number, z: number }>,
-          default: () => ({ x: 0, y: 0, z: 0 })
+          type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+          default: () => ({})
         },
         showHelper: {
           type: Boolean as PropType<boolean>,
@@ -195,15 +196,13 @@ const useDirectionalLight = () => {
         const lightHelper = new DirectionalLightHelper(light)
 
         watch(props, () => {
-          const isPositionChanged = !isEqual({
-            x: light.position.x,
-            y: light.position.y,
-            z: light.position.z
-          }, props.position)
-          if (isPositionChanged) {
-            const { x, y, z } = props.position
-            light.position.set(x, y, z)
-          }
+          ['x', 'y', 'z'].forEach(item => {
+            const key = item as 'x' | 'y' | 'z'
+            const positionValue = props.position?.[key] ?? 0
+            if (positionValue !== light.position[key]) {
+              light.position[key] = positionValue
+            }
+          })
 
           if (light.castShadow !== props.castShadow) {
             light.castShadow = props.castShadow === true
