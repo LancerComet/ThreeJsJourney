@@ -10,8 +10,7 @@ const Shadow = defineComponent({
   name: 'Shadow',
 
   setup () {
-    const { Scene, scene } = useScene({
-      backgroundColor: 0,
+    const { Scene } = useScene({
       useShadow: true,
       antialias: true
     })

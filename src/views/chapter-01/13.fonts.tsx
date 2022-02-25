@@ -11,7 +11,6 @@ const Fonts = defineComponent({
   name: 'Fonts',
   setup () {
     const { Scene, scene, onTick, camera } = useScene({
-      backgroundColor: 0,
       useControl: false
     })
     const fontLoader = new FontLoader()

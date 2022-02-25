@@ -4,16 +4,16 @@ import {
   Color, OrthographicCamera,
   PerspectiveCamera, Scene, Vector3,
   WebGLRenderer,
-  ShadowMapType, PCFSoftShadowMap, Clock
+  ShadowMapType, PCFSoftShadowMap, Clock, Texture
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { defineComponent, inject, onBeforeUnmount, onMounted, provide, ref } from 'vue'
+import { defineComponent, inject, onBeforeUnmount, onMounted, PropType, provide, ref, watch } from 'vue'
+import { isNumber } from './utils/type'
 
 const injectKey = 'three:scene'
 
 const useScene = (param?: {
   camera?: PerspectiveCamera | OrthographicCamera
-  backgroundColor?: number
   useControl?: boolean
   antialias?: boolean
   useShadow?: boolean
@@ -25,7 +25,6 @@ const useScene = (param?: {
   const clock = new Clock()
 
   const scene = new Scene()
-  scene.background = new Color(param?.backgroundColor ?? 0)
   provide(injectKey, scene)
 
   let camera = param?.camera
@@ -49,6 +48,14 @@ const useScene = (param?: {
 
   const SceneComponent = defineComponent({
     name: 'Scene',
+
+    props: {
+      background: {
+        type: Object as PropType<Color | Texture | number>,
+        default: () => new Color(0)
+      }
+    },
+
     setup (props, { slots }) {
       const element = ref<HTMLElement>()
 
@@ -75,6 +82,34 @@ const useScene = (param?: {
         camera?.updateProjectionMatrix()
         renderer.setSize(window.innerWidth, window.innerHeight)
       }
+
+      const setBackground = () => {
+        const newBackground = isNumber(props.background)
+          ? new Color(props.background)
+          : props.background
+
+        const isColorSame = scene.background instanceof Color &&
+          newBackground instanceof Color &&
+          scene.background.equals(newBackground)
+
+        if (isColorSame) {
+          return
+        }
+
+        const isBackgroundChanged = scene.background !== newBackground
+        if (isBackgroundChanged) {
+          scene.background = newBackground ?? null
+        }
+      }
+
+      const setProps = () => {
+        setBackground()
+      }
+
+      watch(props, setProps, {
+        deep: true,
+        immediate: true
+      })
 
       window.addEventListener('resize', onResize)
 

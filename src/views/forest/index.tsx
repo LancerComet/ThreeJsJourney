@@ -1,3 +1,4 @@
+import { Color } from 'three'
 import { defineComponent } from 'vue'
 import { useAmbientLight, usePointLight } from '../../core.v2/lights'
 import { ObjModel } from '../../core.v2/model.obj'
@@ -7,7 +8,6 @@ const ForestScene = defineComponent({
   name: 'ForestScene',
   setup () {
     const { Scene } = useScene({
-      backgroundColor: 0xcccccc,
       useShadow: true,
       useControl: true
     })
@@ -17,7 +17,7 @@ const ForestScene = defineComponent({
 
     return () => (
       <div>
-        <Scene>
+        <Scene background={new Color(0xcccccc)}>
           <AmbientLight
             intensity={0.8} color={0xA9C9E2}
           />
