@@ -1,5 +1,5 @@
 import {
-  AmbientLight, BufferAttribute, CubeTextureLoader, DoubleSide,
+  AmbientLight, BufferAttribute, Color, CubeTextureLoader, DoubleSide,
   Mesh, MeshMatcapMaterial, MeshStandardMaterial,
   PlaneGeometry, PointLight,
   SphereGeometry, TextureLoader,
@@ -11,9 +11,7 @@ import { useScene } from '../../core.v2/scene'
 const Material = defineComponent({
   name: 'Material',
   setup () {
-    const { Scene, scene, onTick, clock } = useScene({
-      backgroundColor: 0xaaaaaa
-    })
+    const { Scene, scene, onTick, clock } = useScene()
 
     const ambientLight = new AmbientLight(0xffffff, 0.5)
     scene.add(ambientLight)
@@ -82,7 +80,7 @@ const Material = defineComponent({
     scene.add(sphere, plane, torus)
 
     return () => (
-      <Scene />
+      <Scene background={new Color(0xaaaaaa)} />
     )
   }
 })

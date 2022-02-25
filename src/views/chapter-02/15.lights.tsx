@@ -11,9 +11,7 @@ import { useScene } from '../../core.v2/scene'
 const Lights = defineComponent({
   name: 'Lights',
   setup () {
-    const { Scene, scene } = useScene({
-      backgroundColor: 0
-    })
+    const { Scene, scene } = useScene()
     const { AmbientLight } = useAmbientLight()
     const { DirectionalLight } = useDirectionalLight()
     const { PointLight } = usePointLight()

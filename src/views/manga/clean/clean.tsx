@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/no-named-as-default
 import gsap from 'gsap'
 import {
+  Color,
   DoubleSide, Group,
   Mesh, MeshPhongMaterial,
   MeshStandardMaterial,
@@ -11,8 +12,8 @@ import {
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { defineComponent, onMounted, ref } from 'vue'
 
-import { useAmbientLight, usePointLight } from '../../core.v2/lights'
-import { useScene } from '../../core.v2/scene'
+import { useAmbientLight, usePointLight } from '../../../core.v2/lights'
+import { useScene } from '../../../core.v2/scene'
 
 import style from './clean.module.styl'
 
@@ -27,7 +28,6 @@ const CleanScene = defineComponent({
 
     const { Scene, scene, renderer, onTick } = useScene({
       useControl: false,
-      backgroundColor: 0xffffff,
       camera
     })
 
@@ -200,7 +200,7 @@ const CleanScene = defineComponent({
 
     return () => (
       <div>
-        <Scene>
+        <Scene background={0xffffff}>
           <AmbientLight intensity={1}/>
           <PointLight showHelper position={{ x: 4, y: 3, z: 4 }} intensity={0} castShadow/>
         </Scene>

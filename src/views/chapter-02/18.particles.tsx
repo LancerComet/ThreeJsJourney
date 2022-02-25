@@ -1,7 +1,7 @@
 import {
   BoxGeometry,
   BufferAttribute,
-  BufferGeometry, Clock, Mesh,
+  BufferGeometry, Clock, Color, Mesh,
   MeshBasicMaterial,
   Points,
   PointsMaterial,
@@ -15,7 +15,6 @@ const Particles = defineComponent({
   name: 'Particles',
   setup () {
     const { Scene, scene, onTick } = useScene({
-      backgroundColor: 0,
       antialias: true
     })
 
@@ -72,7 +71,7 @@ const Particles = defineComponent({
     })
 
     return () => (
-      <Scene />
+      <Scene background={new Color(0)} />
     )
   }
 })
