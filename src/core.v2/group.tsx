@@ -1,10 +1,19 @@
-import { AxesHelper } from 'three'
+import { Group } from 'three'
 import { defineComponent, PropType, watch } from 'vue'
-import { injectContainer } from './providers/container'
+import { injectContainer, provideContainer } from './providers/container'
 
-const useAxesHelper = () => {
+const useGroup = () => {
+  const group = new Group()
+  const container = injectContainer()
+  if (container) {
+    container.add(group)
+  }
+  provideContainer(group)
+
   return {
-    AxesHelper: defineComponent({
+    Group: defineComponent({
+      name: 'Group',
+
       props: {
         position: {
           type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
@@ -16,23 +25,19 @@ const useAxesHelper = () => {
         }
       },
 
-      setup (props) {
-        const axesHelper = new AxesHelper()
-        const container = injectContainer()
-        container?.add(axesHelper)
-
+      setup (props, { slots }) {
         const setProps = () => {
           ['x', 'y', 'z'].forEach(item => {
             const key = item as 'x' | 'y' | 'z'
 
             const positionValue = props.position?.[key] ?? 0
-            if (positionValue !== axesHelper.position[key]) {
-              axesHelper.position[key] = positionValue
+            if (positionValue !== group.position[key]) {
+              group.position[key] = positionValue
             }
 
             const rotationValue = props.rotation?.[key] ?? 0
-            if (rotationValue !== axesHelper.rotation[key]) {
-              axesHelper.rotation[key] = rotationValue
+            if (rotationValue !== group.rotation[key]) {
+              group.rotation[key] = rotationValue
             }
           })
         }
@@ -43,7 +48,7 @@ const useAxesHelper = () => {
         })
 
         return () => (
-          <div class='axes-helper' data-uuid={axesHelper.uuid} />
+          <div class='three-group' data-uid={group.uuid}>{ slots.default?.() }</div>
         )
       }
     })
@@ -51,5 +56,5 @@ const useAxesHelper = () => {
 }
 
 export {
-  useAxesHelper
+  useGroup
 }

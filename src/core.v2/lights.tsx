@@ -1,6 +1,6 @@
 import { AmbientLight, Color, DirectionalLight, DirectionalLightHelper, PointLight, PointLightHelper } from 'three'
 import { defineComponent, onBeforeUnmount, PropType, watch } from 'vue'
-import { getScene } from './scene'
+import { injectContainer } from './providers/container'
 
 const useAmbientLight = () => {
   return {
@@ -35,9 +35,9 @@ const useAmbientLight = () => {
           immediate: true
         })
 
-        const scene = getScene()
-        if (scene) {
-          scene.add(ambientLight)
+        const container = injectContainer()
+        if (container) {
+          container.add(ambientLight)
         }
 
         return () => (
@@ -135,10 +135,10 @@ const usePointLight = () => {
           immediate: true
         })
 
-        const scene = getScene()
-        if (scene) {
-          scene.add(pointLight)
-          scene.add(pointLightHelper)
+        const container = injectContainer()
+        if (container) {
+          container.add(pointLight)
+          container.add(pointLightHelper)
         }
 
         onBeforeUnmount(() => {
@@ -238,10 +238,10 @@ const useDirectionalLight = () => {
           immediate: true
         })
 
-        const scene = getScene()
-        if (scene) {
-          scene.add(light)
-          scene.add(lightHelper)
+        const container = injectContainer()
+        if (container) {
+          container.add(light)
+          container.add(lightHelper)
         }
 
         onBeforeUnmount(() => {

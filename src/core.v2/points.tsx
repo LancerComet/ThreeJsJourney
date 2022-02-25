@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { defineComponent, inject, PropType, provide, ref, watch } from 'vue'
-import { getScene } from './scene'
+import { injectContainer } from './providers/container'
 
 const injectKeySetMaterial = 'setMaterial'
 const injectKeySetGeometry = 'setGeometry'
@@ -25,7 +25,7 @@ const usePoints = () => {
         let points: THREE.Points
         let _material: THREE.PointsMaterial
         let _geometry: THREE.BufferGeometry
-        const scene = getScene()
+        const container = injectContainer()
         const uuid = ref('')
 
         const setMaterial = (Points: THREE.PointsMaterial) => {
@@ -66,16 +66,16 @@ const usePoints = () => {
         }
 
         const updateMesh = () => {
-          if (!scene) {
+          if (!container) {
             return
           }
           if (points) {
-            scene.remove(points)
+            container.remove(points)
           }
           if (_geometry && _material) {
             points = new THREE.Points(_geometry, _material)
             setProps()
-            scene.add(points)
+            container.add(points)
             uuid.value = points.uuid
           }
         }

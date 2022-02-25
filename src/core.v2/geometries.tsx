@@ -6,8 +6,10 @@ import {
   PlaneGeometry,
   SphereGeometry
 } from 'three'
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry'
+import { Font } from 'three/examples/jsm/loaders/FontLoader'
 import { InterleavedBufferAttribute } from 'three/src/core/InterleavedBufferAttribute'
-import { defineComponent, onBeforeUnmount, PropType, watch } from 'vue'
+import { defineComponent, onBeforeUnmount, PropType, ref, watch } from 'vue'
 import { getSetGeometry } from './mesh'
 
 const usePlaneGeometry = () => {
@@ -159,9 +161,68 @@ const useBufferGeometry = () => {
   }
 }
 
+const useTextGeometry = () => {
+  return {
+    TextGeometry: defineComponent({
+      name: 'TextGeometry',
+      props: {
+        text: {
+          type: String as PropType<string>,
+          default: ''
+        },
+        font: {
+          type: Object as PropType<Font>
+        },
+        height: {
+          type: Number as PropType<number>
+        },
+        size: {
+          type: Number as PropType<number>
+        }
+      },
+      setup (props) {
+        let textGeometry: TextGeometry
+        const setGeometry = getSetGeometry()
+        const uuidRef = ref('')
+
+        const createTextGeometry = () => {
+          const font = props.font
+          if (!font) {
+            return
+          }
+          dispose()
+          textGeometry = new TextGeometry(props.text, {
+            font,
+            height: props.height,
+            size: props.size
+          })
+          uuidRef.value = textGeometry.uuid
+          setGeometry(textGeometry)
+        }
+
+        const dispose = () => {
+          textGeometry?.dispose()
+        }
+
+        watch(props, createTextGeometry, {
+          deep: true,
+          immediate: true
+        })
+
+        onBeforeUnmount(dispose)
+
+        return () => (
+          <div class='text-geometry' data-uid={uuidRef.value} />
+        )
+      }
+    })
+  }
+}
+
 export {
   usePlaneGeometry,
   useBoxGeometry,
   useSphereGeometry,
-  useBufferGeometry
+  useBufferGeometry,
+  useTextGeometry
 }
