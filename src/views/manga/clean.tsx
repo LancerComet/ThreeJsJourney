@@ -11,7 +11,6 @@ import {
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { defineComponent, onMounted, ref } from 'vue'
 
-import { useAxesHelper } from '../../core.v2/helpers'
 import { useAmbientLight, usePointLight } from '../../core.v2/lights'
 import { useScene } from '../../core.v2/scene'
 
@@ -37,7 +36,6 @@ const CleanScene = defineComponent({
     controls.dampingFactor = 0.05
 
     const { AmbientLight } = useAmbientLight()
-    const { AxesHelper } = useAxesHelper()
     const { PointLight } = usePointLight()
 
     const scene1Group = new Group()

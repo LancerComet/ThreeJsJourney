@@ -1,7 +1,6 @@
 import * as THREE from 'three'
 import { defineComponent, inject, PropType, provide, ref, watch } from 'vue'
 import { getScene } from './scene'
-import { isNumber } from './utils'
 
 const injectKeySetMaterial = 'setMaterial'
 const injectKeySetGeometry = 'setGeometry'
@@ -41,21 +40,29 @@ const usePoints = () => {
         }
         provide(injectKeySetGeometry, setGeometry)
 
+        const setPositionRotation = () => {
+          ['x', 'y', 'z'].forEach(item => {
+            const key = item as 'x' | 'y' | 'z'
+
+            const positionValue = props.position?.[key] ?? 0
+            if (positionValue !== points.position[key]) {
+              points.position[key] = positionValue
+            }
+
+            const rotationValue = props.rotation?.[key] ?? 0
+            if (rotationValue !== points.rotation[key]) {
+              points.rotation[key] = rotationValue
+            }
+          })
+        }
+
         const setProps = () => {
           if (!points) {
             return
           }
-
           points.castShadow = props.castShadow === true
           points.receiveShadow = props.receiveShadow === true
-
-          if (isNumber(props.position.x)) { points.position.x = props.position.x }
-          if (isNumber(props.position.y)) { points.position.y = props.position.y }
-          if (isNumber(props.position.z)) { points.position.z = props.position.z }
-
-          if (isNumber(props.rotation.x)) { points.rotation.x = props.rotation.x }
-          if (isNumber(props.rotation.y)) { points.rotation.y = props.rotation.y }
-          if (isNumber(props.rotation.z)) { points.rotation.z = props.rotation.z }
+          setPositionRotation()
         }
 
         const updateMesh = () => {
