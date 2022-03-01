@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { computed, defineComponent, inject, PropType, provide, ref, watch } from 'vue'
+import { computed, defineComponent, inject, onBeforeUnmount, PropType, provide, ref, watch } from 'vue'
 import { injectContainer } from './providers/container'
 
 const injectKeySetMaterial = 'setMaterial'
@@ -94,6 +94,10 @@ const useMesh = () => {
 
       expose({
         meshRef: computed(() => mesh)
+      })
+
+      onBeforeUnmount(() => {
+        container?.remove(mesh)
       })
 
       return () => (

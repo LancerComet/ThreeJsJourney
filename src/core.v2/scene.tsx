@@ -17,6 +17,7 @@ const useScene = (param?: {
   antialias?: boolean
   useShadow?: boolean
   shadowType?: ShadowMapType
+  onResize?: () => void
 }) => {
   let isTickStart = true
 
@@ -78,6 +79,9 @@ const useScene = (param?: {
       const onResize = () => {
         if (camera instanceof PerspectiveCamera) {
           camera.aspect = window.innerWidth / window.innerHeight
+        }
+        if (typeof param?.onResize === 'function') {
+          param.onResize()
         }
         camera?.updateProjectionMatrix()
         renderer.setSize(window.innerWidth, window.innerHeight)

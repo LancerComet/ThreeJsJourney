@@ -35,6 +35,11 @@ const useAmbientLight = () => {
           immediate: true
         })
 
+        onBeforeUnmount(() => {
+          ambientLight.dispose()
+          container?.remove(ambientLight)
+        })
+
         const container = injectContainer()
         if (container) {
           container.add(ambientLight)
@@ -143,6 +148,7 @@ const usePointLight = () => {
 
         onBeforeUnmount(() => {
           pointLight.dispose()
+          container?.remove(pointLight)
         })
 
         return () => (
@@ -246,6 +252,7 @@ const useDirectionalLight = () => {
 
         onBeforeUnmount(() => {
           light.dispose()
+          container?.remove(light)
         })
 
         return () => (
