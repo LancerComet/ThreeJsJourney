@@ -20,14 +20,27 @@ const MangaHub = defineComponent({
       -viewSize / 2,
       0.1, 1000
     )
-    camera.position.set(-50, 130, 100)
+    camera.position.set(-30, 100, 100)
     camera.lookAt(new Vector3(0, 0, 0))
+
+    const setCameraSize = () => {
+      const aspect = window.innerWidth / window.innerHeight
+      camera.left = -aspect * viewSize / 2
+      camera.right = aspect * viewSize / 2
+      camera.top = viewSize / 2
+      camera.bottom = -viewSize / 2
+      camera.near = 0.1
+      camera.far = 1000
+    }
 
     const { Scene, controls } = useScene({
       antialias: true,
       useControl: true,
       useShadow: true,
-      camera
+      camera,
+      onResize: () => {
+        setCameraSize()
+      }
     })
 
     // controls.enableZoom = false
@@ -43,7 +56,7 @@ const MangaHub = defineComponent({
     const Ground = () => {
       return (
         <Mesh rotation={{ x: (-90 / 180) * Math.PI }} receiveShadow>
-          <PlaneGeometry width={100} height={100} />
+          <PlaneGeometry width={1000} height={1000} />
           <StandardMaterial params={{
             transparent: true
           }} />

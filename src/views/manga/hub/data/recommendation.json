@@ -1,0 +1,146 @@
+{
+  "code": 0,
+  "msg": "",
+  "data": [
+    {
+      "season_id": 24726,
+      "title": "境·界（死神）",
+      "horizontal_cover": "http://i0.hdslb.com/bfs/manga-static/99a30dc2b4b6afdbe918eb16ab53524d244a69b3.jpg",
+      "square_cover": "http://i0.hdslb.com/bfs/bangumi/1e1aaed3996dfd07e1a59c3e601d4535f6d6639f.jpg",
+      "vertical_cover": "https://i0.hdslb.com/bfs/manga-static/4c4b0666f1d4dd762d0a5d580ba94ee92dfa805f.jpg",
+      "is_finish": 1,
+      "status": 0,
+      "last_ord": 708,
+      "total": 708,
+      "release_time": "",
+      "last_short_title": "短篇（3）",
+      "ext": "{\"trace_id\":\"4a9b0203058d0e3e\"}",
+      "recommend_reason": "",
+      "discount_type": 0,
+      "allow_wait_free": false,
+      "styles": [
+        "热血"
+      ]
+    },
+    {
+      "season_id": 26470,
+      "title": "一拳超人",
+      "horizontal_cover": "http://i0.hdslb.com/bfs/manga-static/098f9f01e59beecd77d14b0e2eee5ef4cb549d0b.jpg",
+      "square_cover": "http://i0.hdslb.com/bfs/manga-static/52c014c5b2d6f076fcd2c4f73d0428d87f73ba12.jpg",
+      "vertical_cover": "https://i0.hdslb.com/bfs/manga-static/accd35013c082cb622fb8749c86aec3bd4fb9253.jpg",
+      "is_finish": 0,
+      "status": 0,
+      "last_ord": 203,
+      "total": 208,
+      "release_time": "",
+      "last_short_title": "203",
+      "ext": "{\"trace_id\":\"4a9b0203058d0e3e\"}",
+      "recommend_reason": "",
+      "discount_type": 0,
+      "allow_wait_free": false,
+      "styles": [
+        "热血"
+      ]
+    },
+    {
+      "season_id": 24742,
+      "title": "航海王",
+      "horizontal_cover": "http://i0.hdslb.com/bfs/manga-static/7bcf22ed4904a4346c7aa33887be0e6540d5908f.png",
+      "square_cover": "http://i0.hdslb.com/bfs/manga-static/4a118d28f338765618a29deea7e2f130df15a61d.jpg",
+      "vertical_cover": "https://i0.hdslb.com/bfs/manga-static/ac575cdf576bd5eb7775a5371d44e0809235bf20.jpg",
+      "is_finish": 0,
+      "status": 0,
+      "last_ord": 1041,
+      "total": 1041,
+      "release_time": "",
+      "last_short_title": "1040",
+      "ext": "{\"trace_id\":\"4a9b0203058d0e3e\"}",
+      "recommend_reason": "",
+      "discount_type": 0,
+      "allow_wait_free": false,
+      "styles": [
+        "热血"
+      ]
+    },
+    {
+      "season_id": 25717,
+      "title": "鬼灭之刃",
+      "horizontal_cover": "http://i0.hdslb.com/bfs/manga-static/78876fdef412fa995ae5cce7cc30af1ff61f4ac7.png",
+      "square_cover": "http://i0.hdslb.com/bfs/manga-static/68a5c694e59b37f58c03530226a24a66933adb3a.png",
+      "vertical_cover": "https://i0.hdslb.com/bfs/manga-static/8b843504867408d80c3a75fa2bb7132212379320.jpg",
+      "is_finish": 1,
+      "status": 0,
+      "last_ord": 208,
+      "total": 208,
+      "release_time": "",
+      "last_short_title": "206",
+      "ext": "{\"trace_id\":\"4a9b0203058d0e3e\"}",
+      "recommend_reason": "",
+      "discount_type": 0,
+      "allow_wait_free": false,
+      "styles": [
+        "热血"
+      ]
+    },
+    {
+      "season_id": 26505,
+      "title": "咒术回战",
+      "horizontal_cover": "http://i0.hdslb.com/bfs/manga-static/c0f6e1bd760d3f65782c1ec67db122e3321ba223.png",
+      "square_cover": "http://i0.hdslb.com/bfs/manga-static/aa84812990483339ae22ac9568167924ad26c198.jpg",
+      "vertical_cover": "https://i0.hdslb.com/bfs/manga-static/ca4c24bd8bf896545811f401106c19588b80549d.png",
+      "is_finish": 0,
+      "status": 0,
+      "last_ord": 147,
+      "total": 179,
+      "release_time": "",
+      "last_short_title": "175",
+      "ext": "{\"trace_id\":\"4a9b0203058d0e3e\"}",
+      "recommend_reason": "",
+      "discount_type": 0,
+      "allow_wait_free": false,
+      "styles": [
+        "热血"
+      ]
+    },
+    {
+      "season_id": 26392,
+      "title": "原神PROJECT",
+      "horizontal_cover": "http://i0.hdslb.com/bfs/manga-static/19db952b2cad86252aef933b20cd4169196929bb.jpg",
+      "square_cover": "http://i0.hdslb.com/bfs/manga-static/e82aacf929213aecc140b07afb16b61388391cd9.jpg",
+      "vertical_cover": "http://i0.hdslb.com/bfs/manga-static/37bc65b7b9312ecc0034960b8bcfd1c9b029c155.jpg",
+      "is_finish": 0,
+      "status": 0,
+      "last_ord": 17,
+      "total": 16,
+      "release_time": "",
+      "last_short_title": "016",
+      "ext": "{\"trace_id\":\"4a9b0203058d0e3e\"}",
+      "recommend_reason": "",
+      "discount_type": 0,
+      "allow_wait_free": false,
+      "styles": [
+        "游戏竞技"
+      ]
+    },
+    {
+      "season_id": 24442,
+      "title": "非人哉",
+      "horizontal_cover": "http://i0.hdslb.com/bfs/manga-static/57d083e085d7c1a3be5b50150c1073f7c065ebbc.png",
+      "square_cover": "http://i0.hdslb.com/bfs/manga-static/9317e164321acfa85faaa31755389492dc1dc9c2.jpg",
+      "vertical_cover": "http://i0.hdslb.com/bfs/manga-static/4fd60d7bfc298495170a004324c9bfcfc4d4c8af.jpg",
+      "is_finish": 0,
+      "status": 0,
+      "last_ord": 789,
+      "total": 785,
+      "release_time": "",
+      "last_short_title": "772",
+      "ext": "{\"trace_id\":\"4a9b0203058d0e3e\"}",
+      "recommend_reason": "",
+      "discount_type": 0,
+      "allow_wait_free": false,
+      "styles": [
+        "现代"
+      ]
+    }
+  ]
+}
