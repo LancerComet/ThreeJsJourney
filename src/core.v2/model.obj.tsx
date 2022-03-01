@@ -11,28 +11,35 @@ const ObjModel = defineComponent({
     objUrl: {
       type: String as PropType<string>
     },
+
     mtlUrl: {
       type: String as PropType<string>
     },
+
     castShadow: {
       type: Boolean as PropType<boolean>,
       default: false
     },
+
     receiveShadow: {
       type: Boolean as PropType<boolean>,
       default: false
     },
+
     position: {
       type: Object as PropType<{ x: number, y: number, z: number }>,
       default: () => ({ x: 0, y: 0, z: 0 })
     },
+
     scale: {
       type: Object as PropType<{ x: number, y: number, z: number }>,
       default: () => ({ x: 1, y: 1, z: 1 })
     }
   },
 
-  setup (props) {
+  emits: ['load'],
+
+  setup (props, { emit }) {
     const uuid = ref('')
     const container = injectContainer()
 
@@ -55,6 +62,8 @@ const ObjModel = defineComponent({
       setObjectShadow(model, props.castShadow === true, props.receiveShadow === true)
 
       container?.add(model)
+
+      emit('load', model)
     }
 
     watch(props, init, {
