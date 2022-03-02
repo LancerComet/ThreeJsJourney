@@ -2,8 +2,8 @@ import * as THREE from 'three'
 import { defineComponent, inject, PropType, provide, ref, watch } from 'vue'
 import { injectContainer } from './providers/container'
 
-const injectKeySetMaterial = 'setMaterial'
-const injectKeySetGeometry = 'setGeometry'
+const injectKeySetMaterial = 'three:point:setMaterial'
+const injectKeySetGeometry = 'three:point:setGeometry'
 
 const usePoints = () => {
   return {

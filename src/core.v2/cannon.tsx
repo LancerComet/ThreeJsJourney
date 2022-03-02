@@ -1,94 +1,178 @@
-import { World, Vec3, Quaternion, Body } from 'cannon-es'
-import { defineComponent, inject, onBeforeUnmount, onMounted, PropType, provide } from 'vue'
+import { World, Vec3, Quaternion, Body, Box, NaiveBroadphase } from 'cannon-es'
+import { Clock } from 'three'
+import { defineComponent, inject, onBeforeUnmount, onMounted, PropType, provide, watch } from 'vue'
 
 const WORLD_INJECT_KEY = 'cannon:world'
-const geCannonWorld = () => inject<World>(WORLD_INJECT_KEY)
+const geCannonWorld = () => inject<World | undefined>(WORLD_INJECT_KEY, () => {
+  console.warn('geCannonWorld can only be called when this component is placed under CannonWorld.')
+  return undefined
+}, true)
 
-const RIGID_BODY_INJECT_KEY = 'cannon:rigidbody'
-const getRigidBody = () => inject<Body>(RIGID_BODY_INJECT_KEY)
+let worldId = 0
 
-const CannonWorld = defineComponent({
-  name: 'CannonWorld',
+const useCannonWorld = () => {
+  const world = new World({
+    broadphase: new NaiveBroadphase()
+  })
 
-  setup () {
-    let isTickStart = false
-    const world = new World()
+  const CannonWorld = defineComponent({
+    name: 'CannonWorld',
 
-    const tick = () => {
-      // TODO: ...
+    props: {
+      gravity: {
+        type: Array as PropType<number[]>,
+        default: () => [0, -9.82, 0]
+      },
+
+      allowSleep: {
+        type: Boolean as PropType<boolean>,
+        default: true
+      }
+    },
+
+    setup (props, ctx) {
+      let isTickStart = false
+      const clock = new Clock()
+      let delta = 0
+
+      const setProps = () => {
+        const [gX, gY, gZ] = props.gravity
+        const isGravityChanged = gX !== world.gravity.x ||
+          gY !== world.gravity.y ||
+          gZ !== world.gravity.z
+        if (isGravityChanged) {
+          world.gravity.set(gX, gY, gZ)
+        }
+
+        const isAllowSleepChanged = props.allowSleep !== world.allowSleep
+        if (isAllowSleepChanged) {
+          world.allowSleep = props.allowSleep
+        }
+      }
+
+      watch(props, setProps, {
+        deep: true,
+        immediate: true
+      })
+
+      const tick = () => {
+        if (!isTickStart) {
+          return
+        }
+
+        world.step(delta)
+        delta = clock.getDelta()
+
+        // TODO: ...
+        requestAnimationFrame(tick)
+      }
+
+      const stopTick = () => {
+        isTickStart = false
+      }
+
+      provide(WORLD_INJECT_KEY, world)
+
+      onMounted(() => {
+        isTickStart = true
+        tick()
+      })
+
+      onBeforeUnmount(() => {
+        stopTick()
+      })
+
+      return () => (
+        <div class='cannon-world' data-id={worldId++}>{
+          ctx.slots.default?.()
+        }</div>
+      )
     }
+  })
 
-    const stopTick = () => {
-      isTickStart = false
-    }
-
-    provide(WORLD_INJECT_KEY, world)
-
-    onMounted(() => {
-      isTickStart = true
-      tick()
-    })
-
-    onBeforeUnmount(() => {
-      stopTick()
-    })
-
-    return () => (
-      <div class='cannon-world'>Cannon World</div>
-    )
+  return {
+    CannonWorld,
+    world
   }
-})
+}
 
-const CannonRigidBody = defineComponent({
-  name: 'CannonRigidBody',
+const useCannonBox = (param?: {
+  position?: number[],
+  quaternion?: number[],
+  size?: number[]
+}) => {
+  const position = param?.position ?? [0, 0, 0]
+  const quaternion = param?.quaternion ?? [0, 0, 0, 0]
 
-  props: {
-    mass: {
-      type: Number as PropType<number>,
-      default: 0
+  const rigidBody = new Body({
+    position: new Vec3(...position),
+    quaternion: new Quaternion(...quaternion)
+  })
+
+  const [x, y, z] = param?.size ?? [1, 1, 1]
+  const boxShape = new Box(new Vec3(x / 2, y / 2, z / 2))
+  const offset = new Vec3(0, 0, 0)
+  rigidBody.addShape(boxShape, offset)
+
+  const CannonBox = defineComponent({
+    name: 'CannonBox',
+
+    props: {
+      mass: {
+        type: Number as PropType<number>,
+        default: 1
+      },
+
+      type: {
+        type: Number as PropType<typeof Body.KINEMATIC |
+          typeof Body.DYNAMIC |
+          typeof Body.STATIC
+          >,
+        default: Body.DYNAMIC
+      }
     },
 
-    type: {
-      type: Number as PropType<typeof Body.KINEMATIC |
-        typeof Body.DYNAMIC |
-        typeof Body.STATIC
-      >,
-      default: Body.DYNAMIC
-    },
+    setup (props) {
+      const cannonWorld = geCannonWorld()
+      if (cannonWorld) {
+        cannonWorld.addBody(rigidBody)
+      }
 
-    position: {
-      type: Array as PropType<number[]>,
-      default: () => [0, 0, 0]
-    },
+      watch(props, () => {
+        const isMassChanged = rigidBody.mass !== props.mass
+        if (isMassChanged) {
+          rigidBody.mass = props.mass
+        }
 
-    quaternion: {
-      type: Array as PropType<number[]>,
-      default: () => [0, 0, 0, 0]
+        const isTypeChanged = rigidBody.type !== props.type
+        if (isTypeChanged) {
+          rigidBody.type = props.type
+        }
+      }, {
+        deep: true
+      })
+
+      onBeforeUnmount(() => {
+        if (cannonWorld) {
+          cannonWorld.removeBody(rigidBody)
+        }
+        rigidBody.removeShape(boxShape)
+      })
+
+      return () => (
+        <div class='cannon-box' data-rigid-id={rigidBody.id} data-box-id={boxShape.id} />
+      )
     }
-  },
+  })
 
-  setup (props) {
-    const world = geCannonWorld()
-    if (!world) {
-      throw new Error('CannonRigidbody should be placed under CannonWorld.')
-    }
-
-    const rigidBody = new Body({
-      mass: props.mass,
-      type: props.type,
-      position: new Vec3(...props.position),
-      quaternion: new Quaternion(...props.quaternion)
-    })
-
-    provide(RIGID_BODY_INJECT_KEY, rigidBody)
-
-    return () => (
-      <div class='cannon-rigidbody'>Cannon Rigidbody</div>
-    )
+  return {
+    CannonBox,
+    rigidBody,
+    boxShape
   }
-})
+}
 
 export {
-  CannonWorld,
-  CannonRigidBody
+  useCannonBox,
+  useCannonWorld
 }

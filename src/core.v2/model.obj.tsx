@@ -2,7 +2,7 @@ import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import { defineComponent, PropType, ref, watch } from 'vue'
 import { injectContainer } from './providers/container'
-import { setObjectShadow } from './utils'
+import { setObjectShadow } from './utils/objects'
 
 const ObjModel = defineComponent({
   name: 'ObjModel',
@@ -40,7 +40,7 @@ const ObjModel = defineComponent({
   emits: ['load'],
 
   setup (props, { emit }) {
-    const uuid = ref('')
+    const uuidRef = ref('')
     const container = injectContainer()
 
     const init = async () => {
@@ -62,6 +62,7 @@ const ObjModel = defineComponent({
       setObjectShadow(model, props.castShadow === true, props.receiveShadow === true)
 
       container?.add(model)
+      uuidRef.value = model.uuid
 
       emit('load', model)
     }
@@ -72,7 +73,7 @@ const ObjModel = defineComponent({
     })
 
     return () => (
-      <div class='obj-model' data-uuid={uuid.value} />
+      <div class='obj-model' data-uuid={uuidRef.value} />
     )
   }
 })
