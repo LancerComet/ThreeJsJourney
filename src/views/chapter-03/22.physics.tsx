@@ -1,5 +1,5 @@
 import * as Cannon from 'cannon-es'
-import { Clock, Mesh, MeshStandardMaterial, PlaneGeometry, SphereGeometry, Vector3 } from 'three'
+import { Clock, Mesh, MeshStandardMaterial, PlaneGeometry, SphereGeometry } from 'three'
 import { defineComponent } from 'vue'
 
 import { useAxesHelper } from '../../core.v2/helpers'

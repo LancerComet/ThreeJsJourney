@@ -2,6 +2,8 @@ import { Group } from 'three'
 import { defineComponent, PropType, watch } from 'vue'
 import { injectContainer, provideContainer } from './providers/container'
 
+const GROUP_INJECT_KEY = 'three:group'
+
 const useGroup = () => {
   const group = new Group()
   const container = injectContainer()
