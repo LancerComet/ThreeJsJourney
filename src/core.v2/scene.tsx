@@ -7,7 +7,7 @@ import {
   ShadowMapType, PCFSoftShadowMap, Clock, Texture
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { defineComponent, onBeforeUnmount, onMounted, PropType, provide, ref, watch } from 'vue'
+import { defineComponent, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue'
 import { provideContainer } from './providers/container'
 import { isNumber } from './utils/type'
 
@@ -19,8 +19,6 @@ const useScene = (param?: {
   shadowType?: ShadowMapType
   onResize?: () => void
 }) => {
-  let isTickStart = true
-
   const gui = new dat.GUI()
   const clock = new Clock()
 
@@ -65,6 +63,7 @@ const useScene = (param?: {
     },
 
     setup (props, { slots }) {
+      let isTickStart = true
       const element = ref<HTMLElement>()
 
       const tick = () => {
@@ -119,6 +118,7 @@ const useScene = (param?: {
 
       onMounted(() => {
         element.value?.appendChild(renderer.domElement)
+        tick()
       })
 
       onBeforeUnmount(() => {
@@ -127,8 +127,6 @@ const useScene = (param?: {
         clock.stop()
         gui.destroy()
       })
-
-      tick()
 
       return () => (
         <div class='scene' data-uuid={scene.uuid} ref={element}>{slots.default?.()}</div>

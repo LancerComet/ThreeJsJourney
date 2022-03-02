@@ -1,6 +1,6 @@
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
-import { defineComponent, PropType, ref, watch } from 'vue'
+import { defineComponent, onMounted, PropType, ref, watch } from 'vue'
 import { injectContainer } from './providers/container'
 import { setObjectShadow } from './utils/objects'
 
@@ -57,6 +57,7 @@ const ObjModel = defineComponent({
       objLoader.setMaterials(material)
 
       const model = await objLoader.loadAsync(objUrl)
+
       model.position.set(props.position.x ?? 0, props.position?.y ?? 0, props.position.z ?? 0)
       model.scale.set(props.scale.x ?? 1, props.scale?.y ?? 1, props.scale.z ?? 1)
       setObjectShadow(model, props.castShadow === true, props.receiveShadow === true)
