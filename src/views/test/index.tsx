@@ -79,7 +79,7 @@ const TestPage = defineComponent({
       <Scene>
         <SphereParticle />
         <WaveParticles />
-        <AmbientLight castShadow/>
+        <AmbientLight />
         <PointLight castShadow showHelper position={{ x: 4, y: 4, z: 4 }} />
         <AxesHelper />
       </Scene>

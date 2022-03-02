@@ -2,8 +2,8 @@ import * as THREE from 'three'
 import { computed, defineComponent, inject, onBeforeUnmount, PropType, provide, ref, watch } from 'vue'
 import { injectContainer } from './providers/container'
 
-const injectKeySetMaterial = 'setMaterial'
-const injectKeySetGeometry = 'setGeometry'
+const injectKeySetMaterial = 'three:mesh:setMaterial'
+const injectKeySetGeometry = 'three:mesh:setGeometry'
 
 const useMesh = () => {
   const Mesh = defineComponent({

@@ -18,6 +18,7 @@ const pageConfig: { [sectionName: string]: RouteRecordRaw[] } = {
       component: () => import('../views/chapter-01/13.fonts').then(item => item.Fonts)
     }
   ],
+
   'Chapter 02': [
     {
       name: 'Lights',
@@ -43,7 +44,10 @@ const pageConfig: { [sectionName: string]: RouteRecordRaw[] } = {
       name: 'RayCaster',
       path: 'ray-caster',
       component: () => import('../views/chapter-02/20.raycaster').then(item => item.RayCasterPage)
-    },
+    }
+  ],
+
+  'Chapter-03': [
     {
       name: 'Physics',
       path: 'physics',
@@ -55,6 +59,7 @@ const pageConfig: { [sectionName: string]: RouteRecordRaw[] } = {
       component: () => import('../views/chapter-03/25.realistic-render').then(item => item.RealisticRender)
     }
   ],
+
   Manga: [
     {
       name: 'Clean',
@@ -72,6 +77,7 @@ const pageConfig: { [sectionName: string]: RouteRecordRaw[] } = {
       component: () => import('../views/manga/hub').then(item => item.MangaHub)
     }
   ],
+
   Forest: [
     {
       name: 'Forest',
