@@ -1,8 +1,6 @@
 import { Group } from 'three'
-import { defineComponent, PropType, watch } from 'vue'
+import { defineComponent, onMounted, PropType, watch } from 'vue'
 import { injectContainer, provideContainer } from './providers/container'
-
-const GROUP_INJECT_KEY = 'three:group'
 
 const useGroup = () => {
   const group = new Group()
@@ -27,7 +25,9 @@ const useGroup = () => {
         }
       },
 
-      setup (props, { slots }) {
+      emits: ['update'],
+
+      setup (props, { slots, emit }) {
         const setProps = () => {
           ['x', 'y', 'z'].forEach(item => {
             const key = item as 'x' | 'y' | 'z'
@@ -47,6 +47,10 @@ const useGroup = () => {
         watch(props, setProps, {
           deep: true,
           immediate: true
+        })
+
+        onMounted(() => {
+          emit('update', group)
         })
 
         return () => (

@@ -1,7 +1,8 @@
 import { Body } from 'cannon-es'
 import CannonDebugger from 'cannon-es-debugger'
 import { Color, Group } from 'three'
-import { defineComponent, onBeforeUnmount } from 'vue'
+import { defineComponent, onBeforeUnmount, ref } from 'vue'
+
 import { useCannon } from '../../core.v2/cannon'
 import { useAxesHelper } from '../../core.v2/helpers'
 import { useAmbientLight, usePointLight } from '../../core.v2/lights'
@@ -37,11 +38,11 @@ const ForestScene = defineComponent({
       let removeObj: () => void
       const onObjLoad = (model: Group) => {
         removeObj?.()
-        const { x, y, z } = getObjectSize(model)
-        removeObj = addObject({
+        const [_, destroy] = addObject({
           model,
-          size: [x, y, z]
+          size: getObjectSize(model).toArray()
         })
+        removeObj = destroy
         onBeforeUnmount(() => {
           removeObj()
         })
@@ -62,13 +63,13 @@ const ForestScene = defineComponent({
 
       const onObjLoad = (model: Group) => {
         removeObj?.()
-        const { x, y, z } = getObjectSize(model)
-        removeObj = addObject({
+        const [_, destroy] = addObject({
           model,
           mass: 1,
           type: Body.KINEMATIC,
-          size: [x, y, z]
+          size: getObjectSize(model).toArray()
         })
+        removeObj = destroy
         onBeforeUnmount(() => {
           removeObj()
         })
@@ -84,17 +85,23 @@ const ForestScene = defineComponent({
     }
 
     const Deer = () => {
-      let removeObj: () => void
+      let rigidBody: Body
+      let destroyCannon: () => void
+      let model: Group
 
-      const onObjLoad = (model: Group) => {
-        removeObj?.()
-        const { x, y, z } = getObjectSize(model)
-        removeObj = addObject({
+      const createCannon = () => {
+        if (!model) {
+          return
+        }
+        destroyCannon?.()
+        const [rb, destroy] = addObject({
           model,
-          size: [x, y, z]
+          size: getObjectSize(model).toArray()
         })
+        rigidBody = rb
+        destroyCannon = destroy
         onBeforeUnmount(() => {
-          removeObj()
+          destroyCannon()
         })
       }
 
@@ -104,7 +111,20 @@ const ForestScene = defineComponent({
           position={{ x: 3, y: 0, z: 3 }}
           scale={{ x: 0.1, y: 0.1, z: 0.1 }}
           castShadow receiveShadow
-          onLoad={onObjLoad}
+          onLoad={m => {
+            model = m
+            createCannon()
+          }}
+        />
+      )
+    }
+
+    const Tree = () => {
+      return (
+        <ObjModel
+          objUrl='/forest/tree/Tree.obj' mtlUrl='/forest/tree/Tree.mtl'
+          scale={{ x: 0.1, y: 0.1, z: 0.1 }}
+          castShadow receiveShadow
         />
       )
     }
@@ -120,12 +140,8 @@ const ForestScene = defineComponent({
         />
         <Ground />
         <Bomb />
-        <ObjModel
-          objUrl='/forest/tree/Tree.obj' mtlUrl='/forest/tree/Tree.mtl'
-          scale={{ x: 0.1, y: 0.1, z: 0.1 }}
-          castShadow receiveShadow
-        />
         <Deer />
+        <Tree />
         <AxesHelper />
       </Scene>
     )

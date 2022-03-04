@@ -22,22 +22,32 @@ const usePlaneGeometry = () => {
 
       setup (props) {
         let geometry: PlaneGeometry
+        let createTimer: NodeJS.Timeout
         const setGeometry = getSetGeometry()
 
         const createGeometry = () => {
+          clearTimeout(createTimer)
+          createTimer = setTimeout(() => {
+            geometry = new PlaneGeometry(
+              props.width,
+              props.height
+            )
+            setGeometry(geometry)
+          }, 1)
           dispose()
-          geometry = new PlaneGeometry(
-            props.width,
-            props.height
-          )
-          setGeometry(geometry)
         }
 
         const dispose = () => {
           geometry?.dispose()
         }
 
-        watch(props, createGeometry, {
+        watch(props, (newValue, oldValue) => {
+          const isSizeChanged = newValue.width !== oldValue?.width ||
+            newValue.height !== oldValue?.height
+          if (isSizeChanged) {
+            createGeometry()
+          }
+        }, {
           deep: true,
           immediate: true
         })
@@ -63,23 +73,35 @@ const useBoxGeometry = () => {
 
       setup (props) {
         let geometry: BoxGeometry
+        let updateTimer: NodeJS.Timeout
         const setGeometry = getSetGeometry()
 
         const createGeometry = () => {
-          dispose()
-          geometry = new BoxGeometry(
-            props.width,
-            props.height,
-            props.depth
-          )
-          setGeometry(geometry)
+          clearTimeout(updateTimer)
+          updateTimer = setTimeout(() => {
+            dispose()
+            geometry = new BoxGeometry(
+              props.width,
+              props.height,
+              props.depth
+            )
+            setGeometry(geometry)
+          }, 1)
         }
 
         const dispose = () => {
           geometry?.dispose()
         }
 
-        watch(props, createGeometry, {
+        watch(props, (newValue, oldValue) => {
+          const isSizeChanged = newValue.width !== oldValue?.width ||
+            newValue.height !== oldValue?.height ||
+            newValue.depth !== oldValue?.depth
+
+          if (isSizeChanged) {
+            createGeometry()
+          }
+        }, {
           deep: true,
           immediate: true
         })

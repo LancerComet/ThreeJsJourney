@@ -2,7 +2,7 @@ import { OrthographicCamera, Vector3 } from 'three'
 import { defineComponent } from 'vue'
 import { usePlaneGeometry } from '../../../core.v2/geometries'
 import { useAxesHelper } from '../../../core.v2/helpers'
-import { useAmbientLight } from '../../../core.v2/lights'
+import { useAmbientLight, useHemisphereLight } from '../../../core.v2/lights'
 import { useStandardMaterial } from '../../../core.v2/materials'
 import { useMesh } from '../../../core.v2/mesh'
 import { useScene } from '../../../core.v2/scene'
@@ -52,6 +52,7 @@ const MangaHub = defineComponent({
     const { PlaneGeometry } = usePlaneGeometry()
     const { Mesh } = useMesh()
     const { StandardMaterial } = useStandardMaterial()
+    const { HemisphereLight } = useHemisphereLight()
 
     const Ground = () => {
       return (
@@ -67,7 +68,7 @@ const MangaHub = defineComponent({
     return () => (
       <Scene background={0xdddddd}>
         <AxesHelper />
-        <AmbientLight intensity={0.7} color={0xeeeeee} />
+        <AmbientLight intensity={0.9} color={0xeeeeee} />
         <Ground />
         <HomeHub />
       </Scene>

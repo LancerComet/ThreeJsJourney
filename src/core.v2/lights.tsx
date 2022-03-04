@@ -1,4 +1,10 @@
-import { AmbientLight, Color, DirectionalLight, DirectionalLightHelper, PointLight, PointLightHelper } from 'three'
+import {
+  AmbientLight,
+  Color,
+  DirectionalLight, DirectionalLightHelper,
+  PointLight, PointLightHelper,
+  HemisphereLight, HemisphereLightHelper
+} from 'three'
 import { defineComponent, onBeforeUnmount, PropType, watch } from 'vue'
 import { injectContainer } from './providers/container'
 
@@ -88,6 +94,10 @@ const usePointLight = () => {
         showHelper: {
           type: Boolean as PropType<boolean>,
           default: false
+        },
+        hide: {
+          type: Boolean as PropType<boolean>,
+          default: false
         }
       },
 
@@ -135,6 +145,8 @@ const usePointLight = () => {
           }
 
           pointLightHelper.visible = props.showHelper === true
+
+          pointLight.visible = props.hide === false
         }, {
           deep: true,
           immediate: true
@@ -263,8 +275,77 @@ const useDirectionalLight = () => {
   }
 }
 
+const useHemisphereLight = () => {
+  return {
+    HemisphereLight: defineComponent({
+      name: 'HemisphereLight',
+
+      props: {
+        skyColor: {
+          type: Number as PropType<number>,
+          default: 0xBBD3EA
+        },
+
+        groundColor: {
+          type: Number as PropType<number>,
+          default: 0xE8B48F
+        },
+
+        intensity: {
+          type: Number as PropType<number>,
+          default: 1
+        },
+
+        showHelper: {
+          type: Boolean as PropType<boolean>,
+          default: false
+        },
+
+        hide: {
+          type: Boolean as PropType<boolean>,
+          default: false
+        }
+      },
+
+      setup (props) {
+        const light = new HemisphereLight(props.skyColor, props.groundColor, props.intensity)
+        const helper = new HemisphereLightHelper(light, 1)
+
+        const container = injectContainer()
+        if (container) {
+          container.add(light)
+          container.add(helper)
+        }
+
+        watch(props, () => {
+          const isGroundColorChanged = !light.groundColor.equals(new Color(props.groundColor))
+          if (isGroundColorChanged) {
+            light.groundColor.set(props.groundColor)
+          }
+
+          const isSkyColorChanged = !light.color.equals(new Color(props.skyColor))
+          if (isSkyColorChanged) {
+            light.color.set(props.skyColor)
+          }
+
+          helper.visible = props.showHelper === true
+          light.visible = props.hide === false
+        }, {
+          immediate: true,
+          deep: true
+        })
+
+        return () => (
+          <div class='hemisphere-light' data-uuid={light.uuid} />
+        )
+      }
+    })
+  }
+}
+
 export {
   useAmbientLight,
   usePointLight,
-  useDirectionalLight
+  useDirectionalLight,
+  useHemisphereLight
 }
