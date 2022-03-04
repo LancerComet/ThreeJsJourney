@@ -48,7 +48,7 @@ const useCannon = (params?: {
     mass?: number
     size?: number[]
     type?: typeof Body.STATIC | typeof Body.DYNAMIC | typeof Body.KINEMATIC
-  }) => {
+  }): [Body, () => void] => {
     const model = param.model
     const mass = param.mass ?? 1
     const type = param.type ?? Body.DYNAMIC
@@ -71,11 +71,11 @@ const useCannon = (params?: {
     })
 
     const [x, y, z] = size
+    const shape = new Box(new Vec3(x / 2, y / 2, z / 2))
     rigidBody.addShape(
-      new Box(new Vec3(x / 2, y / 2, z / 2)),
+      shape,
       new Vec3(0, y * 0.5, 0)
     )
-
     cannonWorld.addBody(rigidBody)
 
     const syncObj = {
@@ -84,13 +84,19 @@ const useCannon = (params?: {
     }
     physicsSyncList.push(syncObj)
 
-    return () => {
+    const destroy = () => {
       const index = physicsSyncList.indexOf(syncObj)
       if (index > -1) {
         physicsSyncList.splice(index, 1)
       }
+      rigidBody.removeShape(shape)
       cannonWorld.removeBody(rigidBody)
     }
+
+    return [
+      rigidBody,
+      destroy
+    ]
   }
 
   return {

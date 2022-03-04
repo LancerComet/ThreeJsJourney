@@ -4,6 +4,7 @@ import { MeshStandardMaterialParameters } from 'three/src/materials/MeshStandard
 import { defineComponent, onBeforeUnmount, PropType, watch } from 'vue'
 import { getSetMaterial } from './mesh'
 import { getSetPointsMaterial } from './points'
+import { isEqual } from './utils/equal'
 
 const useStandardMaterial = () => {
   const StandardMaterial = defineComponent({
@@ -13,12 +14,16 @@ const useStandardMaterial = () => {
 
     setup (props) {
       let material: MeshStandardMaterial
+      let updateTimer: NodeJS.Timeout
       const setMaterial = getSetMaterial()
 
       const createMaterial = () => {
-        dispose()
-        material = new MeshStandardMaterial(props.params)
-        setMaterial(material)
+        clearTimeout(updateTimer)
+        updateTimer = setTimeout(() => {
+          dispose()
+          material = new MeshStandardMaterial(props.params)
+          setMaterial(material)
+        }, 1)
       }
 
       const dispose = () => {
@@ -27,7 +32,12 @@ const useStandardMaterial = () => {
 
       onBeforeUnmount(dispose)
 
-      watch(props, createMaterial, {
+      watch(props, (newValue, oldValue) => {
+        const isPropChanged = !isEqual(newValue, oldValue)
+        if (isPropChanged) {
+          createMaterial()
+        }
+      }, {
         deep: true,
         immediate: true
       })
@@ -51,12 +61,16 @@ const useBasicMaterial = () => {
 
     setup (props) {
       let material: MeshBasicMaterial
+      let updateTimer: NodeJS.Timeout
       const setMaterial = getSetMaterial()
 
       const createMaterial = () => {
-        dispose()
-        material = new MeshBasicMaterial(props.params)
-        setMaterial(material)
+        clearTimeout(updateTimer)
+        setTimeout(() => {
+          dispose()
+          material = new MeshBasicMaterial(props.params)
+          setMaterial(material)
+        }, 1)
       }
 
       const dispose = () => {
@@ -65,7 +79,12 @@ const useBasicMaterial = () => {
 
       onBeforeUnmount(dispose)
 
-      watch(props, createMaterial, {
+      watch(props, (newValue, oldValue) => {
+        const isPropChanged = !isEqual(newValue, oldValue)
+        if (isPropChanged) {
+          createMaterial()
+        }
+      }, {
         deep: true,
         immediate: true
       })

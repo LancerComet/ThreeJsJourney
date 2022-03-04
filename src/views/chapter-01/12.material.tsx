@@ -11,7 +11,9 @@ import { useScene } from '../../core.v2/scene'
 const Material = defineComponent({
   name: 'Material',
   setup () {
-    const { Scene, scene, onTick, clock } = useScene()
+    const { Scene, scene, onTick, clock } = useScene({
+      useControl: true
+    })
 
     const ambientLight = new AmbientLight(0xffffff, 0.5)
     scene.add(ambientLight)

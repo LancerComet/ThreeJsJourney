@@ -25,7 +25,9 @@ const useMesh = () => {
       }
     },
 
-    setup (props, { slots, expose }) {
+    emits: ['update'],
+
+    setup (props, { slots, expose, emit }) {
       let mesh: THREE.Mesh
       let _material: THREE.Material
       let _geometry: THREE.BufferGeometry
@@ -45,18 +47,17 @@ const useMesh = () => {
       provide(injectKeySetGeometry, setGeometry)
 
       const updateMesh = () => {
-        if (!container) {
+        if (!container || !_geometry || !_material) {
           return
         }
         if (mesh) {
           container.remove(mesh)
         }
-        if (_geometry && _material) {
-          mesh = new THREE.Mesh(_geometry, _material)
-          setProps()
-          container.add(mesh)
-          uuid.value = mesh.uuid
-        }
+        mesh = new THREE.Mesh(_geometry, _material)
+        setProps()
+        container.add(mesh)
+        uuid.value = mesh.uuid
+        emit('update', mesh)
       }
 
       const setProps = () => {
