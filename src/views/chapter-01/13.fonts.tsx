@@ -2,7 +2,7 @@ import { Mesh, MeshMatcapMaterial, TextureLoader, TorusGeometry, Vector3 } from 
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader'
 import { defineComponent, onBeforeMount } from 'vue'
-import { useAxesHelper } from '../../core.v2/helpers'
+import { AxesHelper } from '../../core.v2/helpers'
 import { useScene } from '../../core.v2/scene'
 
 // Use this to convert a regular font into the TypeFace font.
@@ -15,7 +15,6 @@ const Fonts = defineComponent({
     })
     const fontLoader = new FontLoader()
     const textureLoader = new TextureLoader()
-    const { AxesHelper } = useAxesHelper()
 
     onBeforeMount(async () => {
       const font = await fontLoader.loadAsync('/fonts/kenpixel.json')

@@ -1,10 +1,10 @@
 import { OrthographicCamera, Vector3 } from 'three'
 import { defineComponent } from 'vue'
-import { usePlaneGeometry } from '../../../core.v2/geometries'
-import { useAxesHelper } from '../../../core.v2/helpers'
-import { useAmbientLight, useHemisphereLight } from '../../../core.v2/lights'
-import { useStandardMaterial } from '../../../core.v2/materials'
-import { useMesh } from '../../../core.v2/mesh'
+import { PlaneGeometry } from '../../../core.v2/geometries'
+import { AxesHelper } from '../../../core.v2/helpers'
+import { AmbientLight, HemisphereLight } from '../../../core.v2/lights'
+import { StandardMaterial } from '../../../core.v2/materials'
+import { Mesh } from '../../../core.v2/mesh'
 import { useScene } from '../../../core.v2/scene'
 import { HomeHub } from './components/home-hub'
 
@@ -46,13 +46,6 @@ const MangaHub = defineComponent({
     // controls.enableZoom = false
     // controls.enablePan = process.env.NODE_ENV === 'development'
     // controls.enableRotate = process.env.NODE_ENV === 'development'
-
-    const { AxesHelper } = useAxesHelper()
-    const { AmbientLight } = useAmbientLight()
-    const { PlaneGeometry } = usePlaneGeometry()
-    const { Mesh } = useMesh()
-    const { StandardMaterial } = useStandardMaterial()
-    const { HemisphereLight } = useHemisphereLight()
 
     const Ground = () => {
       return (

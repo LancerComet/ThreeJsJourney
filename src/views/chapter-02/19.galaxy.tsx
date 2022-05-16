@@ -1,8 +1,8 @@
 import { AdditiveBlending, BufferAttribute, Color, Vector3 } from 'three'
-import { defineComponent, onBeforeMount } from 'vue'
-import { useBufferGeometry } from '../../core.v2/geometries'
-import { usePointsMaterial } from '../../core.v2/materials'
-import { usePoints } from '../../core.v2/points'
+import { defineComponent, onMounted, ref } from 'vue'
+import { BufferGeometry, BufferGeometryComponent } from '../../core.v2/geometries'
+import { PointsMaterial } from '../../core.v2/materials'
+import { Points } from '../../core.v2/points'
 import { useScene } from '../../core.v2/scene'
 
 const Galaxy = defineComponent({
@@ -11,11 +11,7 @@ const Galaxy = defineComponent({
     const { Scene, gui, camera, onTick } = useScene({
       useControl: true
     })
-    const { PointsMaterial } = usePointsMaterial()
-    const { Points } = usePoints()
-    const { BufferGeometry, setAttribute } = useBufferGeometry({
-      isUnderPoint: true
-    })
+    const bufferGeometryRef = ref<BufferGeometryComponent>()
 
     const galaxyConfig = {
       size: 0.02,
@@ -58,8 +54,11 @@ const Galaxy = defineComponent({
         colors[index + 1] = mixedColor.g
         colors[index + 2] = mixedColor.b
       }
-      setAttribute('position', new BufferAttribute(positions, 3))
-      setAttribute('color', new BufferAttribute(colors, 3))
+
+      bufferGeometryRef.value?.setAttributes({
+        position: new BufferAttribute(positions, 3),
+        color: new BufferAttribute(colors, 3)
+      })
     }
 
     // Setup GUI.
@@ -81,14 +80,14 @@ const Galaxy = defineComponent({
       angle += 0.001
     })
 
-    onBeforeMount(() => {
+    onMounted(() => {
       initGalaxy()
     })
 
     return () => (
       <Scene>
         <Points>
-          <BufferGeometry />
+          <BufferGeometry ref={bufferGeometryRef} />
           <PointsMaterial params={{
             size: galaxyConfig.size,
             sizeAttenuation: true,

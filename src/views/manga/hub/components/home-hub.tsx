@@ -1,13 +1,13 @@
-import { NearestMipmapLinearFilter, TextureLoader, Mesh } from 'three'
+import * as THREE from 'three'
 import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader'
 import { computed, defineComponent, onMounted, PropType, ref } from 'vue'
 import { useCannon } from '../../../../core.v2/cannon'
-import { useBoxGeometry, usePlaneGeometry, useTextGeometry } from '../../../../core.v2/geometries'
-import { useGroup } from '../../../../core.v2/group'
-import { useAxesHelper } from '../../../../core.v2/helpers'
-import { usePointLight } from '../../../../core.v2/lights'
-import { useBasicMaterial, useStandardMaterial } from '../../../../core.v2/materials'
-import { useMesh } from '../../../../core.v2/mesh'
+import { BoxGeometry, PlaneGeometry, TextGeometry } from '../../../../core.v2/geometries'
+import { Group } from '../../../../core.v2/group'
+import { AxesHelper } from '../../../../core.v2/helpers'
+import { PointLight } from '../../../../core.v2/lights'
+import { BasicMaterial, StandardMaterial } from '../../../../core.v2/materials'
+import { Mesh } from '../../../../core.v2/mesh'
 import { MangaSeason } from '../model/manga-season'
 import { getRecommendationList } from '../services/recommendation'
 
@@ -37,11 +37,6 @@ const HomeCard = defineComponent({
   emits: ['meshUpdate'],
 
   setup (props, { emit }) {
-    const { Group } = useGroup()
-    const { Mesh } = useMesh()
-    const { BoxGeometry } = useBoxGeometry()
-    const { StandardMaterial } = useStandardMaterial()
-    const { PlaneGeometry } = usePlaneGeometry()
     const seasonData = props.seasonData
 
     const positionRef = computed(() => {
@@ -62,9 +57,9 @@ const HomeCard = defineComponent({
     )
 
     const Cover = () => {
-      const textureLoader = new TextureLoader()
+      const textureLoader = new THREE.TextureLoader()
       const coverMap = textureLoader.load(seasonData.verticalCover)
-      coverMap.minFilter = NearestMipmapLinearFilter
+      coverMap.minFilter = THREE.NearestMipmapLinearFilter
 
       return (
         <Mesh
@@ -113,13 +108,6 @@ const HomeCard = defineComponent({
 
 const HomeHub = defineComponent({
   setup () {
-    const { PointLight } = usePointLight()
-    const { Group } = useGroup()
-    const { Mesh } = useMesh()
-    const { TextGeometry } = useTextGeometry()
-    const { BasicMaterial } = useBasicMaterial()
-    const { AxesHelper } = useAxesHelper()
-
     const fontRef = ref<Font>()
     const seasonListRef = ref<MangaSeason[]>([])
 
@@ -157,7 +145,7 @@ const HomeHub = defineComponent({
 
     tickWorld()
 
-    const onCardUpdate = (mesh: Mesh) => {
+    const onCardUpdate = (mesh: THREE.Mesh) => {
       console.log('card update:', mesh)
       addObject({
         model: mesh,

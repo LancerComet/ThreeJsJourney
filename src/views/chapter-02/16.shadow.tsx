@@ -1,9 +1,8 @@
-import { AmbientLight, CameraHelper, DirectionalLight, PlaneGeometry, PointLight } from 'three'
 import { defineComponent } from 'vue'
-import { useBoxGeometry, usePlaneGeometry } from '../../core.v2/geometries'
-import { useAmbientLight, useDirectionalLight, usePointLight } from '../../core.v2/lights'
-import { useStandardMaterial } from '../../core.v2/materials'
-import { useMesh } from '../../core.v2/mesh'
+import { BoxGeometry, PlaneGeometry } from '../../core.v2/geometries'
+import { AmbientLight, DirectionalLight, PointLight } from '../../core.v2/lights'
+import { StandardMaterial } from '../../core.v2/materials'
+import { Mesh } from '../../core.v2/mesh'
 import { useScene } from '../../core.v2/scene'
 
 const Shadow = defineComponent({
@@ -14,10 +13,6 @@ const Shadow = defineComponent({
       useShadow: true,
       antialias: true
     })
-    const { Mesh } = useMesh()
-    const { BoxGeometry } = useBoxGeometry()
-    const { StandardMaterial } = useStandardMaterial()
-    const { PlaneGeometry } = usePlaneGeometry()
 
     const Cube1 = () => {
       return (
@@ -54,10 +49,6 @@ const Shadow = defineComponent({
         </Mesh>
       )
     }
-
-    const { AmbientLight } = useAmbientLight()
-    const { PointLight } = usePointLight()
-    const { DirectionalLight } = useDirectionalLight()
 
     return () => (
       <Scene>

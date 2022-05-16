@@ -1,11 +1,11 @@
 import { Body } from 'cannon-es'
 import CannonDebugger from 'cannon-es-debugger'
 import { Color, Group } from 'three'
-import { defineComponent, onBeforeUnmount, ref } from 'vue'
+import { defineComponent, onBeforeUnmount } from 'vue'
 
 import { useCannon } from '../../core.v2/cannon'
-import { useAxesHelper } from '../../core.v2/helpers'
-import { useAmbientLight, usePointLight } from '../../core.v2/lights'
+import { AxesHelper } from '../../core.v2/helpers'
+import { AmbientLight, PointLight } from '../../core.v2/lights'
 import { ObjModel } from '../../core.v2/model.obj'
 import { useScene } from '../../core.v2/scene'
 import { getObjectSize } from '../../core.v2/utils/objects'
@@ -18,12 +18,9 @@ const ForestScene = defineComponent({
       useShadow: true,
       useControl: true
     })
-    const { AmbientLight } = useAmbientLight()
-    const { PointLight } = usePointLight()
     const { addObject, stepCannonWorld, cannonWorld } = useCannon({
       clock
     })
-    const { AxesHelper } = useAxesHelper()
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore

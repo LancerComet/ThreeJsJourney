@@ -2,17 +2,14 @@ import * as Cannon from 'cannon-es'
 import { Clock, Mesh, MeshStandardMaterial, PlaneGeometry, SphereGeometry } from 'three'
 import { defineComponent } from 'vue'
 
-import { useAxesHelper } from '../../core.v2/helpers'
-import { useAmbientLight, usePointLight } from '../../core.v2/lights'
+import { AxesHelper } from '../../core.v2/helpers'
+import { AmbientLight, PointLight } from '../../core.v2/lights'
 import { useScene } from '../../core.v2/scene'
 
 const Physics = defineComponent({
   name: 'Physics',
   setup () {
     const { Scene, onTick, scene } = useScene()
-    const { AmbientLight } = useAmbientLight()
-    const { PointLight } = usePointLight()
-    const { AxesHelper } = useAxesHelper()
 
     const sphereRadius = 0.5
     const sphere = new Mesh(
