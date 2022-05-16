@@ -74,7 +74,7 @@ const ObjModel = defineComponent({
       uuidRef.value = model.uuid
     }
 
-    watch(props, async (newValue, oldValue) => {
+    const revoke = watch(props, async (newValue, oldValue) => {
       const { objUrl, mtlUrl } = newValue
       if (!objUrl || !mtlUrl) {
         return
@@ -121,6 +121,7 @@ const ObjModel = defineComponent({
     })
 
     onBeforeUnmount(() => {
+      revoke()
       unloadModel()
     })
 

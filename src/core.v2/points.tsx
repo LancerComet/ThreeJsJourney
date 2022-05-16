@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { defineComponent, inject, PropType, provide, ref, watch } from 'vue'
+import { defineComponent, inject, onBeforeUnmount, PropType, provide, ref, watch } from 'vue'
 import { injectContainer } from './providers/container'
 
 const injectKeySetMaterial = 'three:point:setMaterial'
@@ -80,10 +80,12 @@ const usePoints = () => {
           }
         }
 
-        watch(props, setProps, {
+        const revoke = watch(props, setProps, {
           deep: true,
           immediate: true
         })
+
+        onBeforeUnmount(revoke)
 
         return () => (
           <div class='points' data-uuid={uuid.value}>{ slots.default?.() }</div>

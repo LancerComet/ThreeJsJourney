@@ -1,5 +1,5 @@
 import { AxesHelper } from 'three'
-import { defineComponent, PropType, watch } from 'vue'
+import { defineComponent, onBeforeUnmount, PropType, watch } from 'vue'
 import { injectContainer } from './providers/container'
 
 const useAxesHelper = () => {
@@ -37,10 +37,12 @@ const useAxesHelper = () => {
           })
         }
 
-        watch(props, setProps, {
+        const revoke = watch(props, setProps, {
           deep: true,
           immediate: true
         })
+
+        onBeforeUnmount(revoke)
 
         return () => (
           <div class='axes-helper' data-uuid={axesHelper.uuid} />
