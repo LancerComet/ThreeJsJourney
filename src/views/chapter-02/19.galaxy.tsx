@@ -1,5 +1,5 @@
-import { AdditiveBlending, BufferAttribute, Color, PerspectiveCamera, Vector3 } from 'three'
-import { computed, defineComponent, onBeforeUnmount, ref, watch } from 'vue'
+import { AdditiveBlending, BufferAttribute, Color, Vector3 } from 'three'
+import { defineComponent, onBeforeMount } from 'vue'
 import { useBufferGeometry } from '../../core.v2/geometries'
 import { usePointsMaterial } from '../../core.v2/materials'
 import { usePoints } from '../../core.v2/points'
@@ -9,13 +9,15 @@ const Galaxy = defineComponent({
   name: 'Galaxy',
   setup () {
     const { Scene, gui, camera, onTick } = useScene({
-      useControl: false
+      useControl: true
     })
     const { PointsMaterial } = usePointsMaterial()
     const { Points } = usePoints()
-    const { BufferGeometry, setAttribute } = useBufferGeometry()
+    const { BufferGeometry, setAttribute } = useBufferGeometry({
+      isUnderPoint: true
+    })
 
-    const configRef = ref({
+    const galaxyConfig = {
       size: 0.02,
       count: 10000,
       radius: 5,
@@ -25,22 +27,22 @@ const Galaxy = defineComponent({
       randomnessPower: 3,
       insideColor: '#ff6030',
       outsideColor: '#1b3984'
-    })
+    }
 
-    const updateGalaxy = () => {
-      const count = configRef.value.count
+    const initGalaxy = () => {
+      const count = galaxyConfig.count
       const positions = new Float32Array(count * 3)
       const colors = new Float32Array(count * 3)
-      const insideColor = new Color(configRef.value.insideColor)
-      const outsideColor = new Color(configRef.value.outsideColor)
+      const insideColor = new Color(galaxyConfig.insideColor)
+      const outsideColor = new Color(galaxyConfig.outsideColor)
       for (let i = 0; i < count; i++) {
         const index = i * 3
-        const radius = Math.random() * configRef.value.radius
-        const branchAngle = (i % configRef.value.branches) / configRef.value.branches * Math.PI * 2
-        const spinAngle = radius * configRef.value.spin
+        const radius = Math.random() * galaxyConfig.radius
+        const branchAngle = (i % galaxyConfig.branches) / galaxyConfig.branches * Math.PI * 2
+        const spinAngle = radius * galaxyConfig.spin
 
-        const randomnessPower = configRef.value.randomnessPower
-        const randomness = configRef.value.randomness
+        const randomnessPower = galaxyConfig.randomnessPower
+        const randomness = galaxyConfig.randomness
         const randomX = Math.pow(Math.random(), randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * randomness * radius
         const randomY = Math.pow(Math.random(), randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * randomness * radius
         const randomZ = Math.pow(Math.random(), randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * randomness * radius
@@ -50,7 +52,7 @@ const Galaxy = defineComponent({
         positions[index + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ
 
         const mixedColor = insideColor.clone()
-        mixedColor.lerp(outsideColor, radius / configRef.value.radius)
+        mixedColor.lerp(outsideColor, radius / galaxyConfig.radius)
 
         colors[index] = mixedColor.r
         colors[index + 1] = mixedColor.g
@@ -60,23 +62,12 @@ const Galaxy = defineComponent({
       setAttribute('color', new BufferAttribute(colors, 3))
     }
 
-    const revoke = watch(configRef.value, updateGalaxy, {
-      immediate: true
-    })
-
-    const materialParam = computed(() => ({
-      size: configRef.value.size,
-      sizeAttenuation: true,
-      depthWrite: false,
-      blending: AdditiveBlending,
-      vertexColors: true
-    }))
-
-    Object.keys(configRef.value).forEach(key => {
+    // Setup GUI.
+    Object.keys(galaxyConfig).forEach(key => {
       if (/color/i.test(key)) {
-        gui.addColor(configRef.value, key)
+        gui.addColor(galaxyConfig, key)
       } else {
-        gui.add(configRef.value, key)
+        gui.add(galaxyConfig, key)
       }
     })
 
@@ -90,20 +81,22 @@ const Galaxy = defineComponent({
       angle += 0.001
     })
 
-    onBeforeUnmount(() => {
-      revoke()
+    onBeforeMount(() => {
+      initGalaxy()
     })
-
-    const Galaxy = () => (
-      <Points>
-        <BufferGeometry/>
-        <PointsMaterial params={materialParam.value}/>
-      </Points>
-    )
 
     return () => (
       <Scene>
-        <Galaxy />
+        <Points>
+          <BufferGeometry />
+          <PointsMaterial params={{
+            size: galaxyConfig.size,
+            sizeAttenuation: true,
+            depthWrite: false,
+            blending: AdditiveBlending,
+            vertexColors: true
+          }}/>
+        </Points>
       </Scene>
     )
   }
