@@ -11,6 +11,7 @@ import { Font } from 'three/examples/jsm/loaders/FontLoader'
 import { InterleavedBufferAttribute } from 'three/src/core/InterleavedBufferAttribute'
 import { defineComponent, onBeforeUnmount, PropType, ref, watch } from 'vue'
 import { getSetGeometry } from './mesh'
+import { getSetPointsGeometry } from './points'
 
 const usePlaneGeometry = () => {
   return {
@@ -161,7 +162,9 @@ const useSphereGeometry = () => {
   }
 }
 
-const useBufferGeometry = () => {
+const useBufferGeometry = (param?: {
+  isUnderPoint?: boolean
+}) => {
   const geometry = new BufferGeometry()
 
   const setAttribute = (name: BuiltinShaderAttributeName | string, attribute: BufferAttribute | InterleavedBufferAttribute) => {
@@ -173,8 +176,14 @@ const useBufferGeometry = () => {
     setAttribute,
     BufferGeometry: defineComponent({
       setup () {
-        const setGeometry = getSetGeometry()
-        setGeometry(geometry)
+        const isUnderPoint = param?.isUnderPoint ?? false
+        if (isUnderPoint) {
+          const setPointGeometry = getSetPointsGeometry()
+          setPointGeometry(geometry)
+        } else {
+          const setGeometry = getSetGeometry()
+          setGeometry(geometry)
+        }
 
         const dispose = () => {
           geometry?.dispose()

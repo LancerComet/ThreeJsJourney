@@ -85,7 +85,9 @@ const usePoints = () => {
           immediate: true
         })
 
-        onBeforeUnmount(revoke)
+        onBeforeUnmount(() => {
+          revoke()
+        })
 
         return () => (
           <div class='points' data-uuid={uuid.value}>{ slots.default?.() }</div>
