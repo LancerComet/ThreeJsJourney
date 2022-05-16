@@ -36,7 +36,7 @@ const useAmbientLight = () => {
           }
         }
 
-        watch(props, setProps, {
+        const revoke = watch(props, setProps, {
           deep: true,
           immediate: true
         })
@@ -44,6 +44,7 @@ const useAmbientLight = () => {
         onBeforeUnmount(() => {
           ambientLight.dispose()
           container?.remove(ambientLight)
+          revoke()
         })
 
         const container = injectContainer()
@@ -111,7 +112,7 @@ const usePointLight = () => {
           pointLight.shadow.mapSize.height = props.shadowSize ?? 512
         }
 
-        watch(props, () => {
+        const revoke = watch(props, () => {
           ['x', 'y', 'z'].forEach(item => {
             const key = item as 'x' | 'y' | 'z'
 
@@ -161,6 +162,7 @@ const usePointLight = () => {
         onBeforeUnmount(() => {
           pointLight.dispose()
           container?.remove(pointLight)
+          revoke()
         })
 
         return () => (
@@ -213,7 +215,7 @@ const useDirectionalLight = () => {
         const light = new DirectionalLight(0xffffff, 0.5)
         const lightHelper = new DirectionalLightHelper(light)
 
-        watch(props, () => {
+        const revoke = watch(props, () => {
           ['x', 'y', 'z'].forEach(item => {
             const key = item as 'x' | 'y' | 'z'
             const positionValue = props.position?.[key] ?? 0
@@ -265,6 +267,7 @@ const useDirectionalLight = () => {
         onBeforeUnmount(() => {
           light.dispose()
           container?.remove(light)
+          revoke()
         })
 
         return () => (
@@ -317,7 +320,7 @@ const useHemisphereLight = () => {
           container.add(helper)
         }
 
-        watch(props, () => {
+        const revoke = watch(props, () => {
           const isGroundColorChanged = !light.groundColor.equals(new Color(props.groundColor))
           if (isGroundColorChanged) {
             light.groundColor.set(props.groundColor)
@@ -333,6 +336,10 @@ const useHemisphereLight = () => {
         }, {
           immediate: true,
           deep: true
+        })
+
+        onBeforeUnmount(() => {
+          revoke()
         })
 
         return () => (

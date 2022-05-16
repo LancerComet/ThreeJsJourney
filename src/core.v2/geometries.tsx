@@ -41,7 +41,7 @@ const usePlaneGeometry = () => {
           geometry?.dispose()
         }
 
-        watch(props, (newValue, oldValue) => {
+        const revoke = watch(props, (newValue, oldValue) => {
           const isSizeChanged = newValue.width !== oldValue?.width ||
             newValue.height !== oldValue?.height
           if (isSizeChanged) {
@@ -52,7 +52,10 @@ const usePlaneGeometry = () => {
           immediate: true
         })
 
-        onBeforeUnmount(dispose)
+        onBeforeUnmount(() => {
+          revoke()
+          dispose()
+        })
 
         return () => (
           <div class='plane-geometry' data-uuid={geometry?.uuid} />
@@ -93,7 +96,7 @@ const useBoxGeometry = () => {
           geometry?.dispose()
         }
 
-        watch(props, (newValue, oldValue) => {
+        const revoke = watch(props, (newValue, oldValue) => {
           const isSizeChanged = newValue.width !== oldValue?.width ||
             newValue.height !== oldValue?.height ||
             newValue.depth !== oldValue?.depth
@@ -106,7 +109,10 @@ const useBoxGeometry = () => {
           immediate: true
         })
 
-        onBeforeUnmount(dispose)
+        onBeforeUnmount(() => {
+          dispose()
+          revoke()
+        })
 
         return () => (
           <div class='box-geometry' data-uuid={geometry?.uuid} />
@@ -137,12 +143,15 @@ const useSphereGeometry = () => {
           geometry?.dispose()
         }
 
-        watch(props, createGeometry, {
+        const revoke = watch(props, createGeometry, {
           deep: true,
           immediate: true
         })
 
-        onBeforeUnmount(dispose)
+        onBeforeUnmount(() => {
+          dispose()
+          revoke()
+        })
 
         return () => (
           <div class='sphere-geometry' data-uuid={geometry?.uuid} />
@@ -226,12 +235,15 @@ const useTextGeometry = () => {
           textGeometry?.dispose()
         }
 
-        watch(props, createTextGeometry, {
+        const revoke = watch(props, createTextGeometry, {
           deep: true,
           immediate: true
         })
 
-        onBeforeUnmount(dispose)
+        onBeforeUnmount(() => {
+          dispose()
+          revoke()
+        })
 
         return () => (
           <div class='text-geometry' data-uid={uuidRef.value} />

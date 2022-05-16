@@ -1,5 +1,5 @@
 import { Group } from 'three'
-import { defineComponent, onMounted, PropType, watch } from 'vue'
+import { defineComponent, onBeforeUnmount, onMounted, PropType, watch } from 'vue'
 import { injectContainer, provideContainer } from './providers/container'
 
 const useGroup = () => {
@@ -44,7 +44,7 @@ const useGroup = () => {
           })
         }
 
-        watch(props, setProps, {
+        const revoke = watch(props, setProps, {
           deep: true,
           immediate: true
         })
@@ -52,6 +52,8 @@ const useGroup = () => {
         onMounted(() => {
           emit('update', group)
         })
+
+        onBeforeUnmount(revoke)
 
         return () => (
           <div class='three-group' data-uid={group.uuid}>{ slots.default?.() }</div>

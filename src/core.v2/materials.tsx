@@ -30,9 +30,12 @@ const useStandardMaterial = () => {
         material?.dispose()
       }
 
-      onBeforeUnmount(dispose)
+      onBeforeUnmount(() => {
+        dispose()
+        revoke()
+      })
 
-      watch(props, (newValue, oldValue) => {
+      const revoke = watch(props, (newValue, oldValue) => {
         const isPropChanged = !isEqual(newValue, oldValue)
         if (isPropChanged) {
           createMaterial()
@@ -77,9 +80,12 @@ const useBasicMaterial = () => {
         material?.dispose()
       }
 
-      onBeforeUnmount(dispose)
+      onBeforeUnmount(() => {
+        dispose()
+        revoke()
+      })
 
-      watch(props, (newValue, oldValue) => {
+      const revoke = watch(props, (newValue, oldValue) => {
         const isPropChanged = !isEqual(newValue, oldValue)
         if (isPropChanged) {
           createMaterial()
@@ -121,9 +127,12 @@ const usePointsMaterial = () => {
           material?.dispose()
         }
 
-        onBeforeUnmount(dispose)
+        onBeforeUnmount(() => {
+          dispose()
+          revoke()
+        })
 
-        watch(props, createMaterial, {
+        const revoke = watch(props, createMaterial, {
           deep: true,
           immediate: true
         })

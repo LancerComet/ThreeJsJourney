@@ -1,5 +1,5 @@
 import { Raycaster, Vector3 } from 'three'
-import { defineComponent, PropType, watch } from 'vue'
+import { defineComponent, onBeforeUnmount, PropType, watch } from 'vue'
 
 const useRayCaster = () => {
   const rayCaster = new Raycaster()
@@ -16,7 +16,7 @@ const useRayCaster = () => {
         }
       },
       setup (props) {
-        watch(props, () => {
+        const revoke = watch(props, () => {
           const { origin, direction } = props
           if (origin && direction) {
             rayCaster.set(origin, direction)
@@ -24,6 +24,8 @@ const useRayCaster = () => {
         }, {
           immediate: true
         })
+
+        onBeforeUnmount(revoke)
 
         return () => (
           <div class='ray-caster' />

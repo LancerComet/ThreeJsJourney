@@ -88,7 +88,7 @@ const useMesh = () => {
         })
       }
 
-      watch(props, setProps, {
+      const revoke = watch(props, setProps, {
         deep: true,
         immediate: true
       })
@@ -99,6 +99,7 @@ const useMesh = () => {
 
       onBeforeUnmount(() => {
         container?.remove(mesh)
+        revoke()
       })
 
       return () => (

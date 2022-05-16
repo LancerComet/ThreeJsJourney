@@ -109,7 +109,7 @@ const useScene = (param?: {
         setBackground()
       }
 
-      watch(props, setProps, {
+      const revoke = watch(props, setProps, {
         deep: true,
         immediate: true
       })
@@ -126,6 +126,7 @@ const useScene = (param?: {
         window.removeEventListener('resize', onResize)
         clock.stop()
         gui.destroy()
+        revoke()
       })
 
       return () => (

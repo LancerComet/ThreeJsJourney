@@ -1,5 +1,5 @@
 import { AdditiveBlending, BufferAttribute, Color, PerspectiveCamera, Vector3 } from 'three'
-import { computed, defineComponent, ref, watch } from 'vue'
+import { computed, defineComponent, onBeforeUnmount, ref, watch } from 'vue'
 import { useBufferGeometry } from '../../core.v2/geometries'
 import { usePointsMaterial } from '../../core.v2/materials'
 import { usePoints } from '../../core.v2/points'
@@ -60,7 +60,7 @@ const Galaxy = defineComponent({
       setAttribute('color', new BufferAttribute(colors, 3))
     }
 
-    watch(configRef.value, updateGalaxy, {
+    const revoke = watch(configRef.value, updateGalaxy, {
       immediate: true
     })
 
@@ -88,6 +88,10 @@ const Galaxy = defineComponent({
       camera.position.z = radius * Math.sin(angle)
       camera.lookAt(new Vector3(0, 0, 0))
       angle += 0.001
+    })
+
+    onBeforeUnmount(() => {
+      revoke()
     })
 
     const Galaxy = () => (
