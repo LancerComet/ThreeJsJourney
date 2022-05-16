@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { computed, defineComponent, inject, onBeforeUnmount, PropType, provide, ref, watch } from 'vue'
+import { defineComponent, inject, onBeforeUnmount, PropType, provide, readonly, ref, watch } from 'vue'
 import { injectContainer } from './providers/container'
 
 const injectKeySetMaterial = 'three:mesh:setMaterial'
@@ -27,11 +27,11 @@ const Mesh = defineComponent({
   emits: ['update'],
 
   setup (props, { slots, expose, emit }) {
-    let mesh: THREE.Mesh
     let _material: THREE.Material
     let _geometry: THREE.BufferGeometry
     const container = injectContainer()
-    const uuid = ref('')
+    const uuidRef = ref('')
+    const meshRef = ref<THREE.Mesh>()
 
     const setMaterial = (material: THREE.Material) => {
       _material = material
@@ -49,17 +49,21 @@ const Mesh = defineComponent({
       if (!container || !_geometry || !_material) {
         return
       }
-      if (mesh) {
-        container.remove(mesh)
+      if (meshRef.value) {
+        container.remove(meshRef.value)
       }
-      mesh = new THREE.Mesh(_geometry, _material)
+
+      const mesh = new THREE.Mesh(_geometry, _material)
+      uuidRef.value = mesh.uuid
+      meshRef.value = mesh
       setProps()
       container.add(mesh)
-      uuid.value = mesh.uuid
+
       emit('update', mesh)
     }
 
     const setProps = () => {
+      const mesh = meshRef.value
       if (!mesh) {
         return
       }
@@ -93,16 +97,19 @@ const Mesh = defineComponent({
     })
 
     expose({
-      meshRef: computed(() => mesh)
+      meshRef: readonly(meshRef)
     })
 
     onBeforeUnmount(() => {
-      container?.remove(mesh)
+      if (container && meshRef.value) {
+        container.remove(meshRef.value)
+        meshRef.value = undefined
+      }
       revoke()
     })
 
     return () => (
-      <div class='mesh' data-uuid={uuid.value}>{ slots.default?.() }</div>
+      <div class='mesh' data-uuid={uuidRef.value}>{ slots.default?.() }</div>
     )
   }
 })
