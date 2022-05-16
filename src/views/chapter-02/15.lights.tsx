@@ -2,23 +2,16 @@ import { HemisphereLight, HemisphereLightHelper, RectAreaLight } from 'three'
 import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper'
 import { defineComponent } from 'vue'
 
-import { useBoxGeometry, usePlaneGeometry } from '../../core.v2/geometries'
-import { useAmbientLight, useDirectionalLight, usePointLight } from '../../core.v2/lights'
-import { useStandardMaterial } from '../../core.v2/materials'
-import { useMesh } from '../../core.v2/mesh'
+import { BoxGeometry, PlaneGeometry } from '../../core.v2/geometries'
+import { AmbientLight, DirectionalLight, PointLight } from '../../core.v2/lights'
+import { StandardMaterial } from '../../core.v2/materials'
+import { Mesh } from '../../core.v2/mesh'
 import { useScene } from '../../core.v2/scene'
 
 const Lights = defineComponent({
   name: 'Lights',
   setup () {
     const { Scene, scene } = useScene()
-    const { AmbientLight } = useAmbientLight()
-    const { DirectionalLight } = useDirectionalLight()
-    const { PointLight } = usePointLight()
-    const { Mesh } = useMesh()
-    const { BoxGeometry } = useBoxGeometry()
-    const { StandardMaterial } = useStandardMaterial()
-    const { PlaneGeometry } = usePlaneGeometry()
 
     const hemisphereLight = new HemisphereLight(0xff0000, 0x0000ff, 0.3)
     hemisphereLight.position.set(3, 1, 1)

@@ -1,40 +1,47 @@
-import { Raycaster, Vector3 } from 'three'
-import { defineComponent, onBeforeUnmount, PropType, watch } from 'vue'
+import * as THREE from 'three'
+import { ComponentPublicInstance, defineComponent, onBeforeUnmount, PropType, watchEffect } from 'vue'
 
-const useRayCaster = () => {
-  const rayCaster = new Raycaster()
+const RayCaster = defineComponent({
+  props: {
+    origin: {
+      type: Object as PropType<THREE.Vector3>
+    },
+    direction: {
+      type: Object as PropType<THREE.Vector3>
+    }
+  },
 
-  return {
-    rayCaster,
-    RayCaster: defineComponent({
-      props: {
-        origin: {
-          type: Object as PropType<Vector3>
-        },
-        direction: {
-          type: Object as PropType<Vector3>
-        }
-      },
-      setup (props) {
-        const revoke = watch(props, () => {
-          const { origin, direction } = props
-          if (origin && direction) {
-            rayCaster.set(origin, direction)
-          }
-        }, {
-          immediate: true
-        })
+  setup (props, { expose }) {
+    const rayCaster = new THREE.Raycaster()
 
-        onBeforeUnmount(revoke)
-
-        return () => (
-          <div class='ray-caster' />
-        )
+    const revoke = watchEffect(() => {
+      const origin = props.origin
+      const direction = props.direction
+      if (origin && direction) {
+        rayCaster.set(origin, direction)
       }
     })
+
+    expose({
+      getRayCaster: () => rayCaster
+    })
+
+    onBeforeUnmount(revoke)
+
+    return () => (
+      <div class='ray-caster' />
+    )
   }
-}
+})
+
+type RayCasterComponent = ComponentPublicInstance<{
+  origin: PropType<THREE.Vector3>
+  direction: PropType<THREE.Vector3>
+}, {
+  getRayCaster: () => THREE.Raycaster
+}>
 
 export {
-  useRayCaster
+  RayCaster,
+  RayCasterComponent
 }

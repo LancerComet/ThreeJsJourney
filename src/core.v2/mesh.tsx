@@ -5,113 +5,107 @@ import { injectContainer } from './providers/container'
 const injectKeySetMaterial = 'three:mesh:setMaterial'
 const injectKeySetGeometry = 'three:mesh:setGeometry'
 
-const useMesh = () => {
-  const Mesh = defineComponent({
-    name: 'Mesh',
+const Mesh = defineComponent({
+  name: 'Mesh',
 
-    props: {
-      receiveShadow: Boolean as PropType<boolean>,
+  props: {
+    receiveShadow: Boolean as PropType<boolean>,
 
-      castShadow: Boolean as PropType<boolean>,
+    castShadow: Boolean as PropType<boolean>,
 
-      position: {
-        type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
-        default: () => ({})
-      },
-
-      rotation: {
-        type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
-        default: () => ({})
-      }
+    position: {
+      type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+      default: () => ({})
     },
 
-    emits: ['update'],
-
-    setup (props, { slots, expose, emit }) {
-      let mesh: THREE.Mesh
-      let _material: THREE.Material
-      let _geometry: THREE.BufferGeometry
-      const container = injectContainer()
-      const uuid = ref('')
-
-      const setMaterial = (material: THREE.Material) => {
-        _material = material
-        updateMesh()
-      }
-      provide(injectKeySetMaterial, setMaterial)
-
-      const setGeometry = (geometry: THREE.BufferGeometry) => {
-        _geometry = geometry
-        updateMesh()
-      }
-      provide(injectKeySetGeometry, setGeometry)
-
-      const updateMesh = () => {
-        if (!container || !_geometry || !_material) {
-          return
-        }
-        if (mesh) {
-          container.remove(mesh)
-        }
-        mesh = new THREE.Mesh(_geometry, _material)
-        setProps()
-        container.add(mesh)
-        uuid.value = mesh.uuid
-        emit('update', mesh)
-      }
-
-      const setProps = () => {
-        if (!mesh) {
-          return
-        }
-
-        if (mesh.castShadow !== props.castShadow) {
-          mesh.castShadow = props.castShadow === true
-        }
-
-        if (mesh.receiveShadow !== props.receiveShadow) {
-          mesh.receiveShadow = props.receiveShadow === true
-        }
-
-        ['x', 'y', 'z'].forEach(item => {
-          const key = item as 'x' | 'y' | 'z'
-
-          const positionValue = props.position?.[key] ?? 0
-          if (positionValue !== mesh.position[key]) {
-            mesh.position[key] = positionValue
-          }
-
-          const rotationValue = props.rotation?.[key] ?? 0
-          if (rotationValue !== mesh.rotation[key]) {
-            mesh.rotation[key] = rotationValue
-          }
-        })
-      }
-
-      const revoke = watch(props, setProps, {
-        deep: true,
-        immediate: true
-      })
-
-      expose({
-        meshRef: computed(() => mesh)
-      })
-
-      onBeforeUnmount(() => {
-        container?.remove(mesh)
-        revoke()
-      })
-
-      return () => (
-        <div class='mesh' data-uuid={uuid.value}>{ slots.default?.() }</div>
-      )
+    rotation: {
+      type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+      default: () => ({})
     }
-  })
+  },
 
-  return {
-    Mesh
+  emits: ['update'],
+
+  setup (props, { slots, expose, emit }) {
+    let mesh: THREE.Mesh
+    let _material: THREE.Material
+    let _geometry: THREE.BufferGeometry
+    const container = injectContainer()
+    const uuid = ref('')
+
+    const setMaterial = (material: THREE.Material) => {
+      _material = material
+      updateMesh()
+    }
+    provide(injectKeySetMaterial, setMaterial)
+
+    const setGeometry = (geometry: THREE.BufferGeometry) => {
+      _geometry = geometry
+      updateMesh()
+    }
+    provide(injectKeySetGeometry, setGeometry)
+
+    const updateMesh = () => {
+      if (!container || !_geometry || !_material) {
+        return
+      }
+      if (mesh) {
+        container.remove(mesh)
+      }
+      mesh = new THREE.Mesh(_geometry, _material)
+      setProps()
+      container.add(mesh)
+      uuid.value = mesh.uuid
+      emit('update', mesh)
+    }
+
+    const setProps = () => {
+      if (!mesh) {
+        return
+      }
+
+      if (mesh.castShadow !== props.castShadow) {
+        mesh.castShadow = props.castShadow === true
+      }
+
+      if (mesh.receiveShadow !== props.receiveShadow) {
+        mesh.receiveShadow = props.receiveShadow === true
+      }
+
+      ['x', 'y', 'z'].forEach(item => {
+        const key = item as 'x' | 'y' | 'z'
+
+        const positionValue = props.position?.[key] ?? 0
+        if (positionValue !== mesh.position[key]) {
+          mesh.position[key] = positionValue
+        }
+
+        const rotationValue = props.rotation?.[key] ?? 0
+        if (rotationValue !== mesh.rotation[key]) {
+          mesh.rotation[key] = rotationValue
+        }
+      })
+    }
+
+    const revoke = watch(props, setProps, {
+      deep: true,
+      immediate: true
+    })
+
+    expose({
+      meshRef: computed(() => mesh)
+    })
+
+    onBeforeUnmount(() => {
+      container?.remove(mesh)
+      revoke()
+    })
+
+    return () => (
+      <div class='mesh' data-uuid={uuid.value}>{ slots.default?.() }</div>
+    )
   }
-}
+})
 
 const getSetMaterial = () => {
   return inject<(material: THREE.Material) => void>(injectKeySetMaterial, () => {
@@ -126,7 +120,7 @@ const getSetGeometry = () => {
 }
 
 export {
-  useMesh,
+  Mesh,
   getSetMaterial,
   getSetGeometry
 }

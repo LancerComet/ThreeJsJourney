@@ -1,25 +1,22 @@
-import { BoxGeometry, Mesh, NearestFilter, TextureLoader } from 'three'
+import * as THREE from 'three'
 import { MeshBasicMaterialParameters } from 'three/src/materials/MeshBasicMaterial'
 import { defineComponent, ref } from 'vue'
-import { useBoxGeometry } from '../../core.v2/geometries'
-import { useBasicMaterial } from '../../core.v2/materials'
-import { useMesh } from '../../core.v2/mesh'
+import { BoxGeometry } from '../../core.v2/geometries'
+import { BasicMaterial } from '../../core.v2/materials'
+import { Mesh } from '../../core.v2/mesh'
 import { useScene } from '../../core.v2/scene'
 
 const Textures = defineComponent({
   name: 'Texture',
   setup () {
     const { Scene } = useScene()
-    const { Mesh } = useMesh()
-    const { BoxGeometry } = useBoxGeometry()
-    const { BasicMaterial } = useBasicMaterial()
     const materialParam = ref<MeshBasicMaterialParameters>({})
 
-    const textureLoader = new TextureLoader()
+    const textureLoader = new THREE.TextureLoader()
     textureLoader.loadAsync('/textures/door/color.jpg')
       .then(colorTexture => {
         colorTexture.needsUpdate = true
-        colorTexture.minFilter = NearestFilter
+        colorTexture.minFilter = THREE.NearestFilter
         materialParam.value.map = colorTexture
       })
 

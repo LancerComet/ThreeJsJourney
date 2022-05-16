@@ -1,17 +1,15 @@
-import { Clock, Mesh, MeshStandardMaterial, Raycaster, SphereGeometry, Vector3 } from 'three'
-import { defineComponent } from 'vue'
+import { Clock, Mesh, MeshStandardMaterial, SphereGeometry, Vector3 } from 'three'
+import { defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 
-import { useAxesHelper } from '../../core.v2/helpers'
-import { useAmbientLight, usePointLight } from '../../core.v2/lights'
+import { AxesHelper } from '../../core.v2/helpers'
+import { AmbientLight, PointLight } from '../../core.v2/lights'
+import { RayCaster, RayCasterComponent } from '../../core.v2/raycaster'
 import { useScene } from '../../core.v2/scene'
 
 const RayCasterPage = defineComponent({
   name: 'RayCasterPage',
   setup () {
     const { Scene, scene } = useScene()
-    const { AmbientLight } = useAmbientLight()
-    const { PointLight } = usePointLight()
-    const { AxesHelper } = useAxesHelper()
 
     const createSphere = (x: number = 0, y = 0, z = 0) => {
       const mesh = new Mesh(
@@ -30,14 +28,14 @@ const RayCasterPage = defineComponent({
     scene.add(sphere1, sphere2, sphere3)
 
     const clock = new Clock()
+    let isTickOn = true
+
+    const rayCasterRef = ref<RayCasterComponent>()
+    const rayOrigin = new Vector3(-6, 0, 0)
+    const rayDirection = new Vector3(1, 0, 0)
+    rayDirection.normalize()
 
     const check = () => {
-      const rayCaster = new Raycaster()
-      const rayOrigin = new Vector3(-6, 0, 0)
-      const rayDirection = new Vector3(1, 0, 0)
-      rayDirection.normalize()
-      rayCaster.set(rayOrigin, rayDirection)
-
       const elapsedTime = clock.getElapsedTime()
       sphere1.position.y = Math.sin(elapsedTime * 0.5) * 3
       sphere2.position.y = Math.sin(elapsedTime * 1) * 3
@@ -50,6 +48,12 @@ const RayCasterPage = defineComponent({
         item.material.color.set(0x0000ff)
       })
 
+      const rayCaster = rayCasterRef.value?.getRayCaster()
+      if (!rayCaster) {
+        console.error('No RayCaster was got.')
+        return
+      }
+
       const intersections = rayCaster.intersectObjects(objs)
 
       // Paint intersected sphere red.
@@ -57,18 +61,27 @@ const RayCasterPage = defineComponent({
         ((item.object as Mesh).material as MeshStandardMaterial).color.set(0xff0000)
       })
 
-      requestAnimationFrame(check)
+      isTickOn && requestAnimationFrame(check)
     }
 
-    // I don't know why I have to call this function by using RAF.
-    // Sync calling is incorrect.
-    requestAnimationFrame(check)
+    const stopCheck = () => {
+      isTickOn = false
+    }
+
+    onMounted(() => {
+      check()
+    })
+
+    onBeforeUnmount(() => {
+      stopCheck()
+    })
 
     return () => (
       <Scene>
         <AmbientLight />
         <PointLight position={{ x: 5, y: 5, z: 5 }} castShadow />
         <AxesHelper />
+        <RayCaster ref={rayCasterRef} origin={rayOrigin} direction={rayDirection} />
       </Scene>
     )
   }
