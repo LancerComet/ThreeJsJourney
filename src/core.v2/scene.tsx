@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { isNumber } from '@lancercomet/utils/types'
 import * as dat from 'lil-gui'
 import {
   Color, OrthographicCamera,
@@ -9,7 +10,6 @@ import {
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { defineComponent, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue'
 import { provideContainer } from './providers/container'
-import { isNumber } from './utils/type'
 
 const useScene = (param?: {
   camera?: PerspectiveCamera | OrthographicCamera

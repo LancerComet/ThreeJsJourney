@@ -56,9 +56,18 @@ const PlaneGeometry = defineComponent({
 
 const BoxGeometry = defineComponent({
   props: {
-    width: Number as PropType<number>,
-    height: Number as PropType<number>,
-    depth: Number as PropType<number>
+    width: {
+      type: Number as PropType<number>,
+      default: 1
+    },
+    height: {
+      type: Number as PropType<number>,
+      default: 1
+    },
+    depth: {
+      type: Number as PropType<number>,
+      default: 1
+    }
   },
 
   setup (props) {

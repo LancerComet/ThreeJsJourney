@@ -36,6 +36,8 @@ module.exports = {
         order: 'asc',
         caseInsensitive: true
       }
-    }]
+    }],
+
+    'import/no-unresolved': 'off'
   }
 }

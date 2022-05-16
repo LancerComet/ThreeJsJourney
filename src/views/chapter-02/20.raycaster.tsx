@@ -50,7 +50,7 @@ const RayCasterPage = defineComponent({
 
       const rayCaster = rayCasterRef.value?.getRayCaster()
       if (!rayCaster) {
-        console.error('No RayCaster was got.')
+        console.warn('No RayCaster was got.')
         return
       }
 

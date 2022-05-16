@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { MeshBasicMaterialParameters } from 'three/src/materials/MeshBasicMaterial'
-import { defineComponent, ref } from 'vue'
+import { defineComponent, onMounted, ref } from 'vue'
 import { BoxGeometry } from '../../core.v2/geometries'
 import { BasicMaterial } from '../../core.v2/materials'
 import { Mesh } from '../../core.v2/mesh'
@@ -12,13 +12,15 @@ const Textures = defineComponent({
     const { Scene } = useScene()
     const materialParam = ref<MeshBasicMaterialParameters>({})
 
-    const textureLoader = new THREE.TextureLoader()
-    textureLoader.loadAsync('/textures/door/color.jpg')
-      .then(colorTexture => {
-        colorTexture.needsUpdate = true
-        colorTexture.minFilter = THREE.NearestFilter
-        materialParam.value.map = colorTexture
-      })
+    onMounted(async () => {
+      const textureLoader = new THREE.TextureLoader()
+      const colorTexture = await textureLoader.loadAsync('/textures/door/color.jpg')
+      colorTexture.needsUpdate = true
+      colorTexture.minFilter = THREE.NearestFilter
+      materialParam.value = {
+        map: colorTexture
+      }
+    })
 
     // Repeat texture.
     // ===
@@ -31,7 +33,7 @@ const Textures = defineComponent({
     return () => (
       <Scene>
         <Mesh>
-          <BoxGeometry/>
+          <BoxGeometry width={1} height={1} depth={1} />
           <BasicMaterial params={materialParam.value}/>
         </Mesh>
       </Scene>
