@@ -70,6 +70,11 @@ const pageConfig: { [sectionName: string]: RouteRecordRaw[] } = {
       name: 'Hub',
       path: 'hub',
       component: () => import('../views/manga/hub').then(item => item.MangaHub)
+    },
+    {
+      name: 'Reader',
+      path: 'reader',
+      component: () => import('../views/manga/reader').then(item => item.MangaReader)
     }
   ],
 
