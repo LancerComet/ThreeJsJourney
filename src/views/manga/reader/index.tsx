@@ -26,7 +26,7 @@ const createCamera = (): [OrthographicCamera, () => void] => {
     -viewSize / 2,
     0.1, 1000
   )
-  camera.position.set(-30, 100, 100)
+  camera.position.set(-2, 100, 30)
   camera.lookAt(new Vector3(0, 0, 0))
 
   const setCameraSize = () => {
