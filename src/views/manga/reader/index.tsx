@@ -65,8 +65,8 @@ const MangaReader = defineComponent({
         <Scene background={0xeeeeee}>
           <AxesHelper />
           <Book images={images} />
-          <AmbientLight intensity={1} color={0xffffff} />
-          <PointLight showHelper position={{ x: 4, y: 3, z: 4 }} intensity={0.2} castShadow />
+          <AmbientLight intensity={0.8} color={0xffffff} />
+          <PointLight showHelper position={{ x: 4, y: 3, z: 4 }} intensity={0.5} castShadow />
         </Scene>
 
         <div class={style.controlButtons}>
