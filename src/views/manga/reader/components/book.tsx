@@ -16,9 +16,10 @@ const Book = defineComponent({
     }
   },
 
-  setup (props) {
+  setup (props, { expose }) {
     const width = 3
     const height = width * 1.5
+    const pageGap = 0.01
     const images = props.images || []
 
     const createMap = (url: string) => {
@@ -26,6 +27,17 @@ const Book = defineComponent({
       map.minFilter = THREE.NearestFilter
       return map
     }
+
+    const goPrev = () => {
+    }
+
+    const goNext = () => {
+    }
+
+    expose({
+      goPrev,
+      goNext
+    })
 
     const Page = (param: {
       images: [string, string],
@@ -38,7 +50,7 @@ const Book = defineComponent({
             x: (-90 / 180) * Math.PI
           }}
           position={{
-            y: -0.02 * param.index
+            y: pageGap * -param.index
           }}
         >
           <Mesh receiveShadow castShadow>
