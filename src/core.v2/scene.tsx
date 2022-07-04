@@ -130,7 +130,7 @@ const useScene = (param?: {
       })
 
       return () => (
-        <div class='scene' data-uuid={scene.uuid} ref={element}>{slots.default?.()}</div>
+        <div class='scene' ref={element}>{slots.default?.()}</div>
       )
     }
   })

@@ -34,7 +34,7 @@ const StandardMaterial = defineComponent({
     })
 
     return () => (
-      <div class='standard-material' data-uuid={material.uuid} />
+      <div class='standard-material' />
     )
   }
 })
@@ -69,7 +69,7 @@ const BasicMaterial = defineComponent({
     })
 
     return () => (
-      <div class='basic-material' data-uuid={material?.uuid} />
+      <div class='basic-material' />
     )
   }
 })
@@ -104,7 +104,7 @@ const PointsMaterial = defineComponent({
     })
 
     return () => (
-      <div class='points-material' data-uuid={material?.uuid} />
+      <div class='points-material' />
     )
   }
 })

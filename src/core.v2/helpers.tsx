@@ -43,7 +43,7 @@ const AxesHelper = defineComponent({
     onBeforeUnmount(revoke)
 
     return () => (
-      <div class='axes-helper' data-uuid={axesHelper.uuid} />
+      <div class='axes-helper' />
     )
   }
 })

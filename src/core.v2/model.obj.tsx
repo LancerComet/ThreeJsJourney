@@ -41,7 +41,6 @@ const ObjModel = defineComponent({
   emits: ['load'],
 
   setup (props, { emit }) {
-    const uuidRef = ref('')
     const container = injectContainer()
     let model: Group
     let emitOnLoad = false
@@ -71,7 +70,6 @@ const ObjModel = defineComponent({
       model = await objLoader.loadAsync(objUrl)
 
       container?.add(model)
-      uuidRef.value = model.uuid
     }
 
     const revoke = watch(props, async (newValue, oldValue) => {
@@ -126,7 +124,7 @@ const ObjModel = defineComponent({
     })
 
     return () => (
-      <div class='obj-model' data-uuid={uuidRef.value} />
+      <div class='obj-model' />
     )
   }
 })

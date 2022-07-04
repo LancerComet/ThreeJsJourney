@@ -20,26 +20,32 @@ const Group = defineComponent({
 
   setup (props, { slots, emit }) {
     const group = new THREE.Group()
+
     const container = injectContainer()
     if (container) {
       container.add(group)
     }
     provideContainer(group)
 
+    let setPropsTimer: any = null
+
     const setProps = () => {
-      ['x', 'y', 'z'].forEach(item => {
-        const key = item as 'x' | 'y' | 'z'
+      clearTimeout(setPropsTimer)
+      setPropsTimer = setTimeout(() => {
+        ['x', 'y', 'z'].forEach(item => {
+          const key = item as 'x' | 'y' | 'z'
 
-        const positionValue = props.position?.[key] ?? 0
-        if (positionValue !== group.position[key]) {
-          group.position[key] = positionValue
-        }
+          const positionValue = props.position?.[key] ?? 0
+          if (positionValue !== group.position[key]) {
+            group.position[key] = positionValue
+          }
 
-        const rotationValue = props.rotation?.[key] ?? 0
-        if (rotationValue !== group.rotation[key]) {
-          group.rotation[key] = rotationValue
-        }
-      })
+          const rotationValue = props.rotation?.[key] ?? 0
+          if (rotationValue !== group.rotation[key]) {
+            group.rotation[key] = rotationValue
+          }
+        })
+      }, 10)
     }
 
     const revoke = watch(props, setProps, {
@@ -47,14 +53,21 @@ const Group = defineComponent({
       immediate: true
     })
 
+    const removeSelf = () => {
+      group.removeFromParent()
+    }
+
     onMounted(() => {
       emit('update', group)
     })
 
-    onBeforeUnmount(revoke)
+    onBeforeUnmount(() => {
+      revoke()
+      removeSelf()
+    })
 
     return () => (
-      <div class='three-group' data-uid={group.uuid}>{ slots.default?.() }</div>
+      <div class='three-group'>{ slots.default?.() }</div>
     )
   }
 })

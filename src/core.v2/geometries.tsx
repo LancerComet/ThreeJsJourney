@@ -49,7 +49,7 @@ const PlaneGeometry = defineComponent({
     })
 
     return () => (
-      <div class='plane-geometry' data-uuid={geometry?.uuid} />
+      <div class='plane-geometry' />
     )
   }
 })
@@ -111,7 +111,7 @@ const BoxGeometry = defineComponent({
     })
 
     return () => (
-      <div class='box-geometry' data-uuid={geometry?.uuid} />
+      <div class='box-geometry' />
     )
   }
 })
@@ -146,7 +146,7 @@ const SphereGeometry = defineComponent({
     })
 
     return () => (
-      <div class='sphere-geometry' data-uuid={geometry?.uuid} />
+      <div class='sphere-geometry' />
     )
   }
 })
@@ -191,7 +191,7 @@ const BufferGeometry = defineComponent({
     })
 
     return () => (
-      <div class='box-geometry' data-uuid={geometry?.uuid} />
+      <div class='box-geometry' />
     )
   }
 })
@@ -224,7 +224,6 @@ const TextGeometry = defineComponent({
   setup (props) {
     let textGeometry: THREETextGeometry
     const setGeometry = getSetGeometry()
-    const uuidRef = ref('')
 
     const createTextGeometry = () => {
       const font = props.font
@@ -237,7 +236,6 @@ const TextGeometry = defineComponent({
         height: props.height,
         size: props.size
       })
-      uuidRef.value = textGeometry.uuid
       setGeometry(textGeometry)
     }
 
@@ -256,7 +254,7 @@ const TextGeometry = defineComponent({
     })
 
     return () => (
-      <div class='text-geometry' data-uid={uuidRef.value} />
+      <div class='text-geometry' />
     )
   }
 })

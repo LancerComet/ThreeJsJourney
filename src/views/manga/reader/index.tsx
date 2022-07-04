@@ -1,5 +1,5 @@
 import { OrthographicCamera, Vector3 } from 'three'
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 
 import { AxesHelper } from '../../../core.v2/helpers'
 import { AmbientLight, PointLight } from '../../../core.v2/lights'
@@ -13,7 +13,7 @@ import image05 from './assets/05.jpg'
 import image06 from './assets/06.jpg'
 import image07 from './assets/07.jpg'
 import image08 from './assets/08.jpg'
-import { Book } from './components/book'
+import { Book, BookVM } from './components/book'
 import style from './index.module.styl'
 
 const createCamera = (): [OrthographicCamera, () => void] => {
@@ -26,7 +26,7 @@ const createCamera = (): [OrthographicCamera, () => void] => {
     -viewSize / 2,
     0.1, 1000
   )
-  camera.position.set(-2, 100, 30)
+  camera.position.set(0, 100, 0)
   camera.lookAt(new Vector3(0, 0, 0))
 
   const setCameraSize = () => {
@@ -46,6 +46,7 @@ const MangaReader = defineComponent({
   name: 'MangaReader',
   setup () {
     const [camera, setCameraSize] = createCamera()
+    const bookRef = ref<BookVM>()
 
     const { Scene, controls } = useScene({
       antialias: true,
@@ -60,18 +61,21 @@ const MangaReader = defineComponent({
       image05, image06, image07, image08
     ]
 
+    const goPrev = () => bookRef.value?.goPrev()
+    const goNext = () => bookRef.value?.goNext()
+
     return () => (
       <div class={style.pageContainer}>
         <Scene background={0xeeeeee}>
           <AxesHelper />
-          <Book images={images} />
+          <Book ref={bookRef} images={images} />
           <AmbientLight intensity={0.8} color={0xffffff} />
           <PointLight showHelper position={{ x: 4, y: 3, z: 4 }} intensity={0.5} castShadow />
         </Scene>
 
         <div class={style.controlButtons}>
-          <button>Prev</button>
-          <button>Next</button>
+          <button onClick={goPrev}>Prev</button>
+          <button onClick={goNext}>Next</button>
         </div>
       </div>
     )
