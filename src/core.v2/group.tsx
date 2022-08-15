@@ -27,25 +27,20 @@ const Group = defineComponent({
     }
     provideContainer(group)
 
-    let setPropsTimer: any = null
-
     const setProps = () => {
-      clearTimeout(setPropsTimer)
-      setPropsTimer = setTimeout(() => {
-        ['x', 'y', 'z'].forEach(item => {
-          const key = item as 'x' | 'y' | 'z'
-
-          const positionValue = props.position?.[key] ?? 0
-          if (positionValue !== group.position[key]) {
-            group.position[key] = positionValue
-          }
-
-          const rotationValue = props.rotation?.[key] ?? 0
-          if (rotationValue !== group.rotation[key]) {
-            group.rotation[key] = rotationValue
-          }
-        })
-      }, 10)
+      const axes = ['x', 'y', 'z'] as ('x' | 'y' | 'z')[]
+      for (const key of axes) {
+        const newPosition = props.position?.[key] ?? 0
+        const oldPosition = group.position[key]
+        if (newPosition !== oldPosition) {
+          group.position[key] = newPosition
+        }
+        const newRotation = props.rotation?.[key] ?? 0
+        const oldRotation = group.rotation[key]
+        if (newRotation !== oldRotation) {
+          group.rotation[key] = newRotation
+        }
+      }
     }
 
     const revoke = watch(props, setProps, {
