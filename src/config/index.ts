@@ -84,6 +84,19 @@ const pageConfig: { [sectionName: string]: RouteRecordRaw[] } = {
       path: 'forest',
       component: () => import('../views/forest/index').then(item => item.ForestScene)
     }
+  ],
+
+  Test: [
+    {
+      name: 'Test',
+      path: 'test',
+      component: () => import('../views/test/index').then(item => item.TestPage)
+    },
+    {
+      name: 'Bending',
+      path: 'bending',
+      component: () => import('../views/test.bending').then(item => item.TestBending)
+    }
   ]
 }
 

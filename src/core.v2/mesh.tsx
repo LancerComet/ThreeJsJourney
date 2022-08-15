@@ -1,5 +1,15 @@
 import * as THREE from 'three'
-import { defineComponent, inject, onBeforeUnmount, PropType, provide, readonly, ref, watch } from 'vue'
+import {
+  ComponentPublicInstance,
+  defineComponent,
+  inject,
+  onBeforeUnmount,
+  PropType,
+  provide,
+  readonly, Ref,
+  ref,
+  watch
+} from 'vue'
 import { injectContainer } from './providers/container'
 
 const injectKeySetMaterial = 'three:mesh:setMaterial'
@@ -95,7 +105,7 @@ const Mesh = defineComponent({
     })
 
     expose({
-      meshRef: readonly(meshRef)
+      getMesh: () => meshRef.value
     })
 
     onBeforeUnmount(() => {
@@ -123,8 +133,18 @@ const getSetGeometry = () => {
   })
 }
 
+type MeshVM = ComponentPublicInstance<{
+  receiveShadow: boolean
+  castShadow: boolean
+  position: Partial<{ x: number, y: number, z: number }>
+  rotation: Partial<{ x: number, y: number, z: number }>
+}, {
+  getMesh: () => THREE.Mesh
+}>
+
 export {
   Mesh,
+  MeshVM,
   getSetMaterial,
   getSetGeometry
 }
