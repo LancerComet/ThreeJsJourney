@@ -3,6 +3,7 @@ import { Bend, ModifierStack } from 'three.modifiers'
 import { ComponentPublicInstance, defineComponent, onBeforeUnmount, PropType, ref } from 'vue'
 
 import { injectContainer } from '../../core.v2/providers/container'
+import blankImage from './assets/blank.png'
 import { CubicBezier } from './cubic-bezier'
 
 const fragmentShader = `
@@ -32,7 +33,7 @@ void main() {
 
 const pageWidth = 5
 const pageHeight = 7
-const pageOffset = 0.02
+const pageOffset = 0.008
 const cubicBezier = new CubicBezier(0.22, 0.58, 0.12, 0.98)
 
 const MangaPage = defineComponent({
@@ -49,11 +50,11 @@ const MangaPage = defineComponent({
     },
     image01: {
       type: String as PropType<string>,
-      required: true
+      default: blankImage
     },
     image02: {
       type: String as PropType<string>,
-      required: true
+      default: blankImage
     }
   },
 

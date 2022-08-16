@@ -1,26 +1,17 @@
 import { OrthographicCamera } from 'three'
-import { defineComponent } from 'vue'
+import { computed, defineComponent, onMounted, ref } from 'vue'
 
+import { Group } from '../../core.v2/group'
 import { AxesHelper } from '../../core.v2/helpers'
-import { AmbientLight, PointLight } from '../../core.v2/lights'
 import { useScene } from '../../core.v2/scene'
 
-import image01 from './assets/01.jpg'
-import image02 from './assets/02.jpg'
-import image03 from './assets/03.jpg'
-import image04 from './assets/04.jpg'
-import image05 from './assets/05.jpg'
-import image06 from './assets/06.jpg'
-import image07 from './assets/07.jpg'
-import image08 from './assets/08.jpg'
-import image09 from './assets/09.jpg'
-import image10 from './assets/10.jpg'
-
+import blankImage from './assets/blank.png'
 import style from './index.module.styl'
 import { MangaPage, MangaPageVM } from './manga-page'
+import { getEpisodeId, getBlankPageIndex, getMangaImages } from './modules'
 
 const createCamera = (): [OrthographicCamera, () => void] => {
-  const viewSize = 10
+  const viewSize = 8
   const aspectRatio = window.innerWidth / window.innerHeight
   const camera = new OrthographicCamera(
     -aspectRatio * viewSize / 2,
@@ -45,26 +36,19 @@ const createCamera = (): [OrthographicCamera, () => void] => {
   return [camera, setCameraSize]
 }
 
-const imageList = [
-  image01,
-  image02,
-  image03,
-  image04,
-  image05,
-  image06,
-  image07,
-  image08,
-  image09,
-  image10
-]
-
 const TestBending = defineComponent({
   name: 'TestBending',
 
   setup () {
     let pageIndex = 0
-    const pageCount = 5
     const pageRefs: MangaPageVM[] = []
+    const imageUrlsRef = ref<string[]>()
+    const imageCount = computed(() => {
+      return imageUrlsRef.value?.length ?? 0
+    })
+    const pageCount = computed(() => {
+      return Math.ceil(imageCount.value / 2)
+    })
 
     const [camera, setCameraSize] = createCamera()
     const { Scene } = useScene({
@@ -84,32 +68,52 @@ const TestBending = defineComponent({
     }
 
     const goNext = () => {
-      if (pageIndex < pageCount) {
+      if (pageIndex < pageCount.value) {
         const vm = pageRefs[pageIndex]
         vm?.flip()
         pageIndex++
       }
     }
 
+    const initReaderImages = async () => {
+      const episodeId = getEpisodeId()
+      if (!episodeId) {
+        return
+      }
+      const imageUrls = await getMangaImages(episodeId)
+      if (imageUrls.length) {
+        const blankIndex = getBlankPageIndex()
+        if (blankIndex > -1) {
+          imageUrls.splice(blankIndex, 0, blankImage)
+        }
+        imageUrls.push(blankImage)
+      }
+      imageUrlsRef.value = imageUrls
+    }
+
+    onMounted(initReaderImages)
+
     return () => (
       <div>
         <Scene background={0xaaaaaa}>
           <AxesHelper />
-          {
-            new Array(pageCount).fill('').map((_, index) => {
+          <Group>{
+            new Array(pageCount.value).fill('').map((_, index) => {
               const baseIndex = index * 2
               return (
                 <MangaPage
-                  index={index} totalPage={pageCount}
+                  index={index}
+                  totalPage={pageCount.value}
                   ref={(vm: MangaPageVM) => {
                     pageRefs[index] = vm
                   }}
-                  image01={imageList[baseIndex]}
-                  image02={imageList[baseIndex + 1]}
+                  image01={imageUrlsRef.value?.[baseIndex]}
+                  image02={imageUrlsRef.value?.[baseIndex + 1]}
                 />
               )
             })
-          }
+          }</Group>
+
         </Scene>
 
         <div class={style.controlButtons}>
