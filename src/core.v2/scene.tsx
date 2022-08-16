@@ -16,11 +16,17 @@ const useScene = (param?: {
   useControl?: boolean
   antialias?: boolean
   useShadow?: boolean
+  useGui?: boolean
   shadowType?: ShadowMapType
   onResize?: () => void
 }) => {
-  const gui = new dat.GUI()
   const clock = new Clock()
+
+  const useGui = param?.useGui ?? true
+  let gui: dat.GUI | undefined
+  if (useGui) {
+    gui = new dat.GUI()
+  }
 
   const scene = new Scene()
   provideContainer(scene)
@@ -125,7 +131,7 @@ const useScene = (param?: {
         isTickStart = false
         window.removeEventListener('resize', onResize)
         clock.stop()
-        gui.destroy()
+        gui?.destroy()
         revoke()
       })
 

@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { Bend, ModifierStack } from 'three.modifiers'
 import { ComponentPublicInstance, defineComponent, onBeforeUnmount, PropType, ref } from 'vue'
 
-import { injectContainer } from '../../core.v2/providers/container'
+import { injectContainer } from '../../../core.v2/providers/container'
 import blankImage from './assets/blank.png'
 import { CubicBezier } from './cubic-bezier'
 
@@ -16,7 +16,7 @@ void main() {
   if (gl_FrontFacing) {
     color = texture2D(fronttex, vUv).rgb;
   } else {
-    vec2 backUv = vec2 (1.0 - vUv.s, vUv.t);
+    vec2 backUv = vec2(1.0 - vUv.s, vUv.t);
     color = texture2D(backtex, backUv).rgb;
   }
   gl_FragColor = vec4(color, 1.0);

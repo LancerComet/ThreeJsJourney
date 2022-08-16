@@ -1,23 +1,17 @@
-import { OrthographicCamera, Vector3 } from 'three'
-import { defineComponent, ref } from 'vue'
+import { OrthographicCamera } from 'three'
+import { computed, defineComponent, onMounted, ref } from 'vue'
 
+import { Group } from '../../../core.v2/group'
 import { AxesHelper } from '../../../core.v2/helpers'
-import { AmbientLight, PointLight } from '../../../core.v2/lights'
 import { useScene } from '../../../core.v2/scene'
 
-import image01 from './assets/01.jpg'
-import image02 from './assets/02.jpg'
-import image03 from './assets/03.jpg'
-import image04 from './assets/04.jpg'
-import image05 from './assets/05.jpg'
-import image06 from './assets/06.jpg'
-import image07 from './assets/07.jpg'
-import image08 from './assets/08.jpg'
-import { Book, BookVM } from './components/book'
+import blankImage from './assets/blank.png'
 import style from './index.module.styl'
+import { MangaPage, MangaPageVM } from './manga-page'
+import { getEpisodeId, getBlankPageIndex, getMangaImages } from './modules'
 
 const createCamera = (): [OrthographicCamera, () => void] => {
-  const viewSize = 7
+  const viewSize = 8
   const aspectRatio = window.innerWidth / window.innerHeight
   const camera = new OrthographicCamera(
     -aspectRatio * viewSize / 2,
@@ -26,8 +20,8 @@ const createCamera = (): [OrthographicCamera, () => void] => {
     -viewSize / 2,
     0.1, 1000
   )
-  camera.position.set(0, 100, 0)
-  camera.lookAt(new Vector3(0, 0, 0))
+  camera.position.set(10, 10, 10)
+  camera.lookAt(0, 0, 0)
 
   const setCameraSize = () => {
     const aspect = window.innerWidth / window.innerHeight
@@ -44,38 +38,94 @@ const createCamera = (): [OrthographicCamera, () => void] => {
 
 const MangaReader = defineComponent({
   name: 'MangaReader',
-  setup () {
-    const [camera, setCameraSize] = createCamera()
-    const bookRef = ref<BookVM>()
 
-    const { Scene, controls } = useScene({
-      antialias: true,
-      useControl: true,
-      useShadow: true,
-      camera,
-      onResize: setCameraSize
+  setup () {
+    let pageIndex = 0
+    const pageRefs: MangaPageVM[] = []
+    const imageUrlsRef = ref<string[]>()
+    const imageCount = computed(() => {
+      return imageUrlsRef.value?.length ?? 0
+    })
+    const pageCount = computed(() => {
+      return Math.ceil(imageCount.value / 2)
     })
 
-    const images = [
-      image01, image02, image03, image04,
-      image05, image06, image07, image08
-    ]
+    const [camera, setCameraSize] = createCamera()
+    const { Scene } = useScene({
+      useControl: true,
+      useGui: false,
+      camera,
+      onResize: () => {
+        setCameraSize()
+      }
+    })
 
-    const goPrev = () => bookRef.value?.goPrev()
-    const goNext = () => bookRef.value?.goNext()
+    const goPrev = () => {
+      if (pageIndex > 0) {
+        const vm = pageRefs[pageIndex - 1]
+        vm?.backward()
+        pageIndex--
+      }
+    }
+
+    const goNext = () => {
+      if (pageIndex < pageCount.value) {
+        const vm = pageRefs[pageIndex]
+        vm?.flip()
+        pageIndex++
+      }
+    }
+
+    const initReaderImages = async () => {
+      const episodeId = getEpisodeId()
+      if (!episodeId) {
+        return
+      }
+      const imageUrls = await getMangaImages(episodeId)
+      if (imageUrls.length) {
+        const blankIndex = getBlankPageIndex()
+        if (blankIndex > -1) {
+          imageUrls.splice(blankIndex, 0, blankImage)
+        }
+        imageUrls.push(blankImage)
+      }
+      imageUrlsRef.value = imageUrls
+    }
+
+    onMounted(initReaderImages)
+
+    const useExample = () => {
+      window.location.href = '/manga/reader?episodeId=702661&addBlank=1'
+    }
 
     return () => (
-      <div class={style.pageContainer}>
-        <Scene background={0xeeeeee}>
+      <div>
+        <Scene background={0xaaaaaa}>
           <AxesHelper />
-          <Book ref={bookRef} images={images} />
-          <AmbientLight intensity={0.8} color={0xffffff} />
-          <PointLight showHelper position={{ x: 4, y: 3, z: 4 }} intensity={0.5} castShadow />
+          <Group position={{
+            x: -2.5
+          }}>{
+            new Array(pageCount.value).fill('').map((_, index) => {
+              const baseIndex = index * 2
+              return (
+                <MangaPage
+                  index={index}
+                  totalPage={pageCount.value}
+                  ref={(vm: MangaPageVM) => {
+                    pageRefs[index] = vm
+                  }}
+                  image01={imageUrlsRef.value?.[baseIndex]}
+                  image02={imageUrlsRef.value?.[baseIndex + 1]}
+                />
+              )
+            })
+          }</Group>
         </Scene>
 
         <div class={style.controlButtons}>
-          <button onClick={goPrev}>Prev</button>
-          <button onClick={goNext}>Next</button>
+          <button onClick={goPrev}>Go prev</button>
+          <button onClick={goNext}>Go next</button>
+          <button onClick={useExample}>Example</button>
         </div>
       </div>
     )

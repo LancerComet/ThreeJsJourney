@@ -38,7 +38,7 @@ const getIndexContent = async (episodeId: string | number) => {
   }
   const host = response?.data?.host ?? ''
   const images: string[] = (response?.data?.images ?? [])
-    .map(item => item.path + '@1100w.jpg')
+    .map(item => item.path + '@700w.jpg')
   return {
     host,
     images
