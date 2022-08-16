@@ -1,8 +1,9 @@
-import { OrthographicCamera } from 'three'
+import { OrthographicCamera, Vector3 } from 'three'
 import { computed, defineComponent, onMounted, ref } from 'vue'
 
 import { Group } from '../../../core.v2/group'
 import { AxesHelper } from '../../../core.v2/helpers'
+import { AmbientLight, PointLight } from '../../../core.v2/lights'
 import { useScene } from '../../../core.v2/scene'
 
 import blankImage from './assets/blank.png'
@@ -11,7 +12,7 @@ import { MangaPage, MangaPageVM } from './manga-page'
 import { getEpisodeId, getBlankPageIndex, getMangaImages } from './modules'
 
 const createCamera = (): [OrthographicCamera, () => void] => {
-  const viewSize = 8
+  const viewSize = 8.2
   const aspectRatio = window.innerWidth / window.innerHeight
   const camera = new OrthographicCamera(
     -aspectRatio * viewSize / 2,
@@ -20,8 +21,7 @@ const createCamera = (): [OrthographicCamera, () => void] => {
     -viewSize / 2,
     0.1, 1000
   )
-  camera.position.set(10, 10, 10)
-  camera.lookAt(0, 0, 0)
+  camera.position.set(-40, 60, 180)
 
   const setCameraSize = () => {
     const aspect = window.innerWidth / window.innerHeight
@@ -51,14 +51,19 @@ const MangaReader = defineComponent({
     })
 
     const [camera, setCameraSize] = createCamera()
-    const { Scene } = useScene({
-      useControl: true,
+
+    const { Scene, controls } = useScene({
       useGui: false,
       camera,
       onResize: () => {
         setCameraSize()
       }
     })
+
+    // 设置相机默认值必须使用 controls.target.
+    if (controls) {
+      controls.target = new Vector3(0, 3.4, 0)
+    }
 
     const goPrev = () => {
       if (pageIndex > 0) {
@@ -74,6 +79,10 @@ const MangaReader = defineComponent({
         vm?.flip()
         pageIndex++
       }
+    }
+
+    const useExample = () => {
+      window.location.href = '/manga/reader?episodeId=702661&addBlank=1'
     }
 
     const initReaderImages = async () => {
@@ -94,17 +103,18 @@ const MangaReader = defineComponent({
 
     onMounted(initReaderImages)
 
-    const useExample = () => {
-      window.location.href = '/manga/reader?episodeId=702661&addBlank=1'
-    }
-
     return () => (
-      <div>
-        <Scene background={0xaaaaaa}>
+      <>
+        <Scene background={0xcccccc}>
+          <AmbientLight
+            intensity={0.7} color={0xA9C9E2}
+          />
+          <PointLight
+            castShadow intensity={0.9} color={0xfff0ba} distance={50}
+            position={{ x: 3, y: 10, z: 3 }} showHelper
+          />
           <AxesHelper />
-          <Group position={{
-            x: -2.5
-          }}>{
+          <Group position={{ x: -2.5 }}>{
             new Array(pageCount.value).fill('').map((_, index) => {
               const baseIndex = index * 2
               return (
@@ -123,11 +133,11 @@ const MangaReader = defineComponent({
         </Scene>
 
         <div class={style.controlButtons}>
-          <button onClick={goPrev}>Go prev</button>
-          <button onClick={goNext}>Go next</button>
+          <button onClick={goPrev}>Prev page</button>
+          <button onClick={goNext}>Next page</button>
           <button onClick={useExample}>Example</button>
         </div>
-      </div>
+      </>
     )
   }
 })

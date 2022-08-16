@@ -64,14 +64,19 @@ const MangaPage = defineComponent({
     const plane = new THREE.PlaneGeometry(pageWidth, pageHeight, 10, 10)
       .translate(-pageWidth / 2, 0, 0)
 
+    const texture1 = new THREE.TextureLoader().load(image01)
+    const texture2 = new THREE.TextureLoader().load(image02)
+    texture1.minFilter = THREE.LinearFilter
+    texture2.minFilter = THREE.LinearFilter
+
     const shaderMaterial = new THREE.ShaderMaterial({
       side: THREE.DoubleSide,
       uniforms: {
         fronttex: {
-          value: new THREE.TextureLoader().load(image01)
+          value: texture1
         },
         backtex: {
-          value: new THREE.TextureLoader().load(image02)
+          value: texture2
         }
       },
       vertexShader,

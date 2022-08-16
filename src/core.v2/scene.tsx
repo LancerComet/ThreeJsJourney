@@ -50,12 +50,12 @@ const useScene = (param?: {
   }
   renderer.setSize(window.innerWidth, window.innerHeight)
 
-  const controls = new OrbitControls(camera!, renderer.domElement)
-  controls.enableDamping = true
-  controls.dampingFactor = 0.1
-
-  if (!param?.useControl) {
-    controls.enabled = false
+  let controls: OrbitControls | undefined
+  const useControl = param?.useControl ?? true
+  if (useControl) {
+    controls = new OrbitControls(camera!, renderer.domElement)
+    controls.enableDamping = true
+    controls.dampingFactor = 0.1
   }
 
   const SceneComponent = defineComponent({
