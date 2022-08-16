@@ -32,14 +32,18 @@ void main() {
 
 const pageWidth = 5
 const pageHeight = 7
-const bezierFlip = new CubicBezier(0.22, 0.58, 0.12, 0.98)
-const bezierBack = new CubicBezier(0.43, 0.68, 0.45, 0.8)
+const pageOffset = 0.02
+const cubicBezier = new CubicBezier(0.22, 0.58, 0.12, 0.98)
 
 const MangaPage = defineComponent({
   name: 'MangaPage',
 
   props: {
     index: {
+      type: Number as PropType<number>,
+      required: true
+    },
+    totalPage: {
       type: Number as PropType<number>,
       required: true
     },
@@ -54,7 +58,7 @@ const MangaPage = defineComponent({
   },
 
   setup (props, { expose }) {
-    const { image01, image02 } = props
+    const { image01, image02, totalPage, index } = props
 
     const plane = new THREE.PlaneGeometry(pageWidth, pageHeight, 10, 10)
       .translate(-pageWidth / 2, 0, 0)
@@ -74,7 +78,9 @@ const MangaPage = defineComponent({
     })
 
     const mesh = new THREE.Mesh(plane, shaderMaterial)
-    mesh.position.set(pageWidth / 2, pageHeight / 2, props.index * -0.001)
+    mesh.receiveShadow = true
+    mesh.castShadow = true
+    mesh.position.set(pageWidth / 2, pageHeight / 2, index * -pageOffset)
 
     const modifier = new ModifierStack(mesh)
 
@@ -94,10 +100,13 @@ const MangaPage = defineComponent({
 
     const flip = () => {
       return new Promise<void>(resolve => {
-        bezierFlip.tick(0, 1, 60, (percent, isDone) => {
+        cubicBezier.tick(0, 1.1, 65, (percent, isDone) => {
+          // 圆的函数效果有点生硬, 这里还是使用有点偏移量的正弦函数, 然后 end 需要大一点才能正确归位.
+          // bend.force = Math.sqrt(Math.pow(0.5, 2) - Math.pow(percent - 0.5, 2)) * 2
           bend.force = Math.max(Math.sin(percent * 3), 0)
           modifier.apply()
           mesh.rotation.y = Math.min(percent, 1) * Math.PI
+          mesh.position.z = ((totalPage - index - 1) * pageOffset * -1) * percent
           if (isDone) {
             resolve()
           }
@@ -106,16 +115,27 @@ const MangaPage = defineComponent({
     }
 
     const backward = () => {
-      return new Promise<void>(resolve => {
-        bezierBack.tick(1, 0, 60, (percent, isDone) => {
-          bend.force = Math.max(Math.sin(percent * 3), 0)
-          modifier.apply()
-          mesh.rotation.y = Math.min(percent, 1) * Math.PI
-          if (isDone) {
-            resolve()
-          }
+      return Promise.all([
+        new Promise<void>(resolve => {
+          cubicBezier.tick(0, 1.1, 60, (percent, isDone) => {
+            bend.force = Math.max(Math.sin(percent * 3), 0) * -1
+            modifier.apply()
+            if (percent <= 1) {
+              mesh.position.z = (index * -pageOffset) * percent
+            }
+            isDone && resolve()
+          })
+        }),
+        new Promise<void>(resolve => {
+          cubicBezier.tick(1, 0, 60, (percent, isDone) => {
+            // bend.force = Math.sqrt(Math.pow(0.5, 2) - Math.pow(percent - 0.5, 2)) * -2
+            mesh.rotation.y = Math.min(percent, 1) * Math.PI
+            if (isDone) {
+              resolve()
+            }
+          })
         })
-      })
+      ])
     }
 
     expose({

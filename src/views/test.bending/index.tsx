@@ -94,19 +94,18 @@ const TestBending = defineComponent({
     return () => (
       <div>
         <Scene background={0xaaaaaa}>
-           <AmbientLight />
-           <PointLight castShadow showHelper position={{ x: 0, y: 5, z: 3 }} />
           <AxesHelper />
           {
-            new Array(pageCount).fill({}).map((_, index) => {
+            new Array(pageCount).fill('').map((_, index) => {
+              const baseIndex = index * 2
               return (
                 <MangaPage
-                  index={index}
+                  index={index} totalPage={pageCount}
                   ref={(vm: MangaPageVM) => {
                     pageRefs[index] = vm
                   }}
-                  image01={imageList[Math.floor(index * 2)]}
-                  image02={imageList[Math.floor(index * 2 + 1)]}
+                  image01={imageList[baseIndex]}
+                  image02={imageList[baseIndex + 1]}
                 />
               )
             })
