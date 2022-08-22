@@ -1,5 +1,15 @@
 import * as THREE from 'three'
-import { defineComponent, inject, onBeforeUnmount, PropType, provide, readonly, ref, watch } from 'vue'
+import {
+  ComponentPublicInstance,
+  defineComponent,
+  inject,
+  onBeforeUnmount,
+  PropType,
+  provide,
+  readonly, Ref,
+  ref,
+  watch
+} from 'vue'
 import { injectContainer } from './providers/container'
 
 const injectKeySetMaterial = 'three:mesh:setMaterial'
@@ -30,7 +40,6 @@ const Mesh = defineComponent({
     let _material: THREE.Material
     let _geometry: THREE.BufferGeometry
     const container = injectContainer()
-    const uuidRef = ref('')
     const meshRef = ref<THREE.Mesh>()
 
     const setMaterial = (material: THREE.Material) => {
@@ -54,7 +63,6 @@ const Mesh = defineComponent({
       }
 
       const mesh = new THREE.Mesh(_geometry, _material)
-      uuidRef.value = mesh.uuid
       meshRef.value = mesh
       setProps()
       container.add(mesh)
@@ -97,19 +105,18 @@ const Mesh = defineComponent({
     })
 
     expose({
-      meshRef: readonly(meshRef)
+      getMesh: () => meshRef.value
     })
 
     onBeforeUnmount(() => {
-      if (container && meshRef.value) {
-        container.remove(meshRef.value)
-        meshRef.value = undefined
-      }
       revoke()
+      meshRef.value?.clear()
+      meshRef.value?.removeFromParent()
+      meshRef.value = undefined
     })
 
     return () => (
-      <div class='mesh' data-uuid={uuidRef.value}>{ slots.default?.() }</div>
+      <div class='mesh'>{ slots.default?.() }</div>
     )
   }
 })
@@ -126,8 +133,18 @@ const getSetGeometry = () => {
   })
 }
 
+type MeshVM = ComponentPublicInstance<{
+  receiveShadow: boolean
+  castShadow: boolean
+  position: Partial<{ x: number, y: number, z: number }>
+  rotation: Partial<{ x: number, y: number, z: number }>
+}, {
+  getMesh: () => THREE.Mesh
+}>
+
 export {
   Mesh,
+  MeshVM,
   getSetMaterial,
   getSetGeometry
 }

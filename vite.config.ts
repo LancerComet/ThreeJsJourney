@@ -4,7 +4,6 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import dayjs from 'dayjs'
 import { defineConfig } from 'vite'
 import eslintPlugin from 'vite-plugin-eslint'
-import svgLoader from 'vite-svg-loader'
 import packageJSON from './package.json'
 
 const isProd = process.env.NODE_ENV === 'production'
@@ -54,7 +53,6 @@ export default defineConfig({
     eslintPlugin({
       cache: false
     }),
-    svgLoader(),
     htmlPlugin(),
     legacy({
       targets: 'defaults'

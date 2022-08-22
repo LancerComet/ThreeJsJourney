@@ -26,7 +26,6 @@ const Points = defineComponent({
     let _material: THREE.PointsMaterial
     let _geometry: THREE.BufferGeometry
     const container = injectContainer()
-    const uuid = ref('')
 
     const setMaterial = (Points: THREE.PointsMaterial) => {
       _material = Points
@@ -76,7 +75,6 @@ const Points = defineComponent({
         points = new THREE.Points(_geometry, _material)
         setProps()
         container.add(points)
-        uuid.value = points.uuid
       }
     }
 
@@ -90,7 +88,7 @@ const Points = defineComponent({
     })
 
     return () => (
-      <div class='points' data-uuid={uuid.value}>{ slots.default?.() }</div>
+      <div class='points'>{ slots.default?.() }</div>
     )
   }
 })
