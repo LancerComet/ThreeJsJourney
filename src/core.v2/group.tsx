@@ -13,6 +13,10 @@ const Group = defineComponent({
     rotation: {
       type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
       default: () => ({})
+    },
+    scale: {
+      type: Object as PropType<{ x: number, y: number, z: number }>,
+      default: () => ({ x: 1, y: 1, z: 1 })
     }
   },
 
@@ -39,6 +43,11 @@ const Group = defineComponent({
         const oldRotation = group.rotation[key]
         if (newRotation !== oldRotation) {
           group.rotation[key] = newRotation
+        }
+        const newScale = props.scale?.[key] ?? 0
+        const oldScale = group.scale[key]
+        if (newScale !== oldScale) {
+          group.scale[key] = newScale
         }
       }
     }
