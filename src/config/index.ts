@@ -91,10 +91,14 @@ const pageConfig: { [sectionName: string]: RouteRecordRaw[] } = {
       name: 'Test',
       path: 'test',
       component: () => import('../views/test/index').then(item => item.TestPage)
+    },
+    {
+      name: 'SvgMesh',
+      path: 'svg-mesh',
+      component: () => import('../views/test/svg-mesh').then(item => item.SvgMeshPage)
     }
   ]
 }
-
 export {
   pageConfig
 }
