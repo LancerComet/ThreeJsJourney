@@ -128,17 +128,29 @@ class CubicBezier {
    * @param step
    * @param callback 回调函数, 返回 boolean 表示是否停止.
    */
-  tick (start: number, end: number, step: number, callback: (value: number, isDone: boolean) => true | void) {
+  tick (
+    start: number,
+    end: number,
+    step: number,
+    callback: (value: number, isDone: boolean) => true | void
+  ): () => void {
     const values = this.createPositionsByStep(start, end, step)
     values.push(end) // 确保精度.
+
+    let manualStop = false
+
     const tick = () => {
       if (values.length) {
-        // eslint-disable-next-line node/no-callback-literal
-        const stop = callback(values.shift()!, !values.length)
-        !stop && requestAnimationFrame(tick)
+        // eslint-disable-next-line node/no-callback-literal, @typescript-eslint/no-non-null-assertion
+        const shouldStop = callback(values.shift()!, !values.length) || manualStop
+        !shouldStop && requestAnimationFrame(tick)
       }
     }
     tick()
+
+    return () => {
+      manualStop = true
+    }
   }
 
   constructor (p1x: number, p1y: number, p2x: number, p2y: number) {

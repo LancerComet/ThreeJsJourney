@@ -11,6 +11,7 @@
   "dependencies": {
     "@lancercomet/utils": "^1.0.0",
     "@vert/serializer": "^2.0.0",
+    "camera-controls": "^1.36.1",
     "cannon-es": "^0.19.0",
     "cannon-es-debugger": "^1.0.0",
     "dayjs": "^1.10.8",
