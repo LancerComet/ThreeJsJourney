@@ -16,11 +16,17 @@ const useScene = (param?: {
   useControl?: boolean
   antialias?: boolean
   useShadow?: boolean
+  useGui?: boolean
   shadowType?: ShadowMapType
   onResize?: () => void
 }) => {
-  const gui = new dat.GUI()
   const clock = new Clock()
+
+  const useGui = param?.useGui ?? true
+  let gui: dat.GUI | undefined
+  if (useGui) {
+    gui = new dat.GUI()
+  }
 
   const scene = new Scene()
   provideContainer(scene)
@@ -44,12 +50,12 @@ const useScene = (param?: {
   }
   renderer.setSize(window.innerWidth, window.innerHeight)
 
-  const controls = new OrbitControls(camera!, renderer.domElement)
-  controls.enableDamping = true
-  controls.dampingFactor = 0.1
-
-  if (!param?.useControl) {
-    controls.enabled = false
+  let controls: OrbitControls | undefined
+  const useControl = param?.useControl ?? true
+  if (useControl) {
+    controls = new OrbitControls(camera!, renderer.domElement)
+    controls.enableDamping = true
+    controls.dampingFactor = 0.1
   }
 
   const SceneComponent = defineComponent({
@@ -125,12 +131,12 @@ const useScene = (param?: {
         isTickStart = false
         window.removeEventListener('resize', onResize)
         clock.stop()
-        gui.destroy()
+        gui?.destroy()
         revoke()
       })
 
       return () => (
-        <div class='scene' data-uuid={scene.uuid} ref={element}>{slots.default?.()}</div>
+        <div class='scene' ref={element}>{slots.default?.()}</div>
       )
     }
   })

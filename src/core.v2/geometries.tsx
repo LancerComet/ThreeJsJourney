@@ -1,17 +1,21 @@
 import * as THREE from 'three'
 import { TextGeometry as THREETextGeometry } from 'three/examples/jsm/geometries/TextGeometry'
 import { Font } from 'three/examples/jsm/loaders/FontLoader'
-import { ComponentPublicInstance, defineComponent, onBeforeUnmount, PropType, ref, watch, watchEffect } from 'vue'
+import { ComponentPublicInstance, defineComponent, onBeforeUnmount, PropType, watch } from 'vue'
 import { getSetGeometry } from './mesh'
 import { getSetPointsGeometry } from './points'
 
 const PlaneGeometry = defineComponent({
   props: {
     width: Number as PropType<number>,
-    height: Number as PropType<number>
+    height: Number as PropType<number>,
+    widthSegment: Number as PropType<number>,
+    heightSegment: Number as PropType<number>
   },
 
-  setup (props) {
+  emits: ['update'],
+
+  setup (props, { emit }) {
     let geometry: THREE.PlaneGeometry
     let createTimer: NodeJS.Timeout
     const setGeometry = getSetGeometry()
@@ -21,9 +25,12 @@ const PlaneGeometry = defineComponent({
       createTimer = setTimeout(() => {
         geometry = new THREE.PlaneGeometry(
           props.width,
-          props.height
+          props.height,
+          props.widthSegment,
+          props.heightSegment
         )
         setGeometry(geometry)
+        emit('update', geometry)
       }, 1)
       dispose()
     }
@@ -34,7 +41,9 @@ const PlaneGeometry = defineComponent({
 
     const revoke = watch(props, (newValue, oldValue) => {
       const isSizeChanged = newValue.width !== oldValue?.width ||
-        newValue.height !== oldValue?.height
+        newValue.height !== oldValue?.height ||
+        newValue.widthSegment !== oldValue?.widthSegment ||
+        newValue.heightSegment !== oldValue?.heightSegment
       if (isSizeChanged) {
         createGeometry()
       }
@@ -49,7 +58,7 @@ const PlaneGeometry = defineComponent({
     })
 
     return () => (
-      <div class='plane-geometry' data-uuid={geometry?.uuid} />
+      <div class='plane-geometry' />
     )
   }
 })
@@ -111,7 +120,7 @@ const BoxGeometry = defineComponent({
     })
 
     return () => (
-      <div class='box-geometry' data-uuid={geometry?.uuid} />
+      <div class='box-geometry' />
     )
   }
 })
@@ -146,7 +155,7 @@ const SphereGeometry = defineComponent({
     })
 
     return () => (
-      <div class='sphere-geometry' data-uuid={geometry?.uuid} />
+      <div class='sphere-geometry' />
     )
   }
 })
@@ -191,7 +200,7 @@ const BufferGeometry = defineComponent({
     })
 
     return () => (
-      <div class='box-geometry' data-uuid={geometry?.uuid} />
+      <div class='box-geometry' />
     )
   }
 })
@@ -224,7 +233,6 @@ const TextGeometry = defineComponent({
   setup (props) {
     let textGeometry: THREETextGeometry
     const setGeometry = getSetGeometry()
-    const uuidRef = ref('')
 
     const createTextGeometry = () => {
       const font = props.font
@@ -237,7 +245,6 @@ const TextGeometry = defineComponent({
         height: props.height,
         size: props.size
       })
-      uuidRef.value = textGeometry.uuid
       setGeometry(textGeometry)
     }
 
@@ -256,7 +263,7 @@ const TextGeometry = defineComponent({
     })
 
     return () => (
-      <div class='text-geometry' data-uid={uuidRef.value} />
+      <div class='text-geometry' />
     )
   }
 })

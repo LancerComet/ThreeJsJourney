@@ -70,6 +70,11 @@ const pageConfig: { [sectionName: string]: RouteRecordRaw[] } = {
       name: 'Hub',
       path: 'hub',
       component: () => import('../views/manga/hub').then(item => item.MangaHub)
+    },
+    {
+      name: 'Reader',
+      path: 'reader',
+      component: () => import('../views/manga/reader').then(item => item.MangaReader)
     }
   ],
 
@@ -78,6 +83,14 @@ const pageConfig: { [sectionName: string]: RouteRecordRaw[] } = {
       name: 'Forest',
       path: 'forest',
       component: () => import('../views/forest/index').then(item => item.ForestScene)
+    }
+  ],
+
+  Test: [
+    {
+      name: 'Test',
+      path: 'test',
+      component: () => import('../views/test/index').then(item => item.TestPage)
     }
   ]
 }

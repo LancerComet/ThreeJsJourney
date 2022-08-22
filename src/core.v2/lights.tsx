@@ -45,7 +45,7 @@ const AmbientLight = defineComponent({
     }
 
     return () => (
-      <div class='ambient-light' data-uuid={ambientLight.uuid} />
+      <div class='ambient-light' />
     )
   }
 })
@@ -154,7 +154,7 @@ const PointLight = defineComponent({
     })
 
     return () => (
-      <div class='point-light' data-uuid={pointLight.uuid} />
+      <div class='point-light' />
     )
   }
 })
@@ -255,7 +255,7 @@ const DirectionalLight = defineComponent({
     })
 
     return () => (
-      <div class='directional-light' data-uuid={light.uuid} />
+      <div class='directional-light' />
     )
   }
 })
@@ -323,7 +323,7 @@ const HemisphereLight = defineComponent({
     })
 
     return () => (
-      <div class='hemisphere-light' data-uuid={light.uuid} />
+      <div class='hemisphere-light' />
     )
   }
 })
