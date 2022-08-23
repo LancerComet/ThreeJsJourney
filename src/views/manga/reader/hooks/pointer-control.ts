@@ -1,41 +1,38 @@
-import { BufferGeometry, EventListener, Mesh, ShaderMaterial } from 'three'
-import * as THREE from 'three'
-import { clampNumber } from '../../../utils'
-
-type EventHandler = EventListener<THREE.Event, string, Mesh<BufferGeometry, ShaderMaterial>>
+import { MangaPageVM } from '../components/manga-reader'
+import { clampNumber } from '../utils'
 
 const usePointerControl = (param: {
-  mesh: Mesh,
   moveThreshold?: number
   moveTotalDistance?: number
   flipDistance?: number
-  stopFlipping: () => void
-  getFlipPercent: () => number
-  setFlipPercent: (isForward: boolean, percent: number) => void
-  flipFromCurrentPercent: (isForward: boolean, distPercent: number) => void
+  getIndex: () => number
+  getMangaPageVms: () => MangaPageVM[]
+  onFlip: (pageIndex: number) => void
+  onBackward: (pageIndex: number) => void
 }) => {
   let isEnabled: boolean = false
   const moveThreshold = param.moveThreshold ?? 5
   const moveTotalDistance = param.moveTotalDistance ?? clampNumber(window.innerWidth * 0.4, 250, 1920)
-  const { mesh, setFlipPercent, getFlipPercent, flipFromCurrentPercent, stopFlipping } = param
+  const { getIndex, getMangaPageVms, onFlip, onBackward } = param
 
   let isPointerDown = false
   let pointerDownX = 0
   let lastMoveX = 0
   let startFlipProgress = 0
-  let moveDirection: 'flip' | 'backward' = 'flip'
+  let moveDirection: 'flip' | 'backward' | 'none' = 'none'
 
-  const onPointerDown: EventHandler = (event) => {
+  let targetIndex: number = -1
+  let targetPageVM: MangaPageVM | undefined
+
+  const onPointerDown = (event: PointerEvent) => {
     if (!isEnabled) {
       return
     }
 
     event.stopPropagation()
     isPointerDown = true
-    const originalEvent = event.originalEvent as PointerEvent
-    pointerDownX = originalEvent.offsetX
-    startFlipProgress = getFlipPercent()
-    stopFlipping()
+    pointerDownX = event.offsetX
+    lastMoveX = event.offsetX
   }
 
   const onPointerUp = (event: Event) => {
@@ -45,17 +42,31 @@ const usePointerControl = (param: {
 
     event.stopPropagation()
 
-    const currentFlipPercent = getFlipPercent()
-    const deltaPercent = Math.abs(currentFlipPercent - startFlipProgress)
-    if (deltaPercent > 0) {
-      if (moveDirection === 'flip') {
-        flipFromCurrentPercent(true, deltaPercent <= 0.4 ? 0 : 1)
-      } else {
-        flipFromCurrentPercent(false, deltaPercent <= 0.4 ? 1 : 0)
+    if (targetPageVM) {
+      const currentFlipPercent = targetPageVM.getFlipPercent()
+      const deltaPercent = Math.abs(currentFlipPercent - startFlipProgress)
+      if (deltaPercent > 0) {
+        if (moveDirection === 'flip') {
+          const isFlipped = deltaPercent > 0.4
+          targetPageVM.flipFromCurrentPercent(true, isFlipped ? 1 : 0)
+          if (isFlipped) {
+            onFlip(targetIndex)
+          }
+        } else {
+          const isBackward = deltaPercent > 0.4
+          targetPageVM.flipFromCurrentPercent(false, isBackward ? 0 : 1)
+          if (isBackward) {
+            onBackward(targetIndex)
+          }
+        }
       }
     }
 
+    targetIndex = -1
+    targetPageVM = undefined
     isPointerDown = false
+    lastMoveX = 0
+    moveDirection = 'none'
   }
 
   const onPointerMove = (event: PointerEvent) => {
@@ -69,12 +80,34 @@ const usePointerControl = (param: {
       return
     }
 
-    moveDirection = moveDelta > 0 ? 'flip' : 'backward'
+    moveDirection = moveDelta > 0
+      ? 'flip'
+      : moveDelta < 0
+        ? 'backward'
+        : 'none'
+
+    if (!targetPageVM) {
+      const pageVMs = getMangaPageVms()
+      let index = -1
+      if (moveDirection === 'flip') {
+        index = getIndex()
+      } else if (moveDirection === 'backward') {
+        index = getIndex() - 1
+      }
+      console.log(index, moveDirection, moveDelta)
+      if (index >= 0) {
+        targetIndex = index
+        targetPageVM = pageVMs[index]
+        targetPageVM?.stopFlipping()
+        startFlipProgress = targetPageVM.getFlipPercent()
+      }
+    }
 
     const moveDistance = offsetX - pointerDownX
     const movePercent = moveDistance / moveTotalDistance
     const percent = clampNumber(startFlipProgress + movePercent, 0, 1)
-    setFlipPercent(startFlipProgress <= 0.3, percent)
+    targetPageVM?.setFlipPercent(startFlipProgress <= 0.3, percent)
+
     lastMoveX = offsetX
   }
 
@@ -100,29 +133,31 @@ const usePointerControl = (param: {
     const moveDistance = offsetX - pointerDownX
     const movePercent = moveDistance / moveTotalDistance
     const percent = clampNumber(startFlipProgress + movePercent, 0, 1)
-    setFlipPercent(startFlipProgress <= 0.3, percent)
+    targetPageVM?.setFlipPercent(startFlipProgress <= 0.3, percent)
     lastMoveX = offsetX
   }
 
-  mesh.addEventListener('pointerdown', onPointerDown)
+  window.addEventListener('pointerdown', onPointerDown)
   window.addEventListener('pointerup', onPointerUp)
   window.addEventListener('pointermove', onPointerMove)
   window.addEventListener('touchmove', onTouchMove)
   window.addEventListener('touchend', onPointerUp)
 
   const dispose = () => {
-    mesh.removeEventListener('pointerdown', onPointerDown)
+    window.removeEventListener('pointerdown', onPointerDown)
     window.removeEventListener('pointerup', onPointerUp)
     window.removeEventListener('pointermove', onPointerMove)
     window.removeEventListener('touchmove', onTouchMove)
     window.removeEventListener('touchend', onPointerUp)
   }
 
+  const setEnabled = (newState: boolean) => {
+    isEnabled = newState
+  }
+
   return {
     dispose,
-    setEnabled: (newState: boolean) => {
-      isEnabled = newState
-    }
+    setEnabled
   }
 }
 

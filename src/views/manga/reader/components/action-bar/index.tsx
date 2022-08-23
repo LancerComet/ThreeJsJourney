@@ -1,5 +1,5 @@
 import { defineComponent, PropType } from 'vue'
-import { IEpisodeOption } from '../types'
+import { IEpisodeOption } from '../../types'
 
 const ActionBar = defineComponent({
   name: 'ActionBar',

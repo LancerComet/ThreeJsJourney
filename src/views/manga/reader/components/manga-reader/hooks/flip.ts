@@ -1,23 +1,22 @@
-import { Mesh } from 'three'
+import { Object3D } from 'three'
 import { Bend, ModifierStack } from 'three.modifiers'
 import { CubicBezier } from '../../../modules/cubic-bezier'
 import { getFps } from '../../../modules/fps'
 import { clampNumber } from '../../../utils'
 
 const useFlip = (param: {
-  mesh: Mesh
+  threeObject: Object3D
   bend: Bend
-  modifier: ModifierStack
+  modifiers: ModifierStack[]
   index: number
   totalPage: number
   pageOffset: number
   cubicBezier: CubicBezier
-  emit: (eventName: string, ...args: unknown[]) => void
 }) => {
   const {
-    mesh, bend, modifier,
+    threeObject, bend, modifiers,
     index, totalPage, pageOffset,
-    cubicBezier, emit
+    cubicBezier
   } = param
 
   let flipPercent = 0
@@ -31,50 +30,51 @@ const useFlip = (param: {
     bend.force = isForward
       ? force * 0.88 // 给个小数倍率尽量避免穿模.
       : force * -0.88
-    modifier.apply()
 
-    mesh.rotation.y = Math.min(percent, 1) * Math.PI
+    modifiers.forEach(item => item.apply())
+
+    threeObject.rotation.y = Math.min(percent, 1) * Math.PI
 
     const positionFlipped = (totalPage - index - 1) * -pageOffset
     const positionOrigin = index * -pageOffset
-    mesh.position.z = isForward
+    threeObject.position.z = isForward
       ? positionOrigin + percent * (positionFlipped - positionOrigin)
       : positionFlipped - (1 - percent) * (positionFlipped - positionOrigin)
   }
 
   const flipStepsAt60Fps = 60
-  const flipExec = (isForward: boolean, endOverride?: number, doEmit: boolean = false) => {
-    let end = isForward ? 1 : 0
-    if (typeof endOverride === 'number') {
-      end = clampNumber(endOverride, 0, 1)
-    }
-
-    if (flipPercent === end) {
-      return
-    }
-
-    const baseStep = isForward
-      ? flipStepsAt60Fps * (1 - flipPercent)
-      : flipStepsAt60Fps * flipPercent
-    const stepRatio = getFps() / 60
-    const steps = Math.floor(Math.max(baseStep, Math.floor(baseStep * stepRatio)))
-
-    stopper?.()
-    stopper = cubicBezier.tick(flipPercent, end, steps, (percent, isDone) => {
-      setFlipPercent(isForward, percent)
-      if (isDone) {
-        stopper = undefined
-        if (doEmit) {
-          isForward ? emit('manualFlip', index) : emit('manualBackward', index)
-        }
+  const flipExec = (isForward: boolean, endOverride?: number): Promise<void> => {
+    return new Promise(resolve => {
+      let end = isForward ? 1 : 0
+      if (typeof endOverride === 'number') {
+        end = clampNumber(endOverride, 0, 1)
       }
+
+      if (flipPercent === end) {
+        return
+      }
+
+      const baseStep = isForward
+        ? flipStepsAt60Fps * (1 - flipPercent)
+        : flipStepsAt60Fps * flipPercent
+      const stepRatio = getFps() / 60
+      const steps = Math.floor(Math.max(baseStep, Math.floor(baseStep * stepRatio)))
+
+      stopper?.()
+      stopper = cubicBezier.tick(flipPercent, end, steps, (percent, isDone) => {
+        setFlipPercent(isForward, percent)
+        if (isDone) {
+          stopper = undefined
+          resolve()
+        }
+      })
     })
   }
 
   const flip = () => flipExec(true)
   const backward = () => flipExec(false)
   const flipFromCurrentPercent = (isForward: boolean, distPercent: number) => {
-    flipExec(isForward, distPercent, true)
+    return flipExec(isForward, distPercent)
   }
 
   return {

@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { Bend, ModifierStack } from 'three.modifiers'
+import { createMultiMaterialObject } from 'three/examples/jsm/utils/SceneUtils'
 import { ComponentPublicInstance, defineComponent, onBeforeUnmount, PropType } from 'vue'
 
 import { injectContainer } from '../../../../../core.v2/providers/container'
@@ -7,7 +8,6 @@ import blankImage from '../../assets/blank.png'
 import { CubicBezier } from '../../modules/cubic-bezier'
 import { InteractionManager } from '../../modules/interactive'
 import { useFlip } from './hooks/flip'
-import { usePointerControl } from './hooks/pointer-control'
 import { fragmentShader, vertexShader } from './modules/shaders'
 
 const pageWidth = 5
@@ -45,9 +45,7 @@ const MangaPage = defineComponent({
     }
   },
 
-  emits: ['manualFlip', 'manualBackward'],
-
-  setup (props, { expose, emit }) {
+  setup (props, { expose }) {
     const { image01, image02, totalPage, index, interactionManager } = props
 
     const plane = new THREE.PlaneGeometry(pageWidth, pageHeight, 10, 10)
@@ -98,62 +96,67 @@ const MangaPage = defineComponent({
       vertexShader
     })
 
-    const mesh = new THREE.Mesh(plane, shaderMaterial)
-    mesh.receiveShadow = true
-    mesh.castShadow = true
-    mesh.position.set(pageWidth / 2, pageHeight / 2, index * -pageOffset)
+    const standardMaterial = new THREE.MeshStandardMaterial({
+      color: 'orange',
+      side: THREE.DoubleSide,
+      opacity: 0.5,
+      transparent: true
+    })
+
+    const group = createMultiMaterialObject(plane, [
+      shaderMaterial
+      // standardMaterial
+    ])
+    group.receiveShadow = true
+    group.castShadow = true
+    group.position.set(pageWidth / 2, pageHeight / 2, index * -pageOffset)
 
     const container = injectContainer()
-    container?.add(mesh)
+    container?.add(group)
 
-    interactionManager.add(mesh)
+    interactionManager.add(group)
 
     const bend = new Bend(0, 0, 0)
     bend.offset = 0.5
     bend.angle = (90 / 180) * Math.PI
 
-    const modifier = new ModifierStack(mesh)
-    modifier.addModifier(bend)
+    const meshes = group.children as THREE.Mesh[]
+    const modifiers = meshes.map(mesh => {
+      const modifier = new ModifierStack(mesh)
+      modifier.addModifier(bend)
+      return modifier
+    })
 
     const {
       flip, backward, flipFromCurrentPercent,
       getFlipPercent, setFlipPercent,
       stopper
     } = useFlip({
-      mesh,
+      threeObject: group,
       bend,
-      modifier,
+      modifiers,
       index,
       totalPage,
       pageOffset,
-      cubicBezier,
-      emit: (eventName, ...args) => {
-        emit(eventName as 'manualFlip' | 'manualBackward', ...args)
-      }
-    })
-
-    const {
-      dispose: disposePointerControl,
-      setEnabled: setManualFlipEnable
-    } = usePointerControl({
-      mesh,
-      getFlipPercent,
-      setFlipPercent,
-      stopFlipping: () => stopper?.(),
-      flipFromCurrentPercent
+      cubicBezier
     })
 
     onBeforeUnmount(() => {
-      disposePointerControl()
-      mesh.clear()
-      mesh.removeFromParent()
+      group.clear()
+      group.removeFromParent()
     })
+
+    const stopFlipping = () => {
+      stopper?.()
+    }
 
     expose({
       flip,
       backward,
-      setManualFlipEnable,
-      getFlipPercent
+      getFlipPercent,
+      setFlipPercent,
+      stopFlipping,
+      flipFromCurrentPercent
     })
 
     return () => (
@@ -168,8 +171,10 @@ type MangaPageVM = ComponentPublicInstance<{
 }, {
   flip: () => Promise<void>
   backward: () => Promise<void>
-  setManualFlipEnable: (isEnabled: boolean) => void
   getFlipPercent: () => number
+  setFlipPercent: (isForward: boolean, percent: number) => void
+  stopFlipping: () => void
+  flipFromCurrentPercent: (isForward: boolean, distPercent: number) => Promise<void>
 }>
 
 export {
