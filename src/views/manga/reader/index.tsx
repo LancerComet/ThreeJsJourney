@@ -8,13 +8,14 @@ import { AmbientLight, PointLight } from '../../../core.v2/lights'
 import { useScene } from '../../../core.v2/scene'
 import { ActionBar } from './components/action-bar'
 import { MangaPage, MangaPageVM } from './components/manga-reader'
+import { usePointerControl } from './hooks/pointer-control'
 import style from './index.module.styl'
 import { CubicBezier } from './modules/cubic-bezier'
 import { getFps } from './modules/fps'
 import { InteractionManager } from './modules/interactive'
 import { useMangaImages } from './modules/manga'
 import { IEpisodeOption } from './types'
-import { sleep } from './utils'
+import { clampNumber, sleep } from './utils'
 
 const isProd = process.env.NODE_ENV === 'production'
 const cubicBezier = new CubicBezier(0.22, 0.58, 0.12, 0.98)
@@ -65,6 +66,7 @@ const MangaReader = defineComponent({
     const colorObject = new THREE.Color().setHSL(0, 0, releasedColor)
     const backgroundRef = ref(colorObject.getHex())
 
+    // pageIndex 指的是纸张的下标, 不是逻辑页码.
     let pageIndex = 0
     let isCameraLocked = false
 
@@ -183,10 +185,7 @@ const MangaReader = defineComponent({
     }
 
     const setManualFlipEnableState = () => {
-      const isEnable = isCameraLocked
-      pageComponentRefs.forEach(item => {
-        item.setManualFlipEnable(isEnable)
-      })
+      setPointerControlEnable(isCameraLocked)
     }
 
     const lockCamera = () => {
@@ -253,11 +252,29 @@ const MangaReader = defineComponent({
     window.addEventListener('keyup', globalKeyHandler)
     window.addEventListener('wheel', mouseWheelHandler)
 
+    const {
+      dispose: disposePointerControl,
+      setEnabled: setPointerControlEnable
+    } = usePointerControl({
+      moveTotalDistance: clampNumber(150, 800, window.innerWidth * 0.4),
+      getIndex: () => pageIndex,
+      getMangaPageVms: () => pageComponentRefs.slice(),
+      onFlip: (index) => {
+        console.log('onManualFlip', index)
+        pageIndex = index + 1
+      },
+      onBackward: (index) => {
+        console.log('onManualBackward', index)
+        pageIndex = index
+      }
+    })
+
     onMounted(async () => {
       await selectEpisode(0)
     })
 
     onBeforeUnmount(() => {
+      disposePointerControl()
       interactionManager.dispose()
       window.removeEventListener('keyup', globalKeyHandler)
       window.removeEventListener('wheel', mouseWheelHandler)
@@ -304,12 +321,6 @@ const MangaReader = defineComponent({
                   image01={imageUrlsRef.value?.[baseIndex]}
                   image02={imageUrlsRef.value?.[baseIndex + 1]}
                   interactionManager={interactionManager}
-                  onManualFlip={(index: number) => {
-                    pageIndex = index + 1
-                  }}
-                  onManualBackward={(index: number) => {
-                    pageIndex = index
-                  }}
                 />
               )
             })
