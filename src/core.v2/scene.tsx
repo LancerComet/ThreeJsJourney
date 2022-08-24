@@ -18,8 +18,9 @@ const useScene = (param?: {
   useShadow?: boolean
   useGui?: boolean
   shadowType?: ShadowMapType
-  onResize?: () => void
 }) => {
+  let onResizeCallback: (event: Event) => void
+
   const clock = new Clock()
 
   const useGui = param?.useGui ?? true
@@ -81,13 +82,11 @@ const useScene = (param?: {
         }
       }
 
-      const onResize = () => {
+      const onResizeHandler = (event: Event) => {
         if (camera instanceof PerspectiveCamera) {
           camera.aspect = window.innerWidth / window.innerHeight
         }
-        if (typeof param?.onResize === 'function') {
-          param.onResize()
-        }
+        onResizeCallback?.(event)
         camera?.updateProjectionMatrix()
         renderer.setSize(window.innerWidth, window.innerHeight)
       }
@@ -120,7 +119,7 @@ const useScene = (param?: {
         immediate: true
       })
 
-      window.addEventListener('resize', onResize)
+      window.addEventListener('resize', onResizeHandler)
 
       onMounted(() => {
         element.value?.appendChild(renderer.domElement)
@@ -129,7 +128,7 @@ const useScene = (param?: {
 
       onBeforeUnmount(() => {
         isTickStart = false
-        window.removeEventListener('resize', onResize)
+        window.removeEventListener('resize', onResizeHandler)
         clock.stop()
         gui?.destroy()
         revoke()
@@ -156,7 +155,10 @@ const useScene = (param?: {
     scene,
     renderer,
     clock,
-    controls
+    controls,
+    onResize: (callback: (event: Event) => void) => {
+      onResizeCallback = callback
+    }
   }
 }
 

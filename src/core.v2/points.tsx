@@ -1,9 +1,8 @@
 import * as THREE from 'three'
-import { defineComponent, inject, onBeforeUnmount, PropType, provide, ref, watch } from 'vue'
+import { defineComponent, inject, onBeforeUnmount, onMounted, PropType, provide, ref, watch, watchEffect } from 'vue'
 import { injectContainer } from './providers/container'
 
-const injectKeySetMaterial = 'three:point:setMaterial'
-const injectKeySetGeometry = 'three:point:setGeometry'
+const injectKeyGetPoint = 'three:point:getPoint'
 
 const Points = defineComponent({
   name: 'Points',
@@ -21,23 +20,17 @@ const Points = defineComponent({
     }
   },
 
-  setup (props, { slots }) {
-    let points: THREE.Points
-    let _material: THREE.PointsMaterial
-    let _geometry: THREE.BufferGeometry
+  emits: ['mounted'],
+
+  setup (props, { slots, emit }) {
+    const points = new THREE.Points()
     const container = injectContainer()
+    container?.add(points)
 
-    const setMaterial = (Points: THREE.PointsMaterial) => {
-      _material = Points
-      updateMesh()
+    const getPoint = () => {
+      return points
     }
-    provide(injectKeySetMaterial, setMaterial)
-
-    const setGeometry = (geometry: THREE.BufferGeometry) => {
-      _geometry = geometry
-      updateMesh()
-    }
-    provide(injectKeySetGeometry, setGeometry)
+    provide(injectKeyGetPoint, getPoint)
 
     const setPositionRotation = () => {
       ['x', 'y', 'z'].forEach(item => {
@@ -56,35 +49,23 @@ const Points = defineComponent({
     }
 
     const setProps = () => {
-      if (!points) {
-        return
-      }
       points.castShadow = props.castShadow === true
       points.receiveShadow = props.receiveShadow === true
       setPositionRotation()
     }
 
-    const updateMesh = () => {
-      if (!container) {
-        return
-      }
-      if (points) {
-        container.remove(points)
-      }
-      if (_geometry && _material) {
-        points = new THREE.Points(_geometry, _material)
-        setProps()
-        container.add(points)
-      }
-    }
+    const revoke = watchEffect(() => {
+      setProps()
+    })
 
-    const revoke = watch(props, setProps, {
-      deep: true,
-      immediate: true
+    onMounted(() => {
+      emit('mounted')
     })
 
     onBeforeUnmount(() => {
       revoke()
+      points.clear()
+      points.removeFromParent()
     })
 
     return () => (
@@ -93,18 +74,14 @@ const Points = defineComponent({
   }
 })
 
-const getSetPointsMaterial = () => {
-  return inject<(Points: THREE.PointsMaterial) => void>(injectKeySetMaterial, () => {
-    console.warn('You should use this component under <points/>.')
+const injectGetPoints = () => {
+  return inject<() => THREE.Points | undefined>(injectKeyGetPoint, () => {
+    console.warn('You should call this under <Point />.')
+    return undefined
   })
-}
-
-const getSetPointsGeometry = () => {
-  return inject<(Points: THREE.BufferGeometry) => void>(injectKeySetGeometry)
 }
 
 export {
   Points,
-  getSetPointsMaterial,
-  getSetPointsGeometry
+  injectGetPoints
 }

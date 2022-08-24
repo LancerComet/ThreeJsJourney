@@ -1,22 +1,20 @@
-import { Object3D } from 'three'
-import { Bend, ModifierStack } from 'three.modifiers'
 import { CubicBezier } from '../../../modules/cubic-bezier'
 import { getFps } from '../../../modules/fps'
 import { clampNumber } from '../../../utils'
 
 const useFlip = (param: {
-  threeObject: Object3D
-  bend: Bend
-  modifiers: ModifierStack[]
   index: number
   totalPage: number
   pageOffset: number
   cubicBezier: CubicBezier
+  setPosition: (position: Partial<{ x: number, y: number, z: number }>) => void
+  setRotation: (position: Partial<{ x: number, y: number, z: number }>) => void
+  setForce: (force: number) => void
 }) => {
   const {
-    threeObject, bend, modifiers,
     index, totalPage, pageOffset,
-    cubicBezier
+    cubicBezier,
+    setPosition, setForce, setRotation
   } = param
 
   let flipPercent = 0
@@ -27,19 +25,24 @@ const useFlip = (param: {
 
     // 精度问题, 1 的时候应当为 0 但给了一个小数, 这里复写.
     const force = percent === 1 ? 0 : Math.sin(percent * Math.PI)
-    bend.force = isForward
-      ? force * 0.88 // 给个小数倍率尽量避免穿模.
-      : force * -0.88
-
-    modifiers.forEach(item => item.apply())
-
-    threeObject.rotation.y = Math.min(percent, 1) * Math.PI
+    setForce(
+      isForward
+        ? force * 0.88 // 给个小数倍率尽量避免穿模.
+        : force * -0.88
+    )
 
     const positionFlipped = (totalPage - index - 1) * -pageOffset
     const positionOrigin = index * -pageOffset
-    threeObject.position.z = isForward
-      ? positionOrigin + percent * (positionFlipped - positionOrigin)
-      : positionFlipped - (1 - percent) * (positionFlipped - positionOrigin)
+
+    setRotation({
+      y: Math.min(percent, 1) * Math.PI
+    })
+
+    setPosition({
+      z: isForward
+        ? positionOrigin + percent * (positionFlipped - positionOrigin)
+        : positionFlipped - (1 - percent) * (positionFlipped - positionOrigin)
+    })
   }
 
   const flipStepsAt60Fps = 60

@@ -1,55 +1,57 @@
 import * as THREE from 'three'
 import { TextGeometry as THREETextGeometry } from 'three/examples/jsm/geometries/TextGeometry'
 import { Font } from 'three/examples/jsm/loaders/FontLoader'
-import { ComponentPublicInstance, defineComponent, onBeforeUnmount, PropType, watch } from 'vue'
-import { getSetGeometry } from './mesh'
-import { getSetPointsGeometry } from './points'
+import {
+  ComponentPublicInstance, defineComponent, onBeforeUnmount,
+  PropType, watch, watchEffect
+} from 'vue'
+import { injectGetMesh } from './mesh'
+import { injectGetPoints } from './points'
 
 const PlaneGeometry = defineComponent({
   props: {
     width: Number as PropType<number>,
     height: Number as PropType<number>,
     widthSegment: Number as PropType<number>,
-    heightSegment: Number as PropType<number>
+    heightSegment: Number as PropType<number>,
+    translate: {
+      type: Object as PropType<{ x: number, y: number, z: number }>
+    }
   },
 
-  emits: ['update'],
-
-  setup (props, { emit }) {
+  setup (props) {
     let geometry: THREE.PlaneGeometry
-    let createTimer: NodeJS.Timeout
-    const setGeometry = getSetGeometry()
+    const getMesh = injectGetMesh()
 
     const createGeometry = () => {
-      clearTimeout(createTimer)
-      createTimer = setTimeout(() => {
-        geometry = new THREE.PlaneGeometry(
-          props.width,
-          props.height,
-          props.widthSegment,
-          props.heightSegment
+      geometry = new THREE.PlaneGeometry(
+        props.width,
+        props.height,
+        props.widthSegment,
+        props.heightSegment
+      )
+
+      if (props.translate) {
+        geometry.translate(
+          props.translate.x,
+          props.translate.y,
+          props.translate.z
         )
-        setGeometry(geometry)
-        emit('update', geometry)
-      }, 1)
-      dispose()
+      }
+
+      const mesh = getMesh()
+      if (mesh) {
+        mesh.geometry = geometry
+      }
     }
 
     const dispose = () => {
       geometry?.dispose()
     }
 
-    const revoke = watch(props, (newValue, oldValue) => {
-      const isSizeChanged = newValue.width !== oldValue?.width ||
-        newValue.height !== oldValue?.height ||
-        newValue.widthSegment !== oldValue?.widthSegment ||
-        newValue.heightSegment !== oldValue?.heightSegment
-      if (isSizeChanged) {
-        createGeometry()
-      }
-    }, {
-      deep: true,
-      immediate: true
+    const revoke = watchEffect(() => {
+      dispose()
+      createGeometry()
     })
 
     onBeforeUnmount(() => {
@@ -81,37 +83,28 @@ const BoxGeometry = defineComponent({
 
   setup (props) {
     let geometry: THREE.BoxGeometry
-    let updateTimer: NodeJS.Timeout
-    const setGeometry = getSetGeometry()
+    const getMesh = injectGetMesh()
 
     const createGeometry = () => {
-      clearTimeout(updateTimer)
-      updateTimer = setTimeout(() => {
-        dispose()
-        geometry = new THREE.BoxGeometry(
-          props.width,
-          props.height,
-          props.depth
-        )
-        setGeometry(geometry)
-      }, 1)
+      geometry = new THREE.BoxGeometry(
+        props.width,
+        props.height,
+        props.depth
+      )
+
+      const mesh = getMesh()
+      if (mesh) {
+        mesh.geometry = geometry
+      }
     }
 
     const dispose = () => {
       geometry?.dispose()
     }
 
-    const revoke = watch(props, (newValue, oldValue) => {
-      const isSizeChanged = newValue.width !== oldValue?.width ||
-        newValue.height !== oldValue?.height ||
-        newValue.depth !== oldValue?.depth
-
-      if (isSizeChanged) {
-        createGeometry()
-      }
-    }, {
-      deep: true,
-      immediate: true
+    const revoke = watchEffect(() => {
+      dispose()
+      createGeometry()
     })
 
     onBeforeUnmount(() => {
@@ -132,21 +125,23 @@ const SphereGeometry = defineComponent({
 
   setup (props) {
     let geometry: THREE.SphereGeometry
-    const setGeometry = getSetGeometry()
+    const getMesh = injectGetMesh()
 
     const createGeometry = () => {
-      dispose()
       geometry = new THREE.SphereGeometry(props.radius)
-      setGeometry(geometry)
+      const mesh = getMesh()
+      if (mesh) {
+        mesh.geometry = geometry
+      }
     }
 
     const dispose = () => {
       geometry?.dispose()
     }
 
-    const revoke = watch(props, createGeometry, {
-      deep: true,
-      immediate: true
+    const revoke = watchEffect(() => {
+      dispose()
+      createGeometry()
     })
 
     onBeforeUnmount(() => {
@@ -166,19 +161,24 @@ const BufferGeometry = defineComponent({
   setup (_, { expose }) {
     const geometry = new THREE.BufferGeometry()
 
-    const setPointGeometry = getSetPointsGeometry()
-    if (setPointGeometry) {
-      setPointGeometry(geometry)
+    const getPoints = injectGetPoints()
+    const getMesh = injectGetMesh()
+
+    const points = getPoints()
+    if (points) {
+      points.geometry = geometry
     } else {
-      const setGeometry = getSetGeometry()
-      setGeometry(geometry)
+      const mesh = getMesh()
+      if (mesh) {
+        mesh.geometry = geometry
+      }
     }
 
-    const getGeometry = (): GeometryAttrs => {
-      return geometry.attributes
+    const getGeometry = (): THREE.BufferGeometry => {
+      return geometry
     }
 
-    const getAttributes = () => {
+    const getAttributes = (): GeometryAttrs => {
       return geometry.attributes
     }
 
@@ -221,40 +221,46 @@ const TextGeometry = defineComponent({
       default: ''
     },
     font: {
-      type: Object as PropType<Font>
+      type: Object as PropType<Font>,
+      required: true
     },
     height: {
-      type: Number as PropType<number>
+      type: Number as PropType<number>,
+      required: true
     },
     size: {
-      type: Number as PropType<number>
+      type: Number as PropType<number>,
+      required: true
     }
   },
   setup (props) {
     let textGeometry: THREETextGeometry
-    const setGeometry = getSetGeometry()
+    const getMesh = injectGetMesh()
 
     const createTextGeometry = () => {
       const font = props.font
       if (!font) {
         return
       }
-      dispose()
       textGeometry = new THREETextGeometry(props.text, {
         font,
         height: props.height,
         size: props.size
       })
-      setGeometry(textGeometry)
+
+      const mesh = getMesh()
+      if (mesh) {
+        mesh.geometry = textGeometry
+      }
     }
 
     const dispose = () => {
       textGeometry?.dispose()
     }
 
-    const revoke = watch(props, createTextGeometry, {
-      deep: true,
-      immediate: true
+    const revoke = watchEffect(() => {
+      dispose()
+      createTextGeometry()
     })
 
     onBeforeUnmount(() => {

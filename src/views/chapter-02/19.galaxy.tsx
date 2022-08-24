@@ -7,6 +7,7 @@ import { useScene } from '../../core.v2/scene'
 
 const Galaxy = defineComponent({
   name: 'Galaxy',
+
   setup () {
     const { Scene, gui, camera, onTick } = useScene({
       useControl: true
@@ -63,10 +64,12 @@ const Galaxy = defineComponent({
 
     // Setup GUI.
     Object.keys(galaxyConfig).forEach(key => {
-      if (/color/i.test(key)) {
-        gui.addColor(galaxyConfig, key)
-      } else {
-        gui.add(galaxyConfig, key)
+      if (gui) {
+        if (/color/i.test(key)) {
+          gui.addColor(galaxyConfig, key)
+        } else {
+          gui.add(galaxyConfig, key)
+        }
       }
     })
 
@@ -80,13 +83,9 @@ const Galaxy = defineComponent({
       angle += 0.001
     })
 
-    onMounted(() => {
-      initGalaxy()
-    })
-
     return () => (
       <Scene>
-        <Points>
+        <Points onMounted={initGalaxy}>
           <BufferGeometry ref={bufferGeometryRef} />
           <PointsMaterial params={{
             size: galaxyConfig.size,

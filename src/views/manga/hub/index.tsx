@@ -33,14 +33,15 @@ const MangaHub = defineComponent({
       camera.far = 1000
     }
 
-    const { Scene, controls } = useScene({
+    const { Scene, controls, onResize } = useScene({
       antialias: true,
       useControl: true,
       useShadow: true,
-      camera,
-      onResize: () => {
-        setCameraSize()
-      }
+      camera
+    })
+
+    onResize(() => {
+      setCameraSize()
     })
 
     // controls.enableZoom = false

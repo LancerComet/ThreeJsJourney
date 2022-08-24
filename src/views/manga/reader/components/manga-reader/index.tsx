@@ -1,12 +1,12 @@
 import * as THREE from 'three'
-import { Bend, ModifierStack } from 'three.modifiers'
-import { createMultiMaterialObject } from 'three/examples/jsm/utils/SceneUtils'
-import { ComponentPublicInstance, defineComponent, onBeforeUnmount, PropType } from 'vue'
+import { ComponentPublicInstance, defineComponent, PropType, ref } from 'vue'
 
-import { injectContainer } from '../../../../../core.v2/providers/container'
+import { PlaneGeometry } from '../../../../../core.v2/geometries'
+import { ShaderMaterial } from '../../../../../core.v2/materials'
+import { Mesh } from '../../../../../core.v2/mesh'
+import { BendModifier, BendModifierVM, MeshModifierSlack } from '../../../../../core.v2/modifier'
 import blankImage from '../../assets/blank.png'
 import { CubicBezier } from '../../modules/cubic-bezier'
-import { InteractionManager } from '../../modules/interactive'
 import { useFlip } from './hooks/flip'
 import { fragmentShader, vertexShader } from './modules/shaders'
 
@@ -38,21 +38,26 @@ const MangaPage = defineComponent({
     image02: {
       type: String as PropType<string>,
       default: blankImage
-    },
-    interactionManager: {
-      type: Object as PropType<InteractionManager>,
-      required: true
     }
   },
 
   setup (props, { expose }) {
-    const { image01, image02, totalPage, index, interactionManager } = props
-
-    const plane = new THREE.PlaneGeometry(pageWidth, pageHeight, 10, 10)
-      .translate(-pageWidth / 2, 0, 0)
+    const { image01, image02, totalPage, index } = props
 
     const textureLoader = new THREE.TextureLoader()
     const isLightEnabled = true
+
+    const meshPositionRef = ref({
+      x: pageWidth / 2,
+      y: pageHeight / 2,
+      z: index * -pageOffset
+    })
+    const meshRotationRef = ref({
+      x: 0,
+      y: 0,
+      z: 0
+    })
+    const bendRef = ref<BendModifierVM>()
 
     const uniforms = THREE.UniformsUtils.merge([
       THREE.UniformsLib.lights,
@@ -88,62 +93,36 @@ const MangaPage = defineComponent({
       console.error('Image02 load failure:', error)
     })
 
-    const shaderMaterial = new THREE.ShaderMaterial({
-      side: THREE.DoubleSide,
-      lights: true,
-      uniforms,
-      fragmentShader,
-      vertexShader
-    })
-
-    const standardMaterial = new THREE.MeshStandardMaterial({
-      color: 'orange',
-      side: THREE.DoubleSide,
-      opacity: 0.5,
-      transparent: true
-    })
-
-    const group = createMultiMaterialObject(plane, [
-      shaderMaterial
-      // standardMaterial
-    ])
-    group.receiveShadow = true
-    group.castShadow = true
-    group.position.set(pageWidth / 2, pageHeight / 2, index * -pageOffset)
-
-    const container = injectContainer()
-    container?.add(group)
-
-    interactionManager.add(group)
-
-    const bend = new Bend(0, 0, 0)
-    bend.offset = 0.5
-    bend.angle = (90 / 180) * Math.PI
-
-    const meshes = group.children as THREE.Mesh[]
-    const modifiers = meshes.map(mesh => {
-      const modifier = new ModifierStack(mesh)
-      modifier.addModifier(bend)
-      return modifier
-    })
-
     const {
       flip, backward, flipFromCurrentPercent,
       getFlipPercent, setFlipPercent,
       stopper
     } = useFlip({
-      threeObject: group,
-      bend,
-      modifiers,
       index,
       totalPage,
       pageOffset,
-      cubicBezier
-    })
-
-    onBeforeUnmount(() => {
-      group.clear()
-      group.removeFromParent()
+      cubicBezier,
+      setPosition: payload => {
+        const keys = Object.keys(payload) as ('x' | 'y' | 'z')[]
+        keys.forEach(key => {
+          const value = payload[key]
+          if (typeof value === 'number') {
+            meshPositionRef.value[key] = value
+          }
+        })
+      },
+      setRotation: payload => {
+        const keys = Object.keys(payload) as ('x' | 'y' | 'z')[]
+        keys.forEach(key => {
+          const value = payload[key]
+          if (typeof value === 'number') {
+            meshRotationRef.value[key] = value
+          }
+        })
+      },
+      setForce: force => {
+        bendRef.value?.setForce(force)
+      }
     })
 
     const stopFlipping = () => {
@@ -160,7 +139,33 @@ const MangaPage = defineComponent({
     })
 
     return () => (
-      <div class='manga-page' />
+      <Mesh
+        receiveShadow castShadow
+        position={meshPositionRef.value}
+        rotation={meshRotationRef.value}
+      >
+        <PlaneGeometry
+          width={pageWidth} height={pageHeight}
+          widthSegment={10} heightSegment={10}
+          translate={{
+            x: -pageWidth / 2, y: 0, z: 0
+          }}
+        />
+        <ShaderMaterial params={{
+          lights: true,
+          side: THREE.DoubleSide,
+          fragmentShader,
+          vertexShader,
+          uniforms
+        }}/>
+
+        <MeshModifierSlack>
+          <BendModifier
+            ref={bendRef}
+            offset={0.5} angel={(90 / 180) * Math.PI}
+          />
+        </MeshModifierSlack>
+      </Mesh>
     )
   }
 })
