@@ -128,7 +128,10 @@ const MangaReader = defineComponent({
       if (isWholeBookInFlip) {
         return
       }
+
       isWholeBookInFlip = true
+      setPointerControlEnable(false)
+
       await Promise.all(
         pageComponentRefs.slice()
           .reverse()
@@ -138,8 +141,10 @@ const MangaReader = defineComponent({
             return vm.backward()
           })
       )
+
       pageIndex = 0
       isWholeBookInFlip = false
+      setPointerControlEnable(true)
     }
 
     const toEnd = async () => {
@@ -148,6 +153,8 @@ const MangaReader = defineComponent({
       }
 
       isWholeBookInFlip = true
+      setPointerControlEnable(false)
+
       await Promise.all(
         pageComponentRefs
           .filter(vm => vm.getFlipPercent() < 1)
@@ -156,8 +163,10 @@ const MangaReader = defineComponent({
             return vm.flip()
           })
       )
+
       pageIndex = pageCount.value
       isWholeBookInFlip = false
+      setPointerControlEnable(true)
     }
 
     const resetState = () => {
@@ -172,11 +181,6 @@ const MangaReader = defineComponent({
 
       const { id, blank } = episodeData.value
       await loadEpisodeImages(id, blank)
-      setManualFlipEnableState()
-    }
-
-    const setManualFlipEnableState = () => {
-      setPointerControlEnable(isCameraLocked)
     }
 
     const lockCamera = () => {
@@ -189,7 +193,7 @@ const MangaReader = defineComponent({
       controls.zoomTo(1.1, true)
       controls.enabled = false
       isCameraLocked = true
-      setManualFlipEnableState()
+      setPointerControlEnable(true)
 
       cubicBezier.tick(releasedColor, lockedColor, getFps(), (t) => {
         backgroundRef.value = colorObject.setHSL(0, 0, t).getHex()
@@ -204,7 +208,7 @@ const MangaReader = defineComponent({
       controls.setLookAt(-150, 100, 180, 0, 3, 0, true)
       controls.enabled = true
       isCameraLocked = false
-      setManualFlipEnableState()
+      setPointerControlEnable(false)
       cubicBezier.tick(lockedColor, releasedColor, getFps(), (t) => {
         backgroundRef.value = colorObject.setHSL(0, 0, t).getHex()
       })
