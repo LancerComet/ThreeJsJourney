@@ -1,9 +1,9 @@
 import * as THREE from 'three'
 import { MeshBasicMaterialParameters } from 'three/src/materials/MeshBasicMaterial'
 import { MeshStandardMaterialParameters } from 'three/src/materials/MeshStandardMaterial'
-import { defineComponent, onBeforeUnmount, PropType, toRefs, watch, watchEffect } from 'vue'
-import { getSetMaterial } from './mesh'
-import { getSetPointsMaterial } from './points'
+import { defineComponent, onBeforeUnmount, PropType, toRefs, watchEffect } from 'vue'
+import { injectGetMesh } from './mesh'
+import { injectGetPoints } from './points'
 
 const StandardMaterial = defineComponent({
   props: {
@@ -15,8 +15,15 @@ const StandardMaterial = defineComponent({
 
   setup (props) {
     const { params } = toRefs(props)
-    const material: THREE.MeshStandardMaterial = new THREE.MeshStandardMaterial()
-    const setMaterial = getSetMaterial()
+    const material: THREE.MeshStandardMaterial = new THREE.MeshStandardMaterial(
+      params.value
+    )
+
+    const getMesh = injectGetMesh()
+    const mesh = getMesh()
+    if (mesh) {
+      mesh.material = material
+    }
 
     const dispose = () => {
       material?.dispose()
@@ -25,7 +32,6 @@ const StandardMaterial = defineComponent({
     const revoke = watchEffect(() => {
       material.setValues(params.value)
       material.needsUpdate = true
-      setMaterial(material)
     })
 
     onBeforeUnmount(() => {
@@ -49,10 +55,13 @@ const BasicMaterial = defineComponent({
 
   setup (props) {
     const { params } = toRefs(props)
-    const material = new THREE.MeshBasicMaterial()
+    const material = new THREE.MeshBasicMaterial(params.value)
 
-    const setMaterial = getSetMaterial()
-    setMaterial(material)
+    const getMesh = injectGetMesh()
+    const mesh = getMesh()
+    if (mesh) {
+      mesh.material = material
+    }
 
     const dispose = () => {
       material?.dispose()
@@ -76,31 +85,41 @@ const BasicMaterial = defineComponent({
 
 const PointsMaterial = defineComponent({
   props: {
-    params: Object as PropType<THREE.PointsMaterialParameters>
+    params: Object as PropType<THREE.PointsMaterialParameters>,
+    default: () => ({})
   },
 
   setup (props) {
-    let material: THREE.PointsMaterial
-    const setMaterial = getSetPointsMaterial()
+    const { params } = toRefs(props)
+    const material = new THREE.PointsMaterial(params.value)
 
-    const createMaterial = () => {
-      dispose()
-      material = new THREE.PointsMaterial(props.params)
-      setMaterial(material)
+    const getMesh = injectGetMesh()
+    const getPoints = injectGetPoints()
+
+    const points = getPoints()
+    if (points) {
+      points.material = material
+    } else {
+      const mesh = getMesh()
+      if (mesh) {
+        mesh.material = material
+      }
     }
 
     const dispose = () => {
       material?.dispose()
     }
 
+    const revoke = watchEffect(() => {
+      if (params.value) {
+        material.setValues(params.value)
+        material.needsUpdate = true
+      }
+    })
+
     onBeforeUnmount(() => {
       dispose()
       revoke()
-    })
-
-    const revoke = watch(props, createMaterial, {
-      deep: true,
-      immediate: true
     })
 
     return () => (
@@ -108,8 +127,48 @@ const PointsMaterial = defineComponent({
     )
   }
 })
+
+const ShaderMaterial = defineComponent({
+  name: 'ShaderMaterial',
+  props: {
+    params: {
+      type: Object as PropType<THREE.ShaderMaterialParameters>,
+      default: () => ({})
+    }
+  },
+  setup (props) {
+    const { params } = toRefs(props)
+    const shaderMaterial = new THREE.ShaderMaterial(params.value)
+
+    const getMesh = injectGetMesh()
+    const mesh = getMesh()
+    if (mesh) {
+      mesh.material = shaderMaterial
+    }
+
+    const dispose = () => {
+      shaderMaterial?.dispose()
+    }
+
+    const revoke = watchEffect(() => {
+      shaderMaterial.setValues(params.value)
+      shaderMaterial.needsUpdate = true
+    })
+
+    onBeforeUnmount(() => {
+      dispose()
+      revoke()
+    })
+
+    return () => (
+      <div class='shader-material' />
+    )
+  }
+})
+
 export {
   StandardMaterial,
   BasicMaterial,
-  PointsMaterial
+  PointsMaterial,
+  ShaderMaterial
 }

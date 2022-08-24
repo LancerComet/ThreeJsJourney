@@ -12,7 +12,6 @@ import { usePointerControl } from './hooks/pointer-control'
 import style from './index.module.styl'
 import { CubicBezier } from './modules/cubic-bezier'
 import { getFps } from './modules/fps'
-import { InteractionManager } from './modules/interactive'
 import { useMangaImages } from './modules/manga'
 import { IEpisodeOption } from './types'
 import { clampNumber, sleep } from './utils'
@@ -66,7 +65,6 @@ const MangaReader = defineComponent({
     const colorObject = new THREE.Color().setHSL(0, 0, releasedColor)
     const backgroundRef = ref(colorObject.getHex())
 
-    // pageIndex 指的是纸张的下标, 不是逻辑页码.
     let pageIndex = 0
     let isCameraLocked = false
 
@@ -85,13 +83,10 @@ const MangaReader = defineComponent({
     } = useMangaImages()
 
     const [camera, setCameraSize] = createCamera()
-    const { Scene, renderer, clock, onTick } = useScene({
+    const { Scene, renderer, clock, onTick, onResize } = useScene({
       camera,
-      useControl: false,
       antialias: true,
-      onResize: () => {
-        setCameraSize()
-      }
+      useControl: false
     })
 
     const controls = new CameraControls(camera, renderer.domElement)
@@ -102,20 +97,19 @@ const MangaReader = defineComponent({
     controls.enabled = true
     controls.moveTo(0, 3.4, 0)
 
-    const interactionManager = new InteractionManager({
-      renderer,
-      camera,
-      domElement: renderer.domElement,
-      usePointerEvents: true
+    onResize(() => {
+      setCameraSize()
     })
 
     onTick(() => {
       controls.update(clock.getDelta())
-      interactionManager.update()
     })
 
+    const pageFlippingGap = 60
+    let isWholeBookInFlip = false
+
     const goPrev = () => {
-      if (pageIndex > 0) {
+      if (pageIndex > 0 && !isWholeBookInFlip) {
         const vm = pageComponentRefs[pageIndex - 1]
         vm?.backward()
         pageIndex--
@@ -123,50 +117,47 @@ const MangaReader = defineComponent({
     }
 
     const goNext = () => {
-      if (pageIndex < pageCount.value) {
+      if (pageIndex < pageCount.value && !isWholeBookInFlip) {
         const vm = pageComponentRefs[pageIndex]
         vm?.flip()
         pageIndex++
       }
     }
 
-    const pageFlipDistance = 60
-    let inFlipping = false
-
     const toStart = async () => {
-      if (inFlipping) {
+      if (isWholeBookInFlip) {
         return
       }
-      inFlipping = true
+      isWholeBookInFlip = true
       await Promise.all(
         pageComponentRefs.slice()
           .reverse()
           .filter(vm => vm.getFlipPercent() > 0)
           .map(async (vm, index) => {
-            await sleep(index * pageFlipDistance)
+            await sleep(index * pageFlippingGap)
             return vm.backward()
           })
       )
       pageIndex = 0
-      inFlipping = false
+      isWholeBookInFlip = false
     }
 
     const toEnd = async () => {
-      if (inFlipping) {
+      if (isWholeBookInFlip) {
         return
       }
 
-      inFlipping = true
+      isWholeBookInFlip = true
       await Promise.all(
         pageComponentRefs
           .filter(vm => vm.getFlipPercent() < 1)
           .map(async (vm, index) => {
-            await sleep(index * pageFlipDistance)
+            await sleep(index * pageFlippingGap)
             return vm.flip()
           })
       )
       pageIndex = pageCount.value
-      inFlipping = false
+      isWholeBookInFlip = false
     }
 
     const resetState = () => {
@@ -252,6 +243,53 @@ const MangaReader = defineComponent({
     window.addEventListener('keyup', globalKeyHandler)
     window.addEventListener('wheel', mouseWheelHandler)
 
+    const Lights = () => (
+      <>
+        <PointLight
+          castShadow intensity={0.09} color={0xffffff} distance={80}
+          position={{ x: -3, y: 4, z: 5 }}
+          showHelper={!isProd}
+        />
+        <PointLight
+          castShadow intensity={0.09} color={0xffffff} distance={80}
+          position={{ x: 3, y: 4, z: 5 }}
+          showHelper={!isProd}
+        />
+        <PointLight
+          castShadow intensity={0.09} color={0xffffff} distance={80}
+          position={{ x: -3, y: 4, z: -5 }}
+          showHelper={!isProd}
+        />
+        <PointLight
+          castShadow intensity={0.09} color={0xffffff} distance={80}
+          position={{ x: 3, y: 4, z: -5 }}
+          showHelper={!isProd}
+        />
+      </>
+    )
+
+    const BookPages = () => (
+      <Group position={{ x: -2.5 }}>{
+        new Array(pageCount.value).fill(0).map((_, index) => {
+          const baseIndex = index * 2
+          return (
+            <MangaPage
+              key={`${episodeData.value?.id ?? 0}-${index}`}
+              ref={(vm: unknown) => {
+                if (vm) {
+                  pageComponentRefs[index] = vm as MangaPageVM
+                }
+              }}
+              index={index}
+              totalPage={pageCount.value}
+              image01={imageUrlsRef.value?.[baseIndex]}
+              image02={imageUrlsRef.value?.[baseIndex + 1]}
+            />
+          )
+        })
+      }</Group>
+    )
+
     const {
       dispose: disposePointerControl,
       setEnabled: setPointerControlEnable
@@ -260,11 +298,9 @@ const MangaReader = defineComponent({
       getIndex: () => pageIndex,
       getMangaPageVms: () => pageComponentRefs.slice(),
       onFlip: (index) => {
-        console.log('onManualFlip', index)
         pageIndex = index + 1
       },
       onBackward: (index) => {
-        console.log('onManualBackward', index)
         pageIndex = index
       }
     })
@@ -275,7 +311,6 @@ const MangaReader = defineComponent({
 
     onBeforeUnmount(() => {
       disposePointerControl()
-      interactionManager.dispose()
       window.removeEventListener('keyup', globalKeyHandler)
       window.removeEventListener('wheel', mouseWheelHandler)
     })
@@ -284,47 +319,9 @@ const MangaReader = defineComponent({
       <>
         <Scene background={backgroundRef.value}>
           <AmbientLight intensity={0.2} color={0xffffff} />
-          <PointLight
-            castShadow intensity={0.09} color={0xffffff} distance={80}
-            position={{ x: -3, y: 4, z: 5 }}
-            showHelper={!isProd}
-          />
-          <PointLight
-            castShadow intensity={0.09} color={0xffffff} distance={80}
-            position={{ x: 3, y: 4, z: 5 }}
-            showHelper={!isProd}
-          />
-          <PointLight
-            castShadow intensity={0.09} color={0xffffff} distance={80}
-            position={{ x: -3, y: 4, z: -5 }}
-            showHelper={!isProd}
-          />
-          <PointLight
-            castShadow intensity={0.09} color={0xffffff} distance={80}
-            position={{ x: 3, y: 4, z: -5 }}
-            showHelper={!isProd}
-          />
+          <Lights />
           { isProd ? undefined : <AxesHelper /> }
-          <Group position={{ x: -2.5 }}>{
-            new Array(pageCount.value).fill('').map((_, index) => {
-              const baseIndex = index * 2
-              return (
-                <MangaPage
-                  key={`${episodeData.value?.id ?? 0}-${index}`}
-                  ref={(vm: unknown) => {
-                    if (vm) {
-                      pageComponentRefs[index] = vm as MangaPageVM
-                    }
-                  }}
-                  index={index}
-                  totalPage={pageCount.value}
-                  image01={imageUrlsRef.value?.[baseIndex]}
-                  image02={imageUrlsRef.value?.[baseIndex + 1]}
-                  interactionManager={interactionManager}
-                />
-              )
-            })
-          }</Group>
+          <BookPages />
         </Scene>
 
         <ActionBar

@@ -29,18 +29,15 @@ const usePointerControl = (param: {
       return
     }
 
-    event.stopPropagation()
     isPointerDown = true
     pointerDownX = event.offsetX
     lastMoveX = event.offsetX
   }
 
-  const onPointerUp = (event: Event) => {
+  const onPointerUp = () => {
     if (!isEnabled || !isPointerDown) {
       return
     }
-
-    event.stopPropagation()
 
     if (targetPageVM) {
       const currentFlipPercent = targetPageVM.getFlipPercent()
@@ -80,6 +77,8 @@ const usePointerControl = (param: {
       return
     }
 
+    event.preventDefault()
+
     moveDirection = moveDelta > 0
       ? 'flip'
       : moveDelta < 0
@@ -94,7 +93,6 @@ const usePointerControl = (param: {
       } else if (moveDirection === 'backward') {
         index = getIndex() - 1
       }
-      console.log(index, moveDirection, moveDelta)
       if (index >= 0) {
         targetIndex = index
         targetPageVM = pageVMs[index]
@@ -121,6 +119,7 @@ const usePointerControl = (param: {
     if (!isEnabled || !isPointerDown) {
       return
     }
+
     const offsetX = touch.clientX
     const moveDelta = offsetX - lastMoveX
     if (Math.abs(moveDelta) < moveThreshold) {

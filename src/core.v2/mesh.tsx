@@ -6,13 +6,11 @@ import {
   onBeforeUnmount,
   PropType,
   provide,
-  ref,
-  watch
+  watch, watchEffect
 } from 'vue'
 import { injectContainer } from './providers/container'
 
-const injectKeySetMaterial = 'three:mesh:setMaterial'
-const injectKeySetGeometry = 'three:mesh:setGeometry'
+const injectKeyGetMesh = 'three:mesh:getMesh'
 
 const Mesh = defineComponent({
   name: 'Mesh',
@@ -33,48 +31,17 @@ const Mesh = defineComponent({
     }
   },
 
-  emits: ['update'],
-
-  setup (props, { slots, expose, emit }) {
-    let _material: THREE.Material
-    let _geometry: THREE.BufferGeometry
+  setup (props, { slots, expose }) {
+    const mesh = new THREE.Mesh()
     const container = injectContainer()
-    const meshRef = ref<THREE.Mesh>()
+    container?.add(mesh)
 
-    const setMaterial = (material: THREE.Material) => {
-      _material = material
-      updateMesh()
+    const getMesh = (): THREE.Mesh => {
+      return mesh
     }
-    provide(injectKeySetMaterial, setMaterial)
-
-    const setGeometry = (geometry: THREE.BufferGeometry) => {
-      _geometry = geometry
-      updateMesh()
-    }
-    provide(injectKeySetGeometry, setGeometry)
-
-    const updateMesh = () => {
-      if (!container || !_geometry || !_material) {
-        return
-      }
-      if (meshRef.value) {
-        container.remove(meshRef.value)
-      }
-
-      const mesh = new THREE.Mesh(_geometry, _material)
-      meshRef.value = mesh
-      setProps()
-      container.add(mesh)
-
-      emit('update', mesh)
-    }
+    provide(injectKeyGetMesh, getMesh)
 
     const setProps = () => {
-      const mesh = meshRef.value
-      if (!mesh) {
-        return
-      }
-
       if (mesh.castShadow !== props.castShadow) {
         mesh.castShadow = props.castShadow === true
       }
@@ -98,20 +65,18 @@ const Mesh = defineComponent({
       })
     }
 
-    const revoke = watch(props, setProps, {
-      deep: true,
-      immediate: true
+    const revoke = watchEffect(() => {
+      setProps()
     })
 
     expose({
-      getMesh: () => meshRef.value
+      getMesh
     })
 
     onBeforeUnmount(() => {
       revoke()
-      meshRef.value?.clear()
-      meshRef.value?.removeFromParent()
-      meshRef.value = undefined
+      mesh.clear()
+      mesh.removeFromParent()
     })
 
     return () => (
@@ -120,15 +85,10 @@ const Mesh = defineComponent({
   }
 })
 
-const getSetMaterial = () => {
-  return inject<(material: THREE.Material) => void>(injectKeySetMaterial, () => {
+const injectGetMesh = () => {
+  return inject<() => THREE.Mesh | undefined>(injectKeyGetMesh, () => {
     console.warn('You should use this component under <Mesh/>.')
-  })
-}
-
-const getSetGeometry = () => {
-  return inject<(material: THREE.BufferGeometry) => void>(injectKeySetGeometry, () => {
-    console.warn('You should use this component under <Mesh/>.')
+    return undefined
   })
 }
 
@@ -144,6 +104,5 @@ type MeshVM = ComponentPublicInstance<{
 export {
   Mesh,
   MeshVM,
-  getSetMaterial,
-  getSetGeometry
+  injectGetMesh
 }

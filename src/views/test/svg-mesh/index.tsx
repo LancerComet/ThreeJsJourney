@@ -38,14 +38,15 @@ const SvgMeshPage = defineComponent({
   name: 'SvgMeshPage',
   setup () {
     const [camera, setCameraSize] = createCamera()
-    const { Scene } = useScene({
+    const { Scene, onResize } = useScene({
       useControl: true,
       useShadow: true,
       antialias: true,
-      camera,
-      onResize: () => {
-        setCameraSize()
-      }
+      camera
+    })
+
+    onResize(() => {
+      setCameraSize()
     })
 
     return () => (
