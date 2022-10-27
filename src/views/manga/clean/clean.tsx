@@ -11,8 +11,7 @@ import {
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { defineComponent, onMounted, ref } from 'vue'
 
-import { AmbientLight, PointLight } from '../../../core.v2/lights'
-import { useScene } from '../../../core.v2/scene'
+import { AmbientLight, PointLight, useScene } from '../../../../packages/dancefloor/lib'
 
 import style from './clean.module.styl'
 

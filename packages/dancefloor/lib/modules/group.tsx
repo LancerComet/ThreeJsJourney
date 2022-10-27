@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { defineComponent, onBeforeUnmount, onMounted, PropType, watch } from 'vue'
-import { injectContainer, provideContainer } from './providers/container'
+import { injectContainer, provideContainer } from '../providers/container'
 
 const Group = defineComponent({
   name: 'Group',

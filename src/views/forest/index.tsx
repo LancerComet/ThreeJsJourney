@@ -3,12 +3,9 @@ import CannonDebugger from 'cannon-es-debugger'
 import { Color, Group } from 'three'
 import { defineComponent, onBeforeUnmount } from 'vue'
 
-import { useCannon } from '../../core.v2/cannon'
-import { AxesHelper } from '../../core.v2/helpers'
-import { AmbientLight, PointLight } from '../../core.v2/lights'
-import { ObjModel } from '../../core.v2/model.obj'
-import { useScene } from '../../core.v2/scene'
-import { getObjectSize } from '../../core.v2/utils/objects'
+import { AxesHelper, AmbientLight, PointLight, ObjModel, useScene } from '../../../packages/dancefloor/lib'
+import { getObjectSize } from '../../../packages/dancefloor/lib/utils/objects'
+import { useCannon } from '../../modules/cannon'
 
 const ForestScene = defineComponent({
   name: 'ForestScene',

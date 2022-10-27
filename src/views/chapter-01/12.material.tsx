@@ -6,7 +6,7 @@ import {
   TorusGeometry
 } from 'three'
 import { defineComponent } from 'vue'
-import { useScene } from '../../core.v2/scene'
+import { useScene } from '../../../packages/dancefloor/lib'
 
 const Material = defineComponent({
   name: 'Material',

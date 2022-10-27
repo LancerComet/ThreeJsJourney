@@ -1,9 +1,6 @@
 import { AdditiveBlending, BufferAttribute, Color, Vector3 } from 'three'
 import { defineComponent, onMounted, ref } from 'vue'
-import { BufferGeometry, BufferGeometryComponent } from '../../core.v2/geometries'
-import { PointsMaterial } from '../../core.v2/materials'
-import { Points } from '../../core.v2/points'
-import { useScene } from '../../core.v2/scene'
+import { BufferGeometry, BufferGeometryComponent, PointsMaterial, Points, useScene } from '../../../packages/dancefloor/lib'
 
 const Galaxy = defineComponent({
   name: 'Galaxy',

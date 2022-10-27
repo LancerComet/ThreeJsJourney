@@ -1,0 +1,34 @@
+{
+  "name": "@lancercomet/dancefloor",
+  "version": "0.1.3-test-3",
+  "description": "A Vue binding library for Three.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.es.js",
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development vite",
+    "build": "cross-env NODE_ENV=production vite build",
+    "lint": "eslint ./lib/**/*",
+    "rmdist": "rimraf ./dist",
+    "prebuild": "npm run lint && npm run rmdist"
+  },
+  "maintainers": [
+    {
+      "name": "LancerComet",
+      "email": "chw644@hotmail.com"
+    }
+  ],
+  "peerDependencies": {
+    "three": "^0.144.0",
+    "three.modifiers": "^2.5.7"
+  },
+  "dependencies": {
+    "@lancercomet/utils": "^1.0.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^8.5.0",
+    "rimraf": "^3.0.2"
+  }
+}

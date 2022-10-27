@@ -1,10 +1,7 @@
 import { Clock, Mesh, MeshStandardMaterial, SphereGeometry, Vector3 } from 'three'
 import { defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 
-import { AxesHelper } from '../../core.v2/helpers'
-import { AmbientLight, PointLight } from '../../core.v2/lights'
-import { RayCaster, RayCasterComponent } from '../../core.v2/raycaster'
-import { useScene } from '../../core.v2/scene'
+import { AxesHelper, AmbientLight, PointLight, RayCaster, RayCasterComponent, useScene } from '../../../packages/dancefloor/lib'
 
 const RayCasterPage = defineComponent({
   name: 'RayCasterPage',

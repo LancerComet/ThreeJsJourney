@@ -2,8 +2,7 @@ import { Mesh, MeshMatcapMaterial, TextureLoader, TorusGeometry, Vector3 } from 
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader'
 import { defineComponent, onBeforeMount } from 'vue'
-import { AxesHelper } from '../../core.v2/helpers'
-import { useScene } from '../../core.v2/scene'
+import { AxesHelper, useScene } from '../../../packages/dancefloor/lib'
 
 // Use this to convert a regular font into the TypeFace font.
 // http://gero3.github.io/facetype.js/

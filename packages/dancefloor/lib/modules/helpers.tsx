@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { defineComponent, onBeforeUnmount, PropType, watch } from 'vue'
-import { injectContainer } from './providers/container'
+import { injectContainer } from '../providers/container'
 
 const AxesHelper = defineComponent({
   props: {

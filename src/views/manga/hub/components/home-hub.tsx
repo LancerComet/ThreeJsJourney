@@ -1,13 +1,18 @@
 import * as THREE from 'three'
 import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader'
 import { computed, defineComponent, onMounted, PropType, ref } from 'vue'
-import { useCannon } from '../../../../core.v2/cannon'
-import { BoxGeometry, PlaneGeometry, TextGeometry } from '../../../../core.v2/geometries'
-import { Group } from '../../../../core.v2/group'
-import { AxesHelper } from '../../../../core.v2/helpers'
-import { PointLight } from '../../../../core.v2/lights'
-import { BasicMaterial, StandardMaterial } from '../../../../core.v2/materials'
-import { Mesh } from '../../../../core.v2/mesh'
+import {
+  AxesHelper,
+  BasicMaterial,
+  BoxGeometry,
+  Group,
+  Mesh,
+  PlaneGeometry,
+  PointLight,
+  StandardMaterial,
+  TextGeometry
+} from '../../../../../packages/dancefloor/lib'
+import { useCannon } from '../../../../modules/cannon'
 import { MangaSeason } from '../model/manga-season'
 import { getRecommendationList } from '../services/recommendation'
 
@@ -113,8 +118,7 @@ const HomeHub = defineComponent({
 
     const loadKenPixelFont = async () => {
       const fontLoader = new FontLoader()
-      const font = await fontLoader.loadAsync('/fonts/kenpixel.json') as Font
-      fontRef.value = font
+      fontRef.value = await fontLoader.loadAsync('/fonts/kenpixel.json') as Font
     }
 
     const getSeasonList = async () => {

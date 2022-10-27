@@ -9,7 +9,7 @@ import {
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { defineComponent, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue'
-import { provideContainer } from './providers/container'
+import { provideContainer } from '../providers/container'
 
 const useScene = (param?: {
   camera?: PerspectiveCamera | OrthographicCamera

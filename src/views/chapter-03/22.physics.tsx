@@ -2,9 +2,7 @@ import * as Cannon from 'cannon-es'
 import { Clock, Mesh, MeshStandardMaterial, PlaneGeometry, SphereGeometry } from 'three'
 import { defineComponent } from 'vue'
 
-import { AxesHelper } from '../../core.v2/helpers'
-import { AmbientLight, PointLight } from '../../core.v2/lights'
-import { useScene } from '../../core.v2/scene'
+import { AxesHelper, AmbientLight, PointLight, useScene } from '../../../packages/dancefloor/lib'
 
 const Physics = defineComponent({
   name: 'Physics',

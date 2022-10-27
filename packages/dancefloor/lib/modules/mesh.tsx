@@ -8,7 +8,7 @@ import {
   provide,
   watch, watchEffect
 } from 'vue'
-import { injectContainer } from './providers/container'
+import { injectContainer } from '../providers/container'
 
 const injectKeyGetMesh = 'three:mesh:getMesh'
 

@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { defineComponent, inject, onBeforeUnmount, onMounted, PropType, provide, ref, watch, watchEffect } from 'vue'
-import { injectContainer } from './providers/container'
+import { injectContainer } from '../providers/container'
 
 const injectKeyGetPoint = 'three:point:getPoint'
 

@@ -1,14 +1,8 @@
 import { OrthographicCamera, Vector3 } from 'three'
 import { defineComponent } from 'vue'
-import { PlaneGeometry } from '../../../core.v2/geometries'
-import { AxesHelper } from '../../../core.v2/helpers'
-import { AmbientLight } from '../../../core.v2/lights'
-import { StandardMaterial } from '../../../core.v2/materials'
-import { Mesh } from '../../../core.v2/mesh'
-import { useScene } from '../../../core.v2/scene'
+import { PlaneGeometry, AxesHelper, AmbientLight, StandardMaterial, Mesh, useScene } from '../../../../packages/dancefloor/lib'
 import { useResize } from '../../../hooks/resize'
 import { HomeHub } from './components/home-hub'
-import set = gsap.set;
 
 const MangaHub = defineComponent({
   name: 'MangaHub',

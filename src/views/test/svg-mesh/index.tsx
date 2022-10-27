@@ -1,11 +1,11 @@
 import * as THREE from 'three'
 import { defineComponent } from 'vue'
 
-import { Group } from '../../../core.v2/group'
-import { AxesHelper } from '../../../core.v2/helpers'
-import { AmbientLight, PointLight } from '../../../core.v2/lights'
-import { useScene } from '../../../core.v2/scene'
-import { SvgMesh } from '../../../core.v2/shapes/svg-mesh'
+import { Group } from '../../../../packages/dancefloor/lib/modules/group'
+import { AxesHelper } from '../../../../packages/dancefloor/lib/modules/helpers'
+import { AmbientLight, PointLight } from '../../../../packages/dancefloor/lib/modules/lights'
+import { useScene } from '../../../../packages/dancefloor/lib/modules/scene'
+import { SvgMesh } from '../../../../packages/dancefloor/lib/shapes/svg-mesh'
 
 import { useResize } from '../../../hooks/resize'
 import jsSvg from './assets/js.svg?raw'

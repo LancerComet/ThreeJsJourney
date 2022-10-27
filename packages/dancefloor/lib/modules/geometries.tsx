@@ -221,7 +221,7 @@ const TextGeometry = defineComponent({
       default: ''
     },
     font: {
-      type: Object as PropType<Font>,
+      type: Object as PropType<Font | undefined>,
       required: true
     },
     height: {
