@@ -2,11 +2,13 @@ import { OrthographicCamera, Vector3 } from 'three'
 import { defineComponent } from 'vue'
 import { PlaneGeometry } from '../../../core.v2/geometries'
 import { AxesHelper } from '../../../core.v2/helpers'
-import { AmbientLight, HemisphereLight } from '../../../core.v2/lights'
+import { AmbientLight } from '../../../core.v2/lights'
 import { StandardMaterial } from '../../../core.v2/materials'
 import { Mesh } from '../../../core.v2/mesh'
 import { useScene } from '../../../core.v2/scene'
+import { useResize } from '../../../hooks/resize'
 import { HomeHub } from './components/home-hub'
+import set = gsap.set;
 
 const MangaHub = defineComponent({
   name: 'MangaHub',
@@ -33,14 +35,14 @@ const MangaHub = defineComponent({
       camera.far = 1000
     }
 
-    const { Scene, controls, onResize } = useScene({
+    const { Scene, controls } = useScene({
       antialias: true,
       useControl: true,
       useShadow: true,
       camera
     })
 
-    onResize(() => {
+    useResize(() => {
       setCameraSize()
     })
 

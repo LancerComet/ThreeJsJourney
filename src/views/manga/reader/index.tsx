@@ -6,6 +6,7 @@ import { Group } from '../../../core.v2/group'
 import { AxesHelper } from '../../../core.v2/helpers'
 import { AmbientLight, PointLight } from '../../../core.v2/lights'
 import { useScene } from '../../../core.v2/scene'
+import { useResize } from '../../../hooks/resize'
 import { ActionBar } from './components/action-bar'
 import { MangaPage, MangaPageVM } from './components/manga-reader'
 import { usePointerControl } from './hooks/pointer-control'
@@ -83,7 +84,7 @@ const MangaReader = defineComponent({
     } = useMangaImages()
 
     const [camera, setCameraSize] = createCamera()
-    const { Scene, renderer, clock, onTick, onResize } = useScene({
+    const { Scene, renderer, clock, onTick } = useScene({
       camera,
       antialias: true,
       useControl: false
@@ -97,7 +98,7 @@ const MangaReader = defineComponent({
     controls.enabled = true
     controls.moveTo(0, 3.4, 0)
 
-    onResize(() => {
+    useResize(() => {
       setCameraSize()
     })
 

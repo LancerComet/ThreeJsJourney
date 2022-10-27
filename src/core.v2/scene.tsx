@@ -18,11 +18,13 @@ const useScene = (param?: {
   useShadow?: boolean
   useGui?: boolean
   shadowType?: ShadowMapType
+  width?: number
+  height?: number
 }) => {
-  let onResizeCallback: (event: Event) => void
+  let width = param?.width ?? 800
+  let height = param?.height ?? 600
 
   const clock = new Clock()
-
   const useGui = param?.useGui ?? true
   let gui: dat.GUI | undefined
   if (useGui) {
@@ -34,7 +36,7 @@ const useScene = (param?: {
 
   let camera = param?.camera
   if (!camera) {
-    camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+    camera = new PerspectiveCamera(75, width / height, 0.1, 1000)
     camera.position.set(5, 5, 5)
     camera.lookAt(new Vector3(0, 0, 0))
   }
@@ -49,7 +51,7 @@ const useScene = (param?: {
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = param?.shadowType ?? PCFSoftShadowMap
   }
-  renderer.setSize(window.innerWidth, window.innerHeight)
+  renderer.setSize(width, height)
 
   let controls: OrbitControls | undefined
   const useControl = param?.useControl ?? true
@@ -57,6 +59,14 @@ const useScene = (param?: {
     controls = new OrbitControls(camera!, renderer.domElement)
     controls.enableDamping = true
     controls.dampingFactor = 0.1
+  }
+
+  const doResize = () => {
+    if (camera instanceof PerspectiveCamera) {
+      camera.aspect = width / height
+    }
+    camera?.updateProjectionMatrix()
+    renderer.setSize(width, height)
   }
 
   const SceneComponent = defineComponent({
@@ -80,15 +90,6 @@ const useScene = (param?: {
         if (isTickStart) {
           requestAnimationFrame(tick)
         }
-      }
-
-      const onResizeHandler = (event: Event) => {
-        if (camera instanceof PerspectiveCamera) {
-          camera.aspect = window.innerWidth / window.innerHeight
-        }
-        onResizeCallback?.(event)
-        camera?.updateProjectionMatrix()
-        renderer.setSize(window.innerWidth, window.innerHeight)
       }
 
       const setBackground = () => {
@@ -119,8 +120,6 @@ const useScene = (param?: {
         immediate: true
       })
 
-      window.addEventListener('resize', onResizeHandler)
-
       onMounted(() => {
         element.value?.appendChild(renderer.domElement)
         tick()
@@ -128,7 +127,6 @@ const useScene = (param?: {
 
       onBeforeUnmount(() => {
         isTickStart = false
-        window.removeEventListener('resize', onResizeHandler)
         clock.stop()
         gui?.destroy()
         revoke()
@@ -156,8 +154,10 @@ const useScene = (param?: {
     renderer,
     clock,
     controls,
-    onResize: (callback: (event: Event) => void) => {
-      onResizeCallback = callback
+    resize: (w: number, h: number) => {
+      width = w
+      height = h
+      doResize()
     }
   }
 }

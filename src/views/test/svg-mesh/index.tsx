@@ -7,6 +7,7 @@ import { AmbientLight, PointLight } from '../../../core.v2/lights'
 import { useScene } from '../../../core.v2/scene'
 import { SvgMesh } from '../../../core.v2/shapes/svg-mesh'
 
+import { useResize } from '../../../hooks/resize'
 import jsSvg from './assets/js.svg?raw'
 
 const createCamera = (): [THREE.OrthographicCamera, () => void] => {
@@ -38,14 +39,14 @@ const SvgMeshPage = defineComponent({
   name: 'SvgMeshPage',
   setup () {
     const [camera, setCameraSize] = createCamera()
-    const { Scene, onResize } = useScene({
+    const { Scene } = useScene({
       useControl: true,
       useShadow: true,
       antialias: true,
       camera
     })
 
-    onResize(() => {
+    useResize(() => {
       setCameraSize()
     })
 
