@@ -78,27 +78,25 @@ const pageConfig: { [sectionName: string]: RouteRecordRaw[] } = {
     }
   ],
 
-  Forest: [
+  Showcase: [
     {
       name: 'Forest',
       path: 'forest',
-      component: () => import('../views/forest/index').then(item => item.ForestScene)
-    }
-  ],
-
-  Test: [
+      component: () => import('../views/showcase/forest/index').then(item => item.ForestScene)
+    },
     {
-      name: 'Test',
-      path: 'test',
-      component: () => import('../views/test/index').then(item => item.TestPage)
+      name: 'Points Wave',
+      path: 'points-wave',
+      component: () => import('../views/showcase/points-wave/index').then(item => item.TestPage)
     },
     {
       name: 'SvgMesh',
       path: 'svg-mesh',
-      component: () => import('../views/test/svg-mesh').then(item => item.SvgMeshPage)
+      component: () => import('../views/showcase/svg-mesh').then(item => item.SvgMeshPage)
     }
   ]
 }
+
 export {
   pageConfig
 }

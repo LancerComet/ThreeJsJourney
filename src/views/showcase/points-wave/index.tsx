@@ -1,12 +1,7 @@
 import * as THREE from 'three'
 import { BufferAttribute } from 'three'
 import { defineComponent, onMounted, ref } from 'vue'
-import { BufferGeometry, BufferGeometryComponent, SphereGeometry } from '../../../packages/dancefloor/lib/modules/geometries'
-import { AxesHelper } from '../../../packages/dancefloor/lib/modules/helpers'
-import { AmbientLight, PointLight } from '../../../packages/dancefloor/lib/modules/lights'
-import { PointsMaterial } from '../../../packages/dancefloor/lib/modules/materials'
-import { Points } from '../../../packages/dancefloor/lib/modules/points'
-import { useScene } from '../../../packages/dancefloor/lib/modules/scene'
+import { BufferGeometry, BufferGeometryComponent, SphereGeometry, AxesHelper, AmbientLight, PointLight, PointsMaterial, Points, useScene } from '../../../../packages/dancefloor/lib'
 
 const TestPage = defineComponent({
   name: 'TestPage',

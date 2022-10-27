@@ -21,8 +21,8 @@ const useScene = (param?: {
   width?: number
   height?: number
 }) => {
-  let width = param?.width ?? 800
-  let height = param?.height ?? 600
+  let width = param?.width ?? window.innerWidth
+  let height = param?.height ?? window.innerHeight
 
   const clock = new Clock()
   const useGui = param?.useGui ?? true
