@@ -78,10 +78,22 @@ const BoxGeometry = defineComponent({
     depth: {
       type: Number as PropType<number>,
       default: 1
+    },
+    widthSegments: {
+      type: Number as PropType<number>,
+      default: 1
+    },
+    heightSegments: {
+      type: Number as PropType<number>,
+      default: 1
+    },
+    depthSegments: {
+      type: Number as PropType<number>,
+      default: 1
     }
   },
 
-  setup (props) {
+  setup (props, { expose }) {
     let geometry: THREE.BoxGeometry
     const getMesh = injectGetMesh()
 
@@ -89,7 +101,10 @@ const BoxGeometry = defineComponent({
       geometry = new THREE.BoxGeometry(
         props.width,
         props.height,
-        props.depth
+        props.depth,
+        props.widthSegments,
+        props.heightSegments,
+        props.depthSegments
       )
 
       const mesh = getMesh()
@@ -112,11 +127,27 @@ const BoxGeometry = defineComponent({
       revoke()
     })
 
+    const getGeometry = () => {
+      return geometry
+    }
+
+    expose({
+      getGeometry
+    })
+
     return () => (
       <div class='box-geometry' />
     )
   }
 })
+
+type BoxGeometryComponent = ComponentPublicInstance<{
+  width?: number
+  height?: number
+  depth?: number
+}, {
+  getGeometry: () => THREE.BoxGeometry,
+}>
 
 const SphereGeometry = defineComponent({
   props: {
@@ -277,8 +308,9 @@ const TextGeometry = defineComponent({
 export {
   PlaneGeometry,
   BoxGeometry,
-  BufferGeometryComponent,
+  BoxGeometryComponent,
   SphereGeometry,
   BufferGeometry,
+  BufferGeometryComponent,
   TextGeometry
 }

@@ -1,6 +1,6 @@
 {
   "name": "@lancercomet/dancefloor",
-  "version": "0.1.3-test-3",
+  "version": "0.1.3-test-6",
   "description": "A Vue binding library for Three.",
   "main": "./dist/index.js",
   "module": "./dist/index.es.js",
