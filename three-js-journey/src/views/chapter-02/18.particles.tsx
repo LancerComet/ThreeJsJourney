@@ -1,3 +1,4 @@
+import { useScene } from '@lancercomet/dancefloor'
 import {
   BoxGeometry,
   BufferAttribute,
@@ -9,7 +10,6 @@ import {
   TextureLoader
 } from 'three'
 import { defineComponent } from 'vue'
-import { useScene } from '../../../packages/dancefloor/lib'
 
 const Particles = defineComponent({
   name: 'Particles',

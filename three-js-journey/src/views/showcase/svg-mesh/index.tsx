@@ -1,11 +1,6 @@
+import { Group, AxesHelper, AmbientLight, PointLight, useScene, SvgMesh } from '@lancercomet/dancefloor'
 import * as THREE from 'three'
 import { defineComponent } from 'vue'
-
-import { Group } from '../../../../packages/dancefloor/lib/modules/group'
-import { AxesHelper } from '../../../../packages/dancefloor/lib/modules/helpers'
-import { AmbientLight, PointLight } from '../../../../packages/dancefloor/lib/modules/lights'
-import { useScene } from '../../../../packages/dancefloor/lib/modules/scene'
-import { SvgMesh } from '../../../../packages/dancefloor/lib/shapes/svg-mesh'
 
 import { useResize } from '../../../hooks/resize'
 import jsSvg from './assets/js.svg?raw'

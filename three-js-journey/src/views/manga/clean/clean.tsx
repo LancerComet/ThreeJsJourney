@@ -1,4 +1,5 @@
 // eslint-disable-next-line import/no-named-as-default
+import { AmbientLight, PointLight, useScene } from '@lancercomet/dancefloor'
 import gsap from 'gsap'
 import {
   DoubleSide, Group,
@@ -10,8 +11,6 @@ import {
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { defineComponent, onMounted, ref } from 'vue'
-
-import { AmbientLight, PointLight, useScene } from '../../../../packages/dancefloor/lib'
 
 import style from './clean.module.styl'
 

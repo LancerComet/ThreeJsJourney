@@ -1,8 +1,8 @@
+import { Group, AxesHelper, AmbientLight, PointLight, useScene } from '@lancercomet/dancefloor'
 import CameraControls from 'camera-controls'
 import * as THREE from 'three'
 import { computed, defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 
-import { Group, AxesHelper, AmbientLight, PointLight, useScene } from '../../../../packages/dancefloor/lib'
 import { useResize } from '../../../hooks/resize'
 import { ActionBar } from './components/action-bar'
 import { MangaPage, MangaPageVM } from './components/manga-reader'

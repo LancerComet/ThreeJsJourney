@@ -1,10 +1,7 @@
+import { PlaneGeometry, ShaderMaterial, Mesh, BendModifier, BendModifierVM, MeshModifierSlack } from '@lancercomet/dancefloor'
 import * as THREE from 'three'
 import { ComponentPublicInstance, defineComponent, PropType, ref } from 'vue'
 
-import { PlaneGeometry } from '../../../../../../packages/dancefloor/lib/modules/geometries'
-import { ShaderMaterial } from '../../../../../../packages/dancefloor/lib/modules/materials'
-import { Mesh } from '../../../../../../packages/dancefloor/lib/modules/mesh'
-import { BendModifier, BendModifierVM, MeshModifierSlack } from '../../../../../../packages/dancefloor/lib/modules/modifier'
 import blankImage from '../../assets/blank.png'
 import { CubicBezier } from '../../modules/cubic-bezier'
 import { useFlip } from './hooks/flip'

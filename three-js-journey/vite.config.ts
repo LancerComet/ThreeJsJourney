@@ -22,7 +22,9 @@ export default defineConfig({
 
   resolve: {
     alias: {
-      '@lancercomet/dancefloor': path.resolve(__dirname, '../packages/dancefloor')
+      '@lancercomet/dancefloor': path.resolve(__dirname, '../packages/dancefloor'),
+      three: path.resolve(__dirname, 'node_modules/three'),
+      'three.modifiers': path.resolve(__dirname, 'node_modules/three.modifiers')
     }
   },
 
@@ -48,7 +50,16 @@ export default defineConfig({
 
   server: {
     port: 80,
-    host: '0.0.0.0'
+    host: '0.0.0.0',
+    proxy: {
+      '/twirp': {
+        target: 'https://manga.bilibili.com',
+        changeOrigin: true,
+        headers: {
+          origin: 'manga.bilibili.com'
+        }
+      }
+    }
   },
 
   build: {

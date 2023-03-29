@@ -1,6 +1,3 @@
-import * as THREE from 'three'
-import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader'
-import { computed, defineComponent, onMounted, PropType, ref } from 'vue'
 import {
   AxesHelper,
   BasicMaterial,
@@ -11,7 +8,10 @@ import {
   PointLight,
   StandardMaterial,
   TextGeometry
-} from '../../../../../packages/dancefloor/lib'
+} from '@lancercomet/dancefloor'
+import * as THREE from 'three'
+import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader'
+import { computed, defineComponent, onMounted, PropType, ref } from 'vue'
 import { useCannon } from '../../../../modules/cannon'
 import { MangaSeason } from '../model/manga-season'
 import { getRecommendationList } from '../services/recommendation'
@@ -135,7 +135,7 @@ const HomeHub = defineComponent({
 
     const Title = () => (
       <Mesh castShadow position={{ z: 4 }}>
-        <TextGeometry text='Bilibili Manga' font={fontRef.value} size={0.5} height={0.2} />
+        <TextGeometry text='Manga' font={fontRef.value} size={0.5} height={0.2} />
         <BasicMaterial params={{ color: 0x222222 }} />
       </Mesh>
     )

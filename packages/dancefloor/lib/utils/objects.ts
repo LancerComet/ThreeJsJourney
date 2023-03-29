@@ -8,7 +8,7 @@ const getObjectSize = (obj: Object3D): Vector3 => {
 }
 
 const setObjectShadow = (obj: Object3D, castShadow: boolean, receiveShadow: boolean) => {
-  obj.traverse(child => {
+  obj.traverse((child: Object3D) => {
     if (child instanceof Mesh) {
       child.castShadow = castShadow
       child.receiveShadow = receiveShadow

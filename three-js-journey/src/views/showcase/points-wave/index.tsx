@@ -1,7 +1,7 @@
+import { BufferGeometry, BufferGeometryComponent, SphereGeometry, AxesHelper, AmbientLight, PointLight, PointsMaterial, Points, useScene } from '@lancercomet/dancefloor'
 import * as THREE from 'three'
 import { BufferAttribute } from 'three'
 import { defineComponent, onMounted, ref } from 'vue'
-import { BufferGeometry, BufferGeometryComponent, SphereGeometry, AxesHelper, AmbientLight, PointLight, PointsMaterial, Points, useScene } from '../../../../packages/dancefloor/lib'
 
 const TestPage = defineComponent({
   name: 'TestPage',

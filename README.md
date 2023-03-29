@@ -16,3 +16,8 @@ This package is published to npm as the name `@lancercomet/dancefloor`.
 ## ThreeJS Journey
 
 ThreeJS Journey is located in `three-js-journey`.
+
+How to start:
+
+ - Build package DanceFloor.
+ - Run `npm run dev` in `three-js-journey` folder.

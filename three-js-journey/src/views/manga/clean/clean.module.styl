@@ -1,4 +1,14 @@
 .button-container
   position: fixed
-  right: 20px
+  left: 50%
   bottom: 20px
+  transform: translate(-50%, 0)
+
+  > button
+    padding: 8px 15px
+    background-color: #000
+    border: none
+    color: #fff
+
+    &[disabled]
+      opacity: .5

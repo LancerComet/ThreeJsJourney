@@ -1,5 +1,9 @@
+import {
+  BoxGeometry, PlaneGeometry,
+  AmbientLight, DirectionalLight, PointLight,
+  StandardMaterial, Mesh, useScene
+} from '@lancercomet/dancefloor'
 import { defineComponent } from 'vue'
-import { BoxGeometry, PlaneGeometry, AmbientLight, DirectionalLight, PointLight, StandardMaterial, Mesh, useScene } from '../../../packages/dancefloor/lib'
 
 const Shadow = defineComponent({
   name: 'Shadow',

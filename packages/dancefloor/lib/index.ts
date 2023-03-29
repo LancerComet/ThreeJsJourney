@@ -12,3 +12,5 @@ export * from './modules/scene'
 
 export * from './shapes/texture-cube'
 export * from './shapes/svg-mesh'
+
+export * from './utils/objects'

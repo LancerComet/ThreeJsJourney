@@ -42,7 +42,14 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [
-        'vue'
+        'vue',
+        'three',
+        'three.modifiers',
+        'three/examples/jsm/geometries/TextGeometry',
+        'three/examples/jsm/loaders/MTLLoader',
+        'three/examples/jsm/loaders/OBJLoader',
+        'three/examples/jsm/controls/OrbitControls',
+        'three/examples/jsm/loaders/SVGLoader'
       ],
       output: {
         globals: {

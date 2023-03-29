@@ -1,8 +1,7 @@
+import { AxesHelper, AmbientLight, PointLight, useScene } from '@lancercomet/dancefloor'
 import * as Cannon from 'cannon-es'
 import { Clock, Mesh, MeshStandardMaterial, PlaneGeometry, SphereGeometry } from 'three'
 import { defineComponent } from 'vue'
-
-import { AxesHelper, AmbientLight, PointLight, useScene } from '../../../packages/dancefloor/lib'
 
 const Physics = defineComponent({
   name: 'Physics',

@@ -1,6 +1,6 @@
+import { PlaneGeometry, AxesHelper, AmbientLight, StandardMaterial, Mesh, useScene } from '@lancercomet/dancefloor'
 import { OrthographicCamera, Vector3 } from 'three'
 import { defineComponent } from 'vue'
-import { PlaneGeometry, AxesHelper, AmbientLight, StandardMaterial, Mesh, useScene } from '../../../../packages/dancefloor/lib'
 import { useResize } from '../../../hooks/resize'
 import { HomeHub } from './components/home-hub'
 
