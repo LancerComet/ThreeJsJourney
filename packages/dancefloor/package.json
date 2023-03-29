@@ -4,15 +4,14 @@
   "description": "A Vue binding library for Three.",
   "main": "./dist/index.js",
   "module": "./dist/index.es.js",
+  "license": "Apache-2.0",
   "files": [
     "dist/"
   ],
   "scripts": {
     "dev": "cross-env NODE_ENV=development vite",
     "build": "cross-env NODE_ENV=production vite build",
-    "lint": "eslint ./lib/**/*",
-    "rmdist": "rimraf ./dist",
-    "prebuild": "npm run lint && npm run rmdist"
+    "rmdist": "rimraf ./dist"
   },
   "maintainers": [
     {
@@ -28,7 +27,21 @@
     "@lancercomet/utils": "^1.0.0"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.16.7",
+    "@babel/plugin-proposal-decorators": "^7.17.2",
+    "@babel/preset-env": "^7.16.11",
     "@rollup/plugin-typescript": "^8.5.0",
-    "rimraf": "^3.0.2"
+    "@vitejs/plugin-vue": "^4.1.0",
+    "@vitejs/plugin-vue-jsx": "^3.0.1",
+    "@vue/compiler-sfc": "^3.2.47",
+    "babel-plugin-transform-typescript-metadata": "^0.3.2",
+    "cross-env": "^7.0.3",
+    "rimraf": "^3.0.2",
+    "three": "^0.144.0",
+    "three.modifiers": "^2.5.7",
+    "tslib": "^2.5.0",
+    "typescript": "^4.9.5",
+    "vite": "^4.2.1",
+    "vue": "^3.2.47"
   }
 }

@@ -1,3 +1,4 @@
+import { useScene } from '@lancercomet/dancefloor'
 import {
   AmbientLight, BufferAttribute, Color, CubeTextureLoader, DoubleSide,
   Mesh, MeshMatcapMaterial, MeshStandardMaterial,
@@ -6,7 +7,6 @@ import {
   TorusGeometry
 } from 'three'
 import { defineComponent } from 'vue'
-import { useScene } from '../../../packages/dancefloor/lib'
 
 const Material = defineComponent({
   name: 'Material',

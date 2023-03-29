@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { isNumber } from '@lancercomet/utils/types'
-import * as dat from 'lil-gui'
 import {
   Color, OrthographicCamera,
   PerspectiveCamera, Scene, Vector3,
@@ -16,7 +15,6 @@ const useScene = (param?: {
   useControl?: boolean
   antialias?: boolean
   useShadow?: boolean
-  useGui?: boolean
   shadowType?: ShadowMapType
   width?: number
   height?: number
@@ -25,12 +23,6 @@ const useScene = (param?: {
   let height = param?.height ?? window.innerHeight
 
   const clock = new Clock()
-  const useGui = param?.useGui ?? true
-  let gui: dat.GUI | undefined
-  if (useGui) {
-    gui = new dat.GUI()
-  }
-
   const scene = new Scene()
   provideContainer(scene)
 
@@ -128,7 +120,6 @@ const useScene = (param?: {
       onBeforeUnmount(() => {
         isTickStart = false
         clock.stop()
-        gui?.destroy()
         revoke()
       })
 
@@ -148,7 +139,6 @@ const useScene = (param?: {
   return {
     Scene: SceneComponent,
     onTick,
-    gui,
     camera,
     scene,
     renderer,

@@ -1,15 +1,10 @@
 # ThreeJS Journey
 
-This project contains all practice codes of ThreeJS Journey.
-
-Everything is located under `src/views`.
-
-Not all chapters are included.  
-
 > God bless Ukraine.
 
-## Vue and Three
+This project comes with two parts:
 
-I have found that using markup language to build Three app is more convenient.
+ - My practice codes for the course **ThreeJS Journey**, but not all chapters are included.
+ - A package named **DanceFloor**, it's a Vue binding for ThreeJS.
 
-So I made some of Three components the Vue components just like what they have done with React.
+

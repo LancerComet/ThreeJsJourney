@@ -1,7 +1,7 @@
+import { BoxGeometry, BasicMaterial, Mesh, useScene } from '@lancercomet/dancefloor'
 import * as THREE from 'three'
 import { MeshBasicMaterialParameters } from 'three/src/materials/MeshBasicMaterial'
 import { defineComponent, onMounted, ref } from 'vue'
-import { BoxGeometry, BasicMaterial, Mesh, useScene } from '../../../packages/dancefloor/lib'
 
 const Textures = defineComponent({
   name: 'Texture',

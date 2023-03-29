@@ -23,7 +23,10 @@
     "types": [
       "vite/client",
       "node"
-    ]
+    ],
+    "paths": {
+      "@lancercomet/dancefloor": ["../packages/dancefloor/lib"]
+    }
   },
   "include": [
     "src/**/*.ts",

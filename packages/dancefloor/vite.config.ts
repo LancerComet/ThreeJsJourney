@@ -3,7 +3,6 @@ import typescript from '@rollup/plugin-typescript'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { defineConfig } from 'vite'
-import eslintPlugin from 'vite-plugin-eslint'
 
 export default defineConfig({
   base: '/',
@@ -16,9 +15,6 @@ export default defineConfig({
         ['@babel/plugin-proposal-decorators', { legacy: true }],
         ['@babel/plugin-proposal-class-properties', { loose: true }]
       ]
-    }),
-    eslintPlugin({
-      cache: false
     })
   ],
 

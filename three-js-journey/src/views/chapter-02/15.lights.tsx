@@ -1,12 +1,11 @@
-import { HemisphereLight, HemisphereLightHelper, RectAreaLight } from 'three'
-import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper'
-import { defineComponent } from 'vue'
-
 import {
   BoxGeometry, PlaneGeometry, AmbientLight,
   DirectionalLight, PointLight, StandardMaterial,
   Mesh, useScene
-} from '../../../packages/dancefloor/lib'
+} from '@lancercomet/dancefloor'
+import { HemisphereLight, HemisphereLightHelper, RectAreaLight } from 'three'
+import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper'
+import { defineComponent } from 'vue'
 
 const Lights = defineComponent({
   name: 'Lights',

@@ -23,6 +23,8 @@ module.exports = {
     '@typescript-eslint'
   ],
 
+  ignorePatterns: ['**/dist/*.js'],
+
   rules: {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
 

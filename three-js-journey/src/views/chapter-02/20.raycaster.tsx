@@ -1,7 +1,7 @@
-import { Clock, Mesh, MeshStandardMaterial, SphereGeometry, Vector3 } from 'three'
+import { AxesHelper, AmbientLight, PointLight, RayCaster, RayCasterComponent, useScene } from '@lancercomet/dancefloor'
+import { Clock, Intersection, Mesh, MeshStandardMaterial, Object3D, SphereGeometry, Vector3 } from 'three'
+import { instance } from 'three/examples/jsm/nodes/shadernode/ShaderNodeElements'
 import { defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
-
-import { AxesHelper, AmbientLight, PointLight, RayCaster, RayCasterComponent, useScene } from '../../../packages/dancefloor/lib'
 
 const RayCasterPage = defineComponent({
   name: 'RayCasterPage',
@@ -54,7 +54,7 @@ const RayCasterPage = defineComponent({
       const intersections = rayCaster.intersectObjects(objs)
 
       // Paint intersected sphere red.
-      intersections.forEach(item => {
+      intersections.forEach((item: Intersection<Object3D>) => {
         ((item.object as Mesh).material as MeshStandardMaterial).color.set(0xff0000)
       })
 
