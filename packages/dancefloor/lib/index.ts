@@ -13,8 +13,10 @@ export * from './modules/raycaster'
 export * from './modules/scene'
 
 export * from './providers/cameras'
-export * from './providers/renderer'
+export * from './providers/container'
 export * from './providers/ontick'
+export * from './providers/renderer'
+export * from './providers/resize'
 
 export * from './shapes/texture-cube'
 export * from './shapes/svg-mesh'
