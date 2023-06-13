@@ -1,7 +1,12 @@
-import { Group, AxesHelper, AmbientLight, PointLight, useScene } from '@lancercomet/dancefloor'
+import {
+  Group, AxesHelper, useScene,
+  AmbientLight, PointLight,
+  OrbitControls, OrthographicCamera,
+  injectCamera, injectRenderer, injectOnTick
+} from '@lancercomet/dancefloor'
 import CameraControls from 'camera-controls'
 import * as THREE from 'three'
-import { computed, defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, defineComponent, onBeforeUnmount, onMounted, PropType, ref } from 'vue'
 
 import { useResize } from '../../../hooks/resize'
 import { ActionBar } from './components/action-bar'
@@ -31,15 +36,6 @@ const EXAMPLE_EPISODES: IEpisodeOption[] = [
 
 const createCamera = (): [THREE.OrthographicCamera, () => void] => {
   const viewSize = 8.2
-  const aspectRatio = window.innerWidth / window.innerHeight
-  const camera = new THREE.OrthographicCamera(
-    -aspectRatio * viewSize / 2,
-    aspectRatio * viewSize / 2,
-    viewSize / 2,
-    -viewSize / 2,
-    0.1, 1000
-  )
-  camera.position.set(-40, 60, 180)
 
   const setCameraSize = () => {
     const aspect = window.innerWidth / window.innerHeight
@@ -49,7 +45,12 @@ const createCamera = (): [THREE.OrthographicCamera, () => void] => {
     camera.bottom = -viewSize / 2
     camera.near = 0.1
     camera.far = 1000
+    camera.updateProjectionMatrix()
   }
+
+  const camera = new THREE.OrthographicCamera()
+  camera.position.set(-40, 60, 180)
+  setCameraSize()
 
   return [camera, setCameraSize]
 }
@@ -80,12 +81,12 @@ const MangaReader = defineComponent({
       mutate: loadEpisodeImages
     } = useMangaImages()
 
-    const [camera, setCameraSize] = createCamera()
-    const { Scene, renderer, clock, onTick } = useScene({
-      camera,
-      antialias: true,
-      useControl: false
+    const { Scene, renderer, clock, onTick, scene, resize } = useScene({
+      antialias: true
     })
+
+    const [camera, setCameraSize] = createCamera()
+    scene.add(camera)
 
     const controls = new CameraControls(camera, renderer.domElement)
     controls.dampingFactor = 0.07
@@ -96,11 +97,13 @@ const MangaReader = defineComponent({
     controls.moveTo(0, 3.4, 0)
 
     useResize(() => {
+      resize(window.innerWidth, window.innerHeight)
       setCameraSize()
     })
 
     onTick(() => {
       controls.update(clock.getDelta())
+      renderer.render(scene, camera)
     })
 
     const pageFlippingGap = 60

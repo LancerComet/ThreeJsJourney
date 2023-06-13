@@ -1,4 +1,4 @@
-import { useScene } from '@lancercomet/dancefloor'
+import { OrbitControls, PerspectiveCamera, useScene } from '@lancercomet/dancefloor'
 import {
   BoxGeometry,
   BufferAttribute,
@@ -10,11 +10,12 @@ import {
   TextureLoader
 } from 'three'
 import { defineComponent } from 'vue'
+import { useResize } from '../../hooks/resize'
 
 const Particles = defineComponent({
   name: 'Particles',
   setup () {
-    const { Scene, scene, onTick } = useScene({
+    const { Scene, scene, onTick, resize } = useScene({
       antialias: true
     })
 
@@ -70,8 +71,16 @@ const Particles = defineComponent({
       bufferGeometry.attributes.position.needsUpdate = true
     })
 
+    useResize(() => {
+      resize(window.innerWidth, window.innerHeight)
+    })
+
     return () => (
-      <Scene background={new Color(0)} />
+      <Scene background={new Color(0)}>
+        <PerspectiveCamera position={{ x: 5, y: 5, z: 5 }}>
+          <OrbitControls />
+        </PerspectiveCamera>
+      </Scene>
     )
   }
 })

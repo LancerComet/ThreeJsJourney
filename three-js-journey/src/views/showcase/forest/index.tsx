@@ -1,18 +1,23 @@
-import { AxesHelper, AmbientLight, PointLight, ObjModel, useScene, getObjectSize } from '@lancercomet/dancefloor'
+import {
+  AxesHelper, ObjModel, getObjectSize,
+  AmbientLight, PointLight,
+  PerspectiveCamera, OrbitControls,
+  useScene
+} from '@lancercomet/dancefloor'
 import { Body } from 'cannon-es'
 import CannonDebugger from 'cannon-es-debugger'
 import { Color, Group } from 'three'
 import { defineComponent, onBeforeUnmount } from 'vue'
 
+import { useResize } from '../../../hooks/resize'
 import { useCannon } from '../../../modules/cannon'
 
 const ForestScene = defineComponent({
   name: 'ForestScene',
 
   setup () {
-    const { Scene, onTick, clock, scene } = useScene({
-      useShadow: true,
-      useControl: true
+    const { Scene, onTick, clock, scene, resize } = useScene({
+      useShadow: true
     })
     const { addObject, stepCannonWorld, cannonWorld } = useCannon({
       clock
@@ -122,8 +127,16 @@ const ForestScene = defineComponent({
       )
     }
 
+    useResize(() => {
+      resize(window.innerWidth, window.innerHeight)
+    })
+
     return () => (
       <Scene background={new Color(0xcccccc)}>
+        <PerspectiveCamera position={{ x: 5, y: 5, z: 5 }}>
+          <OrbitControls />
+        </PerspectiveCamera>
+
         <AmbientLight
           intensity={0.8} color={0xA9C9E2}
         />

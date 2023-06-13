@@ -1,4 +1,4 @@
-import path from 'path'
+import * as path from 'path'
 import typescript from '@rollup/plugin-typescript'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -46,6 +46,7 @@ export default defineConfig({
         'three',
         'three.modifiers',
         'three/examples/jsm/geometries/TextGeometry',
+        'three/src/materials/MeshStandardMaterial',
         'three/examples/jsm/loaders/MTLLoader',
         'three/examples/jsm/loaders/OBJLoader',
         'three/examples/jsm/controls/OrbitControls',

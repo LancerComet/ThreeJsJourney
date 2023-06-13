@@ -1,16 +1,16 @@
 // eslint-disable-next-line import/no-named-as-default
-import { AmbientLight, PointLight, useScene } from '@lancercomet/dancefloor'
+import { AmbientLight, PointLight, useScene, PerspectiveCamera, OrbitControls } from '@lancercomet/dancefloor'
 import gsap from 'gsap'
 import {
   DoubleSide, Group,
   Mesh, MeshPhongMaterial,
   MeshStandardMaterial,
-  PerspectiveCamera,
   PlaneGeometry, TextureLoader,
   Vector3
 } from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { defineComponent, onMounted, ref } from 'vue'
+
+import { useResize } from '../../../hooks/resize'
 
 import style from './clean.module.styl'
 
@@ -19,18 +19,15 @@ const CleanScene = defineComponent({
   setup () {
     const isCameraMoving = ref(false)
 
-    const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-    camera.position.set(0, 0, 0.45)
-    camera.lookAt(new Vector3(0, 0, 0))
+    const { Scene, scene, renderer, onTick, resize } = useScene()
 
-    const { Scene, scene, renderer, onTick } = useScene({
-      useControl: false,
-      camera
+    const cameraPositionRef = ref({
+      x: 0, y: 0, z: 0.45
     })
-
-    const controls = new OrbitControls(camera, renderer.domElement)
-    controls.enableDamping = true
-    controls.dampingFactor = 0.05
+    const isControlEnabledRef = ref(true)
+    const controlTargetRef = ref({
+      x: 0, y: 0, z: 0
+    })
 
     const scene1Group = new Group()
     const scene2Group = new Group()
@@ -130,23 +127,13 @@ const CleanScene = defineComponent({
       // })
     }
 
-    onTick(() => {
-      controls.update()
-    })
-
-    onMounted(() => {
-      createScene1()
-      createScene2()
-      goScene2()
-    })
-
     const goScene1 = async () => {
-      controls.enabled = false
-      controls.target.set(0, 0, 0)
+      isControlEnabledRef.value = false
+      controlTargetRef.value = { x: 0, y: 0, z: 0 }
       isCameraMoving.value = true
       scene1Group.visible = true
 
-      await gsap.to(camera.position, {
+      await gsap.to(cameraPositionRef.value, {
         duration: 1,
         x: 0,
         y: 0,
@@ -154,23 +141,23 @@ const CleanScene = defineComponent({
         ease: 'power3.out'
       })
 
-      await gsap.to(camera.position, {
+      await gsap.to(cameraPositionRef.value, {
         duration: 1.5,
         x: 0.05,
         ease: 'power3.out'
       })
 
-      controls.enabled = true
+      isControlEnabledRef.value = true
       isCameraMoving.value = false
       scene2Group.visible = false
     }
 
     const goScene2 = async () => {
-      controls.enabled = false
+      isControlEnabledRef.value = false
       isCameraMoving.value = true
       scene2Group.visible = true
 
-      await gsap.to(camera.position, {
+      await gsap.to(cameraPositionRef.value, {
         duration: 1,
         x: 0,
         y: 0,
@@ -178,23 +165,45 @@ const CleanScene = defineComponent({
         ease: 'power3.out'
       })
 
-      controls.target.set(0, 0, 3)
+      controlTargetRef.value = {
+        x: 0, y: 0, z: 3
+      }
 
-      await gsap.to(camera.position, {
+      await gsap.to(cameraPositionRef.value, {
         duration: 1.5,
         x: -0.5,
         y: -0.1,
         ease: 'power3.out'
       })
 
-      controls.enabled = true
+      isControlEnabledRef.value = true
       isCameraMoving.value = false
       scene1Group.visible = false
     }
 
+    onMounted(() => {
+      createScene1()
+      createScene2()
+      goScene2()
+    })
+
+    useResize(() => {
+      resize(window.innerWidth, window.innerHeight)
+    })
+
     return () => (
       <div>
         <Scene background={0xffffff}>
+          <PerspectiveCamera
+            position={cameraPositionRef.value}
+            fov={75}
+          >
+            <OrbitControls
+              enabled={isControlEnabledRef.value} target={controlTargetRef.value}
+              enableDamping dampingFactor={0.05}
+            />
+          </PerspectiveCamera>
+
           <AmbientLight intensity={1}/>
           <PointLight showHelper position={{ x: 4, y: 3, z: 4 }} intensity={0} castShadow/>
         </Scene>

@@ -1,15 +1,16 @@
 import {
   BoxGeometry, PlaneGeometry,
   AmbientLight, DirectionalLight, PointLight,
-  StandardMaterial, Mesh, useScene
+  StandardMaterial, Mesh, useScene, PerspectiveCamera, OrbitControls
 } from '@lancercomet/dancefloor'
 import { defineComponent } from 'vue'
+import { useResize } from '../../hooks/resize'
 
 const Shadow = defineComponent({
   name: 'Shadow',
 
   setup () {
-    const { Scene } = useScene({
+    const { Scene, resize } = useScene({
       useShadow: true,
       antialias: true
     })
@@ -50,8 +51,16 @@ const Shadow = defineComponent({
       )
     }
 
+    useResize(() => {
+      resize(window.innerWidth, window.innerHeight)
+    })
+
     return () => (
       <Scene>
+        <PerspectiveCamera position={{ x: 5, y: 5, z: 5 }}>
+          <OrbitControls />
+        </PerspectiveCamera>
+
         <Cube1 />
         <Cube2 />
         <Cube3 />

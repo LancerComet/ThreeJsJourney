@@ -1,7 +1,7 @@
 import { Group } from 'three'
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
-import { defineComponent, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue'
+import { defineComponent, onBeforeUnmount, PropType, watch } from 'vue'
 import { injectContainer } from '../providers/container'
 import { setObjectShadow } from '../utils/objects'
 

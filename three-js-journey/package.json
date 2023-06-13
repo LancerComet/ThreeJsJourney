@@ -18,7 +18,7 @@
     "gsap": "^3.9.1",
     "lil-gui": "^0.16.0",
     "reflect-metadata": "^0.1.13",
-    "three": "^0.143.0",
+    "three": "^0.152.1",
     "three.modifiers": "^2.5.7",
     "vue": "^3.2.31",
     "vue-router": "^4.0.13"
@@ -29,7 +29,7 @@
     "@babel/preset-env": "^7.16.11",
     "@types/color": "^3.0.3",
     "@types/node": "^16.11.26",
-    "@types/three": "^0.143.1",
+    "@types/three": "^0.152.1",
     "@types/underscore": "^1.11.4",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",

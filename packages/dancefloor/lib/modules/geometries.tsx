@@ -3,7 +3,7 @@ import { TextGeometry as THREETextGeometry } from 'three/examples/jsm/geometries
 import { Font } from 'three/examples/jsm/loaders/FontLoader'
 import {
   ComponentPublicInstance, defineComponent, onBeforeUnmount,
-  PropType, watch, watchEffect
+  PropType, watchEffect
 } from 'vue'
 import { injectGetMesh } from './mesh'
 import { injectGetPoints } from './points'
@@ -14,12 +14,13 @@ const PlaneGeometry = defineComponent({
     height: Number as PropType<number>,
     widthSegment: Number as PropType<number>,
     heightSegment: Number as PropType<number>,
-    translate: {
-      type: Object as PropType<{ x: number, y: number, z: number }>
-    }
+    translate: Object as PropType<{ x: number, y: number, z: number }>,
+    onCreated: Function as PropType<(geometry: THREE.PlaneGeometry) => void>
   },
 
-  setup (props) {
+  emits: ['created'],
+
+  setup (props, { emit }) {
     let geometry: THREE.PlaneGeometry
     const getMesh = injectGetMesh()
 
@@ -43,6 +44,8 @@ const PlaneGeometry = defineComponent({
       if (mesh) {
         mesh.geometry = geometry
       }
+
+      emit('created', geometry)
     }
 
     const dispose = () => {
@@ -151,7 +154,9 @@ type BoxGeometryComponent = ComponentPublicInstance<{
 
 const SphereGeometry = defineComponent({
   props: {
-    radius: Number as PropType<number>
+    radius: Number as PropType<number>,
+    widthSegment: Number as PropType<number>,
+    heightSegment: Number as PropType<number>
   },
 
   setup (props) {
@@ -159,7 +164,7 @@ const SphereGeometry = defineComponent({
     const getMesh = injectGetMesh()
 
     const createGeometry = () => {
-      geometry = new THREE.SphereGeometry(props.radius)
+      geometry = new THREE.SphereGeometry(props.radius, props.widthSegment, props.heightSegment)
       const mesh = getMesh()
       if (mesh) {
         mesh.geometry = geometry
@@ -186,7 +191,7 @@ const SphereGeometry = defineComponent({
   }
 })
 
-type GeometryAttrs = Record<THREE.BuiltinShaderAttributeName | string, THREE.BufferAttribute | THREE.InterleavedBufferAttribute>
+type GeometryAttrs = Record<string, THREE.BufferAttribute | THREE.InterleavedBufferAttribute>
 
 const BufferGeometry = defineComponent({
   setup (_, { expose }) {
@@ -246,14 +251,14 @@ type BufferGeometryComponent = ComponentPublicInstance<{
 
 const TextGeometry = defineComponent({
   name: 'TextGeometry',
+
   props: {
     text: {
       type: String as PropType<string>,
       default: ''
     },
     font: {
-      type: Object as PropType<Font | undefined>,
-      required: true
+      type: Object as PropType<Font>
     },
     height: {
       type: Number as PropType<number>,
@@ -262,9 +267,26 @@ const TextGeometry = defineComponent({
     size: {
       type: Number as PropType<number>,
       required: true
+    },
+    curveSegments: {
+      type: Number as PropType<number>
+    },
+    computeBoundingBox: {
+      type: Boolean as PropType<boolean>,
+      default: false
+    },
+    centered: {
+      type: Boolean as PropType<boolean>,
+      default: false
+    },
+    onCreated: {
+      type: Function as PropType<(textGeometry: THREETextGeometry) => void>
     }
   },
-  setup (props) {
+
+  emits: ['created'],
+
+  setup (props, { emit }) {
     let textGeometry: THREETextGeometry
     const getMesh = injectGetMesh()
 
@@ -273,16 +295,28 @@ const TextGeometry = defineComponent({
       if (!font) {
         return
       }
+
       textGeometry = new THREETextGeometry(props.text, {
         font,
         height: props.height,
-        size: props.size
+        size: props.size,
+        curveSegments: props.curveSegments
       })
+
+      if (props.computeBoundingBox) {
+        textGeometry.computeBoundingBox()
+      }
+
+      if (props.centered) {
+        textGeometry.center()
+      }
 
       const mesh = getMesh()
       if (mesh) {
         mesh.geometry = textGeometry
       }
+
+      emit('created', textGeometry)
     }
 
     const dispose = () => {
@@ -305,6 +339,42 @@ const TextGeometry = defineComponent({
   }
 })
 
+const TorusGeometry = defineComponent({
+  name: 'TorusGeometry',
+
+  props: {
+    radius: Number as PropType<number>,
+    tube: Number as PropType<number>,
+    radialSegment: Number as PropType<number>,
+    tubularSegments: Number as PropType<number>
+  },
+
+  setup (props) {
+    let torus: THREE.TorusGeometry
+    const getMesh = injectGetMesh()
+
+    const createTorus = () => {
+      torus = new THREE.TorusGeometry(props.radius, props.tube, props.radialSegment, props.tubularSegments)
+      const mesh = getMesh()
+      if (mesh) {
+        mesh.geometry = torus
+      }
+    }
+
+    const revoke = watchEffect(() => {
+      createTorus()
+    })
+
+    onBeforeUnmount(() => {
+      revoke()
+    })
+
+    return () => (
+      <div class='torus-geometry' />
+    )
+  }
+})
+
 export {
   PlaneGeometry,
   BoxGeometry,
@@ -312,5 +382,6 @@ export {
   SphereGeometry,
   BufferGeometry,
   BufferGeometryComponent,
-  TextGeometry
+  TextGeometry,
+  TorusGeometry
 }

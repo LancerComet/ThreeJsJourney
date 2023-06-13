@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { MeshBasicMaterialParameters } from 'three/src/materials/MeshBasicMaterial'
+import type { MeshBasicMaterialParameters } from 'three/src/materials/MeshBasicMaterial'
 import { MeshStandardMaterialParameters } from 'three/src/materials/MeshStandardMaterial'
 import { defineComponent, onBeforeUnmount, PropType, toRefs, watchEffect } from 'vue'
 import { injectGetMesh } from './mesh'
@@ -166,9 +166,50 @@ const ShaderMaterial = defineComponent({
   }
 })
 
+const MatcapMaterial = defineComponent({
+  name: 'MatcapMaterial',
+
+  props: {
+    params: {
+      type: Object as PropType<THREE.MeshMatcapMaterialParameters>,
+      default: () => ({})
+    }
+  },
+
+  setup (props) {
+    const { params } = toRefs(props)
+    const material = new THREE.MeshMatcapMaterial(params.value)
+
+    const getMesh = injectGetMesh()
+    const mesh = getMesh()
+    if (mesh) {
+      mesh.material = material
+    }
+
+    const dispose = () => {
+      material?.dispose()
+    }
+
+    const revoke = watchEffect(() => {
+      material.setValues(params.value)
+      material.needsUpdate = true
+    })
+
+    onBeforeUnmount(() => {
+      dispose()
+      revoke()
+    })
+
+    return () => (
+      <div class='matcap-material' />
+    )
+  }
+})
+
 export {
   StandardMaterial,
   BasicMaterial,
   PointsMaterial,
-  ShaderMaterial
+  ShaderMaterial,
+  MatcapMaterial
 }

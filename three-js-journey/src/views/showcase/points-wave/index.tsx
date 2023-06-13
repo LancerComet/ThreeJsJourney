@@ -1,14 +1,24 @@
-import { BufferGeometry, BufferGeometryComponent, SphereGeometry, AxesHelper, AmbientLight, PointLight, PointsMaterial, Points, useScene } from '@lancercomet/dancefloor'
+import {
+  BufferGeometry,
+  BufferGeometryComponent,
+  SphereGeometry,
+  AxesHelper,
+  AmbientLight,
+  PointLight,
+  PointsMaterial,
+  Points,
+  useScene,
+  PerspectiveCamera, OrbitControls
+} from '@lancercomet/dancefloor'
 import * as THREE from 'three'
 import { BufferAttribute } from 'three'
 import { defineComponent, onMounted, ref } from 'vue'
+import { useResize } from '../../../hooks/resize'
 
 const TestPage = defineComponent({
   name: 'TestPage',
   setup () {
-    const { Scene } = useScene({
-      useControl: true
-    })
+    const { Scene, resize } = useScene()
     const geometryRef = ref<BufferGeometryComponent>()
 
     const init = () => {
@@ -44,6 +54,10 @@ const TestPage = defineComponent({
       tick()
     }
 
+    useResize(() => {
+      resize(window.innerWidth, window.innerHeight)
+    })
+
     onMounted(() => init())
 
     const SphereParticle = () => (
@@ -74,6 +88,10 @@ const TestPage = defineComponent({
 
     return () => (
       <Scene>
+        <PerspectiveCamera position={{ x: 5, y: 5, z: 5 }}>
+          <OrbitControls />
+        </PerspectiveCamera>
+
         <SphereParticle />
         <WaveParticles />
         <AmbientLight />

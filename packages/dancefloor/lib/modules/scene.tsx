@@ -1,18 +1,17 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { isNumber } from '@lancercomet/utils/types'
 import {
-  Color, OrthographicCamera,
-  PerspectiveCamera, Scene, Vector3,
-  WebGLRenderer,
+  Color,
+  Scene, WebGLRenderer,
   ShadowMapType, PCFSoftShadowMap, Clock, Texture
 } from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { defineComponent, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue'
 import { provideContainer } from '../providers/container'
+import { provideOnTick } from '../providers/ontick'
+import { provideRenderer } from '../providers/renderer'
+import { provideOnResize } from '../providers/resize'
 
 const useScene = (param?: {
-  camera?: PerspectiveCamera | OrthographicCamera
-  useControl?: boolean
   antialias?: boolean
   useShadow?: boolean
   shadowType?: ShadowMapType
@@ -26,17 +25,10 @@ const useScene = (param?: {
   const scene = new Scene()
   provideContainer(scene)
 
-  let camera = param?.camera
-  if (!camera) {
-    camera = new PerspectiveCamera(75, width / height, 0.1, 1000)
-    camera.position.set(5, 5, 5)
-    camera.lookAt(new Vector3(0, 0, 0))
-  }
-  scene.add(camera!)
-
   const renderer = new WebGLRenderer({
     antialias: param?.antialias === true
   })
+  provideRenderer(renderer)
 
   const useShadow = param?.useShadow === true
   if (useShadow) {
@@ -45,21 +37,38 @@ const useScene = (param?: {
   }
   renderer.setSize(width, height)
 
-  let controls: OrbitControls | undefined
-  const useControl = param?.useControl ?? true
-  if (useControl) {
-    controls = new OrbitControls(camera!, renderer.domElement)
-    controls.enableDamping = true
-    controls.dampingFactor = 0.1
+  const onResizeCallback: Array<(width: number, height: number) => void> = []
+  const onResize = (callback: (width: number, height: number) => void) => {
+    if (!onResizeCallback.includes(callback)) {
+      onResizeCallback.push(callback)
+    }
+    return () => {
+      const index = onResizeCallback.indexOf(callback)
+      if (index > -1) {
+        onResizeCallback.splice(index, 1)
+      }
+    }
   }
+  provideOnResize(onResize)
 
   const doResize = () => {
-    if (camera instanceof PerspectiveCamera) {
-      camera.aspect = width / height
-    }
-    camera?.updateProjectionMatrix()
+    onResizeCallback.forEach(item => item(width, height))
     renderer.setSize(width, height)
   }
+
+  const onTickCallbacks: (() => void)[] = []
+  const onTick = (callback: () => void) => {
+    if (!onTickCallbacks.includes(callback)) {
+      onTickCallbacks.push(callback)
+    }
+    return () => {
+      const index = onTickCallbacks.indexOf(callback)
+      if (index > -1) {
+        onTickCallbacks.splice(index, 1)
+      }
+    }
+  }
+  provideOnTick(onTick)
 
   const SceneComponent = defineComponent({
     name: 'Scene',
@@ -68,6 +77,9 @@ const useScene = (param?: {
       background: {
         type: [Object, Number] as PropType<Color | Texture | number>,
         default: () => new Color(0)
+      },
+      onTick: {
+        type: Function as PropType<() => void>
       }
     },
 
@@ -76,8 +88,7 @@ const useScene = (param?: {
       const element = ref<HTMLElement>()
 
       const tick = () => {
-        controls?.update()
-        renderer.render(scene, camera!)
+        props.onTick?.()
         onTickCallbacks.forEach(item => item())
         if (isTickStart) {
           requestAnimationFrame(tick)
@@ -129,21 +140,12 @@ const useScene = (param?: {
     }
   })
 
-  const onTickCallbacks: (() => void)[] = []
-  const onTick = (callback: () => void) => {
-    if (!onTickCallbacks.includes(callback)) {
-      onTickCallbacks.push(callback)
-    }
-  }
-
   return {
     Scene: SceneComponent,
     onTick,
-    camera,
     scene,
     renderer,
     clock,
-    controls,
     resize: (w: number, h: number) => {
       width = w
       height = h

@@ -1,3 +1,5 @@
+export * from './modules/cameras'
+export * from './modules/controls'
 export * from './modules/geometries'
 export * from './modules/group'
 export * from './modules/helpers'
@@ -9,6 +11,10 @@ export * from './modules/modifier'
 export * from './modules/points'
 export * from './modules/raycaster'
 export * from './modules/scene'
+
+export * from './providers/cameras'
+export * from './providers/renderer'
+export * from './providers/ontick'
 
 export * from './shapes/texture-cube'
 export * from './shapes/svg-mesh'

@@ -1,52 +1,57 @@
-import { Group, AxesHelper, AmbientLight, PointLight, useScene, SvgMesh } from '@lancercomet/dancefloor'
+import {
+  Group,
+  AxesHelper,
+  AmbientLight,
+  PointLight,
+  useScene,
+  SvgMesh,
+  OrthographicCamera, OrbitControls
+} from '@lancercomet/dancefloor'
 import * as THREE from 'three'
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 
 import { useResize } from '../../../hooks/resize'
 import jsSvg from './assets/js.svg?raw'
 
-const createCamera = (): [THREE.OrthographicCamera, () => void] => {
-  const viewSize = 8.2
-  const aspectRatio = window.innerWidth / window.innerHeight
-  const camera = new THREE.OrthographicCamera(
-    -aspectRatio * viewSize / 2,
-    aspectRatio * viewSize / 2,
-    viewSize / 2,
-    -viewSize / 2,
-    0.1, 1000
-  )
-  camera.position.set(-40, 60, 180)
-
-  const setCameraSize = () => {
-    const aspect = window.innerWidth / window.innerHeight
-    camera.left = -aspect * viewSize / 2
-    camera.right = aspect * viewSize / 2
-    camera.top = viewSize / 2
-    camera.bottom = -viewSize / 2
-    camera.near = 0.1
-    camera.far = 1000
-  }
-
-  return [camera, setCameraSize]
-}
-
 const SvgMeshPage = defineComponent({
   name: 'SvgMeshPage',
   setup () {
-    const [camera, setCameraSize] = createCamera()
-    const { Scene } = useScene({
-      useControl: true,
+    const viewSize = 15
+    const getCameraViewport = () => {
+      const aspect = window.innerWidth / window.innerHeight
+      return {
+        left: -aspect * viewSize / 2,
+        right: aspect * viewSize / 2,
+        top: viewSize / 2,
+        bottom: -viewSize / 2
+      }
+    }
+    const cameraViewport = ref(getCameraViewport())
+
+    const { Scene, resize } = useScene({
       useShadow: true,
-      antialias: true,
-      camera
+      antialias: true
     })
 
     useResize(() => {
-      setCameraSize()
+      cameraViewport.value = getCameraViewport()
+      resize(window.innerWidth, window.innerHeight)
     })
 
     return () => (
       <Scene background={0xffffff}>
+        <OrthographicCamera
+          position={{ x: -30, y: 100, z: 100 }}
+          lookAt={{ x: 0, y: 0, z: 0 }}
+          far={1000}
+          left={cameraViewport.value.left}
+          right={cameraViewport.value.right}
+          top={cameraViewport.value.top}
+          bottom={cameraViewport.value.bottom}
+        >
+          <OrbitControls />
+        </OrthographicCamera>
+
         <AmbientLight intensity={0.3} color={0xffffff} />
         <PointLight
           castShadow showHelper

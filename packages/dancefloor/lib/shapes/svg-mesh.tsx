@@ -26,7 +26,7 @@ const renderSVG = (param: {
     const shapes = SVGLoader.createShapes(path)
 
     shapes.forEach((shape) => {
-      const meshGeometry = new THREE.ExtrudeBufferGeometry(shape, {
+      const meshGeometry = new THREE.ExtrudeGeometry(shape, {
         depth: extrusion,
         bevelEnabled: false
       })
@@ -62,7 +62,7 @@ const renderSVG = (param: {
 
   const update = (extrusion: number) => {
     svgShapes.forEach(item => {
-      const meshGeometry = new THREE.ExtrudeBufferGeometry(
+      const meshGeometry = new THREE.ExtrudeGeometry(
         item.shape,
         {
           depth: extrusion,

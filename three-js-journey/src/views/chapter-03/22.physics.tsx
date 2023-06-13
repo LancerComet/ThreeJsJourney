@@ -1,4 +1,4 @@
-import { AxesHelper, AmbientLight, PointLight, useScene } from '@lancercomet/dancefloor'
+import { AxesHelper, AmbientLight, PointLight, useScene, PerspectiveCamera, OrbitControls } from '@lancercomet/dancefloor'
 import * as Cannon from 'cannon-es'
 import { Clock, Mesh, MeshStandardMaterial, PlaneGeometry, SphereGeometry } from 'three'
 import { defineComponent } from 'vue'
@@ -74,6 +74,10 @@ const Physics = defineComponent({
 
     return () => (
       <Scene>
+        <PerspectiveCamera position={{ x: 5, y: 5, z: 5 }}>
+          <OrbitControls />
+        </PerspectiveCamera>
+
         <AmbientLight />
         <PointLight position={{ x: 5, y: 5, z: 5 }} castShadow />
         <AxesHelper />

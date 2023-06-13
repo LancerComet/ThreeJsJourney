@@ -1,6 +1,11 @@
-import { PlaneGeometry, AxesHelper, AmbientLight, StandardMaterial, Mesh, useScene } from '@lancercomet/dancefloor'
-import { OrthographicCamera, Vector3 } from 'three'
-import { defineComponent } from 'vue'
+import {
+  AxesHelper, useScene,
+  AmbientLight,
+  Mesh, StandardMaterial, PlaneGeometry,
+  OrbitControls, OrthographicCamera
+} from '@lancercomet/dancefloor'
+import { defineComponent, ref } from 'vue'
+
 import { useResize } from '../../../hooks/resize'
 import { HomeHub } from './components/home-hub'
 
@@ -8,41 +13,25 @@ const MangaHub = defineComponent({
   name: 'MangaHub',
   setup () {
     const viewSize = 15
-    const aspectRatio = window.innerWidth / window.innerHeight
-    const camera = new OrthographicCamera(
-      -aspectRatio * viewSize / 2,
-      aspectRatio * viewSize / 2,
-      viewSize / 2,
-      -viewSize / 2,
-      0.1, 1000
-    )
-    camera.position.set(-30, 100, 100)
-    camera.lookAt(new Vector3(0, 0, 0))
-
-    const setCameraSize = () => {
+    const getCameraViewport = () => {
       const aspect = window.innerWidth / window.innerHeight
-      camera.left = -aspect * viewSize / 2
-      camera.right = aspect * viewSize / 2
-      camera.top = viewSize / 2
-      camera.bottom = -viewSize / 2
-      camera.near = 0.1
-      camera.far = 1000
+      return {
+        left: -aspect * viewSize / 2,
+        right: aspect * viewSize / 2,
+        top: viewSize / 2,
+        bottom: -viewSize / 2
+      }
     }
-
-    const { Scene, controls } = useScene({
+    const cameraViewport = ref(getCameraViewport())
+    const { Scene, resize } = useScene({
       antialias: true,
-      useControl: true,
-      useShadow: true,
-      camera
+      useShadow: true
     })
 
     useResize(() => {
-      setCameraSize()
+      cameraViewport.value = getCameraViewport()
+      resize(window.innerWidth, window.innerHeight)
     })
-
-    // controls.enableZoom = false
-    // controls.enablePan = process.env.NODE_ENV === 'development'
-    // controls.enableRotate = process.env.NODE_ENV === 'development'
 
     const Ground = () => {
       return (
@@ -57,6 +46,18 @@ const MangaHub = defineComponent({
 
     return () => (
       <Scene background={0xdddddd}>
+        <OrthographicCamera
+          position={{ x: -30, y: 100, z: 100 }}
+          lookAt={{ x: 0, y: 0, z: 0 }}
+          far={1000}
+          left={cameraViewport.value.left}
+          right={cameraViewport.value.right}
+          top={cameraViewport.value.top}
+          bottom={cameraViewport.value.bottom}
+        >
+          <OrbitControls />
+        </OrthographicCamera>
+
         <AxesHelper />
         <AmbientLight intensity={0.9} color={0xeeeeee} />
         <Ground />

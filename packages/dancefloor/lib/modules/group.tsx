@@ -20,7 +20,7 @@ const Group = defineComponent({
     }
   },
 
-  emits: ['update'],
+  emits: ['mounted'],
 
   setup (props, { slots, emit }) {
     const group = new THREE.Group()
@@ -62,7 +62,7 @@ const Group = defineComponent({
     }
 
     onMounted(() => {
-      emit('update', group)
+      emit('mounted', group)
     })
 
     onBeforeUnmount(() => {

@@ -1,6 +1,9 @@
-import { AxesHelper, AmbientLight, PointLight, RayCaster, RayCasterComponent, useScene } from '@lancercomet/dancefloor'
+import {
+  AxesHelper, AmbientLight, PointLight,
+  RayCaster, RayCasterComponent,
+  useScene, PerspectiveCamera, OrbitControls
+} from '@lancercomet/dancefloor'
 import { Clock, Intersection, Mesh, MeshStandardMaterial, Object3D, SphereGeometry, Vector3 } from 'three'
-import { instance } from 'three/examples/jsm/nodes/shadernode/ShaderNodeElements'
 import { defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 
 const RayCasterPage = defineComponent({
@@ -75,6 +78,10 @@ const RayCasterPage = defineComponent({
 
     return () => (
       <Scene>
+        <PerspectiveCamera position={{ x: 5, y: 5, z: 5 }}>
+           <OrbitControls />
+        </PerspectiveCamera>
+
         <AmbientLight />
         <PointLight position={{ x: 5, y: 5, z: 5 }} castShadow />
         <AxesHelper />

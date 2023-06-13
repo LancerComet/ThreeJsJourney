@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { defineComponent, inject, onBeforeUnmount, onMounted, PropType, provide, ref, watch, watchEffect } from 'vue'
+import { defineComponent, inject, onBeforeUnmount, PropType, provide, watchEffect } from 'vue'
 import { injectContainer } from '../providers/container'
 
 const injectKeyGetPoint = 'three:point:getPoint'
@@ -19,8 +19,6 @@ const Points = defineComponent({
       default: () => ({})
     }
   },
-
-  emits: ['mounted'],
 
   setup (props, { slots, emit }) {
     const points = new THREE.Points()
@@ -56,10 +54,6 @@ const Points = defineComponent({
 
     const revoke = watchEffect(() => {
       setProps()
-    })
-
-    onMounted(() => {
-      emit('mounted')
     })
 
     onBeforeUnmount(() => {

@@ -102,7 +102,7 @@ const HomeCard = defineComponent({
     )
 
     return () => (
-      <Group position={positionRef.value} onUpdate={mesh => emit('meshUpdate', mesh)}>
+      <Group position={positionRef.value} onMounted={mesh => emit('meshUpdate', mesh)}>
         <CardBody />
         <Cover />
         <TextSection />

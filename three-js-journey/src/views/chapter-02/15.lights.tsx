@@ -1,16 +1,17 @@
 import {
   BoxGeometry, PlaneGeometry, AmbientLight,
   DirectionalLight, PointLight, StandardMaterial,
-  Mesh, useScene
+  Mesh, useScene, PerspectiveCamera, OrbitControls
 } from '@lancercomet/dancefloor'
 import { HemisphereLight, HemisphereLightHelper, RectAreaLight } from 'three'
 import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper'
 import { defineComponent } from 'vue'
+import { useResize } from '../../hooks/resize'
 
 const Lights = defineComponent({
   name: 'Lights',
   setup () {
-    const { Scene, scene } = useScene()
+    const { Scene, scene, resize } = useScene()
 
     const hemisphereLight = new HemisphereLight(0xff0000, 0x0000ff, 0.3)
     hemisphereLight.position.set(3, 1, 1)
@@ -26,8 +27,16 @@ const Lights = defineComponent({
     const rectAreaLightHelper = new RectAreaLightHelper(rectAreaLight)
     scene.add(rectAreaLightHelper)
 
+    useResize(() => {
+      resize(window.innerWidth, window.innerHeight)
+    })
+
     return () => (
       <Scene>
+        <PerspectiveCamera position={{ x: 5, y: 5, z: 5 }}>
+          <OrbitControls />
+        </PerspectiveCamera>
+
         <AmbientLight color={0xffffff} intensity={0.5}/>
         <DirectionalLight showHelper color={0xb6e5fb} intensity={0.3} position={{ x: 4, y: 4, z: 4 }} />
         <PointLight color={0xffff00} intensity={0.5} distance={10} decay={1} position={{ x: -4, y: 2, z: 4 }} />

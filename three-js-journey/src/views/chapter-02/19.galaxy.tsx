@@ -1,14 +1,17 @@
-import { BufferGeometry, BufferGeometryComponent, PointsMaterial, Points, useScene } from '@lancercomet/dancefloor'
-import { AdditiveBlending, BufferAttribute, Color, Vector3 } from 'three'
+import {
+  BufferGeometry, BufferGeometryComponent, PointsMaterial, Points,
+  useScene, PerspectiveCamera, OrbitControls
+} from '@lancercomet/dancefloor'
+import GUI from 'lil-gui'
+import { AdditiveBlending, BufferAttribute, Color } from 'three'
 import { defineComponent, onMounted, ref } from 'vue'
+import { useResize } from '../../hooks/resize'
 
 const Galaxy = defineComponent({
   name: 'Galaxy',
 
   setup () {
-    const { Scene, gui, camera, onTick } = useScene({
-      useControl: true
-    })
+    const { Scene, onTick, resize } = useScene()
     const bufferGeometryRef = ref<BufferGeometryComponent>()
 
     const galaxyConfig = {
@@ -23,7 +26,7 @@ const Galaxy = defineComponent({
       outsideColor: '#1b3984'
     }
 
-    const initGalaxy = () => {
+    const updateGalaxy = () => {
       const count = galaxyConfig.count
       const positions = new Float32Array(count * 3)
       const colors = new Float32Array(count * 3)
@@ -60,29 +63,47 @@ const Galaxy = defineComponent({
     }
 
     // Setup GUI.
+    const gui = new GUI()
     Object.keys(galaxyConfig).forEach(key => {
-      if (gui) {
-        if (/color/i.test(key)) {
-          gui.addColor(galaxyConfig, key)
-        } else {
-          gui.add(galaxyConfig, key)
-        }
+      if (/color/i.test(key)) {
+        gui.addColor(galaxyConfig, key)
+      } else {
+        gui.add(galaxyConfig, key)
       }
+    })
+
+    gui.onChange(() => {
+      updateGalaxy()
     })
 
     let angle = 0
     const radius = 8
+    const cameraPositionRef = ref({
+      x: 5, y: 5, z: 5
+    })
+
     onTick(() => {
       // Use Math.cos and Math.sin to set camera X and Z values based on angle.
-      camera.position.x = radius * Math.cos(angle)
-      camera.position.z = radius * Math.sin(angle)
-      camera.lookAt(new Vector3(0, 0, 0))
+      cameraPositionRef.value.x = radius * Math.cos(angle)
+      cameraPositionRef.value.z = radius * Math.sin(angle)
       angle += 0.001
+    })
+
+    useResize(() => {
+      resize(window.innerWidth, window.innerHeight)
+    })
+
+    onMounted(() => {
+      updateGalaxy()
     })
 
     return () => (
       <Scene>
-        <Points onMounted={initGalaxy}>
+        <PerspectiveCamera position={cameraPositionRef.value}>
+          {/* <OrbitControls /> */}
+        </PerspectiveCamera>
+
+        <Points>
           <BufferGeometry ref={bufferGeometryRef} />
           <PointsMaterial params={{
             size: galaxyConfig.size,

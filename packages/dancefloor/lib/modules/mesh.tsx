@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { BufferGeometry, Material } from 'three'
 import {
   ComponentPublicInstance,
   defineComponent,
@@ -6,7 +7,7 @@ import {
   onBeforeUnmount,
   PropType,
   provide,
-  watch, watchEffect
+  watchEffect
 } from 'vue'
 import { injectContainer } from '../providers/container'
 
@@ -28,6 +29,19 @@ const Mesh = defineComponent({
     rotation: {
       type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
       default: () => ({})
+    },
+
+    scale: {
+      type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+      default: () => ({})
+    },
+
+    geometry: {
+      type: Object as PropType<BufferGeometry>
+    },
+
+    material: {
+      type: Object as PropType<Material>
     }
   },
 
@@ -50,6 +64,13 @@ const Mesh = defineComponent({
         mesh.receiveShadow = props.receiveShadow === true
       }
 
+      if (props.geometry) {
+        mesh.geometry = props.geometry
+      }
+      if (props.material) {
+        mesh.material = props.material
+      }
+
       ['x', 'y', 'z'].forEach(item => {
         const key = item as 'x' | 'y' | 'z'
 
@@ -61,6 +82,11 @@ const Mesh = defineComponent({
         const rotationValue = props.rotation?.[key] ?? 0
         if (rotationValue !== mesh.rotation[key]) {
           mesh.rotation[key] = rotationValue
+        }
+
+        const scaleValue = props.scale?.[key] ?? 1
+        if (scaleValue !== mesh.scale[key]) {
+          mesh.scale[key] = scaleValue
         }
       })
     }
@@ -77,6 +103,7 @@ const Mesh = defineComponent({
       revoke()
       mesh.clear()
       mesh.removeFromParent()
+      container?.remove(mesh)
     })
 
     return () => (

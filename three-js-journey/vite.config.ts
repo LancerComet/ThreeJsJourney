@@ -1,9 +1,8 @@
-import path from 'path'
+import * as path from 'path'
 import legacy from '@vitejs/plugin-legacy'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { defineConfig } from 'vite'
-import packageJSON from './package.json'
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -11,8 +10,7 @@ const isProd = process.env.NODE_ENV === 'production'
 export default defineConfig({
   define: {
     'process.env': {
-      NODE_ENV: process.env.NODE_ENV,
-      VERSION: packageJSON.version
+      NODE_ENV: process.env.NODE_ENV
     }
   },
 
@@ -22,7 +20,7 @@ export default defineConfig({
 
   resolve: {
     alias: {
-      '@lancercomet/dancefloor': path.resolve(__dirname, '../packages/dancefloor'),
+      '@lancercomet/dancefloor': path.resolve(__dirname, '../packages/dancefloor/lib'),
       three: path.resolve(__dirname, 'node_modules/three'),
       'three.modifiers': path.resolve(__dirname, 'node_modules/three.modifiers')
     }
