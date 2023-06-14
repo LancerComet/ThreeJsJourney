@@ -1,8 +1,8 @@
 import * as THREE from 'three'
-import { defineComponent, inject, onBeforeUnmount, PropType, provide, watchEffect } from 'vue'
+import { BufferGeometry, Material } from 'three'
+import { defineComponent, onBeforeUnmount, PropType, watchEffect } from 'vue'
 import { injectContainer } from '../providers/container'
-
-const injectKeyGetPoint = 'three:point:getPoint'
+import { provideMesh } from '../providers/mesh'
 
 const Points = defineComponent({
   name: 'Points',
@@ -17,18 +17,21 @@ const Points = defineComponent({
     rotation: {
       type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
       default: () => ({})
+    },
+    geometry: {
+      type: Object as PropType<BufferGeometry>
+    },
+    material: {
+      type: Object as PropType<Material>
     }
   },
 
-  setup (props, { slots, emit }) {
+  setup (props, { slots }) {
     const points = new THREE.Points()
+    provideMesh(points)
+
     const container = injectContainer()
     container?.add(points)
-
-    const getPoint = () => {
-      return points
-    }
-    provide(injectKeyGetPoint, getPoint)
 
     const setPositionRotation = () => {
       ['x', 'y', 'z'].forEach(item => {
@@ -46,14 +49,19 @@ const Points = defineComponent({
       })
     }
 
-    const setProps = () => {
+    const revoke = watchEffect(() => {
       points.castShadow = props.castShadow === true
       points.receiveShadow = props.receiveShadow === true
-      setPositionRotation()
-    }
 
-    const revoke = watchEffect(() => {
-      setProps()
+      if (props.material) {
+        points.material = props.material
+      }
+
+      if (props.geometry) {
+        points.geometry = props.geometry
+      }
+
+      setPositionRotation()
     })
 
     onBeforeUnmount(() => {
@@ -68,14 +76,6 @@ const Points = defineComponent({
   }
 })
 
-const injectGetPoints = () => {
-  return inject<() => THREE.Points | undefined>(injectKeyGetPoint, () => {
-    console.warn('You should call this under <Point />.')
-    return undefined
-  })
-}
-
 export {
-  Points,
-  injectGetPoints
+  Points
 }

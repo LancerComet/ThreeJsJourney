@@ -1,9 +1,9 @@
 import * as THREE from 'three'
+import { PointsMaterialParameters } from 'three'
 import type { MeshBasicMaterialParameters } from 'three/src/materials/MeshBasicMaterial'
-import { MeshStandardMaterialParameters } from 'three/src/materials/MeshStandardMaterial'
+import type { MeshStandardMaterialParameters } from 'three/src/materials/MeshStandardMaterial'
 import { defineComponent, onBeforeUnmount, PropType, toRefs, watchEffect } from 'vue'
-import { injectGetMesh } from './mesh'
-import { injectGetPoints } from './points'
+import { injectMesh } from '../providers/mesh'
 
 const StandardMaterial = defineComponent({
   props: {
@@ -19,8 +19,7 @@ const StandardMaterial = defineComponent({
       params.value
     )
 
-    const getMesh = injectGetMesh()
-    const mesh = getMesh()
+    const mesh = injectMesh()
     if (mesh) {
       mesh.material = material
     }
@@ -57,8 +56,7 @@ const BasicMaterial = defineComponent({
     const { params } = toRefs(props)
     const material = new THREE.MeshBasicMaterial(params.value)
 
-    const getMesh = injectGetMesh()
-    const mesh = getMesh()
+    const mesh = injectMesh()
     if (mesh) {
       mesh.material = material
     }
@@ -85,45 +83,38 @@ const BasicMaterial = defineComponent({
 
 const PointsMaterial = defineComponent({
   props: {
-    params: Object as PropType<THREE.PointsMaterialParameters>,
-    default: () => ({})
+    params: {
+      type: Object as PropType<PointsMaterialParameters>,
+      default: () => ({})
+    }
   },
 
   setup (props) {
-    const { params } = toRefs(props)
-    const material = new THREE.PointsMaterial(params.value)
+    const material = new THREE.PointsMaterial(props.params)
 
-    const getMesh = injectGetMesh()
-    const getPoints = injectGetPoints()
-
-    const points = getPoints()
-    if (points) {
-      points.material = material
-    } else {
-      const mesh = getMesh()
-      if (mesh) {
-        mesh.material = material
-      }
+    const mesh = injectMesh()
+    if (mesh?.type === 'Points') {
+      mesh.material = material
     }
+
+    const setProps = () => {
+      material.setValues(props.params)
+      material.needsUpdate = true
+    }
+
+    const removeSetProps = watchEffect(setProps)
 
     const dispose = () => {
       material?.dispose()
     }
 
-    const revoke = watchEffect(() => {
-      if (params.value) {
-        material.setValues(params.value)
-        material.needsUpdate = true
-      }
-    })
-
     onBeforeUnmount(() => {
       dispose()
-      revoke()
+      removeSetProps()
     })
 
     return () => (
-      <div class='points-material' />
+      <div class='points-material' data-uuid={material.uuid} />
     )
   }
 })
@@ -140,8 +131,7 @@ const ShaderMaterial = defineComponent({
     const { params } = toRefs(props)
     const shaderMaterial = new THREE.ShaderMaterial(params.value)
 
-    const getMesh = injectGetMesh()
-    const mesh = getMesh()
+    const mesh = injectMesh()
     if (mesh) {
       mesh.material = shaderMaterial
     }
@@ -180,8 +170,7 @@ const MatcapMaterial = defineComponent({
     const { params } = toRefs(props)
     const material = new THREE.MeshMatcapMaterial(params.value)
 
-    const getMesh = injectGetMesh()
-    const mesh = getMesh()
+    const mesh = injectMesh()
     if (mesh) {
       mesh.material = material
     }

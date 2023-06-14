@@ -6,6 +6,7 @@ import {
   ShadowMapType, PCFSoftShadowMap, Clock, Texture
 } from 'three'
 import { defineComponent, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue'
+import { provideClock } from '../providers/clock'
 import { provideContainer } from '../providers/container'
 import { provideOnTick } from '../providers/ontick'
 import { provideRenderer } from '../providers/renderer'
@@ -22,6 +23,8 @@ const useScene = (param?: {
   let height = param?.height ?? window.innerHeight
 
   const clock = new Clock()
+  provideClock(clock)
+
   const scene = new Scene()
   provideContainer(scene)
 

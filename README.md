@@ -1,6 +1,6 @@
 # ThreeJS Journey
 
-> God bless Ukraine.
+> Slava Ukraine!
 
 This project comes with two parts:
 

@@ -5,8 +5,8 @@ import {
   ComponentPublicInstance, defineComponent, onBeforeUnmount,
   PropType, watchEffect
 } from 'vue'
-import { injectGetMesh } from './mesh'
-import { injectGetPoints } from './points'
+import { provideGeometry } from '../providers/geometry'
+import { injectMesh } from '../providers/mesh'
 
 const PlaneGeometry = defineComponent({
   props: {
@@ -22,7 +22,7 @@ const PlaneGeometry = defineComponent({
 
   setup (props, { emit }) {
     let geometry: THREE.PlaneGeometry
-    const getMesh = injectGetMesh()
+    const mesh = injectMesh()
 
     const createGeometry = () => {
       geometry = new THREE.PlaneGeometry(
@@ -40,7 +40,6 @@ const PlaneGeometry = defineComponent({
         )
       }
 
-      const mesh = getMesh()
       if (mesh) {
         mesh.geometry = geometry
       }
@@ -98,7 +97,7 @@ const BoxGeometry = defineComponent({
 
   setup (props, { expose }) {
     let geometry: THREE.BoxGeometry
-    const getMesh = injectGetMesh()
+    const mesh = injectMesh()
 
     const createGeometry = () => {
       geometry = new THREE.BoxGeometry(
@@ -110,7 +109,6 @@ const BoxGeometry = defineComponent({
         props.depthSegments
       )
 
-      const mesh = getMesh()
       if (mesh) {
         mesh.geometry = geometry
       }
@@ -160,12 +158,12 @@ const SphereGeometry = defineComponent({
   },
 
   setup (props) {
-    let geometry: THREE.SphereGeometry
-    const getMesh = injectGetMesh()
+    let geometry: THREE.SphereGeometry | undefined
+    const mesh = injectMesh()
 
     const createGeometry = () => {
+      dispose()
       geometry = new THREE.SphereGeometry(props.radius, props.widthSegment, props.heightSegment)
-      const mesh = getMesh()
       if (mesh) {
         mesh.geometry = geometry
       }
@@ -173,10 +171,10 @@ const SphereGeometry = defineComponent({
 
     const dispose = () => {
       geometry?.dispose()
+      geometry = undefined
     }
 
     const revoke = watchEffect(() => {
-      dispose()
       createGeometry()
     })
 
@@ -194,28 +192,17 @@ const SphereGeometry = defineComponent({
 type GeometryAttrs = Record<string, THREE.BufferAttribute | THREE.InterleavedBufferAttribute>
 
 const BufferGeometry = defineComponent({
-  setup (_, { expose }) {
+  setup (_, { expose, slots }) {
     const geometry = new THREE.BufferGeometry()
+    provideGeometry(geometry)
 
-    const getPoints = injectGetPoints()
-    const getMesh = injectGetMesh()
-
-    const points = getPoints()
-    if (points) {
-      points.geometry = geometry
-    } else {
-      const mesh = getMesh()
-      if (mesh) {
-        mesh.geometry = geometry
-      }
+    const mesh = injectMesh()
+    if (mesh) {
+      mesh.geometry = geometry
     }
 
     const getGeometry = (): THREE.BufferGeometry => {
       return geometry
-    }
-
-    const getAttributes = (): GeometryAttrs => {
-      return geometry.attributes
     }
 
     const setAttributes = (attrs: Partial<GeometryAttrs>) => {
@@ -230,13 +217,14 @@ const BufferGeometry = defineComponent({
     })
 
     expose({
-      getAttributes,
       getGeometry,
       setAttributes
     })
 
     return () => (
-      <div class='box-geometry' />
+      <div class='buffer-geometry'>
+        { slots.default?.() }
+      </div>
     )
   }
 })
@@ -245,7 +233,6 @@ type BufferGeometryComponent = ComponentPublicInstance<{
   attributes: Partial<GeometryAttrs>
 }, {
   getGeometry: () => THREE.BufferGeometry,
-  getAttributes: () => GeometryAttrs
   setAttributes: (attrs: Partial<GeometryAttrs>) => void
 }>
 
@@ -288,7 +275,7 @@ const TextGeometry = defineComponent({
 
   setup (props, { emit }) {
     let textGeometry: THREETextGeometry
-    const getMesh = injectGetMesh()
+    const mesh = injectMesh()
 
     const createTextGeometry = () => {
       const font = props.font
@@ -311,7 +298,6 @@ const TextGeometry = defineComponent({
         textGeometry.center()
       }
 
-      const mesh = getMesh()
       if (mesh) {
         mesh.geometry = textGeometry
       }
@@ -351,11 +337,12 @@ const TorusGeometry = defineComponent({
 
   setup (props) {
     let torus: THREE.TorusGeometry
-    const getMesh = injectGetMesh()
+    const mesh = injectMesh()
 
     const createTorus = () => {
-      torus = new THREE.TorusGeometry(props.radius, props.tube, props.radialSegment, props.tubularSegments)
-      const mesh = getMesh()
+      torus = new THREE.TorusGeometry(
+        props.radius, props.tube, props.radialSegment, props.tubularSegments
+      )
       if (mesh) {
         mesh.geometry = torus
       }

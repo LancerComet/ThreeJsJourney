@@ -1,17 +1,8 @@
 import * as THREE from 'three'
 import { BufferGeometry, Material } from 'three'
-import {
-  ComponentPublicInstance,
-  defineComponent,
-  inject,
-  onBeforeUnmount,
-  PropType,
-  provide,
-  watchEffect
-} from 'vue'
+import { defineComponent, onBeforeUnmount, PropType, watchEffect } from 'vue'
 import { injectContainer } from '../providers/container'
-
-const injectKeyGetMesh = 'three:mesh:getMesh'
+import { provideMesh } from '../providers/mesh'
 
 const Mesh = defineComponent({
   name: 'Mesh',
@@ -45,15 +36,12 @@ const Mesh = defineComponent({
     }
   },
 
-  setup (props, { slots, expose }) {
+  setup (props, { slots }) {
     const mesh = new THREE.Mesh()
+    provideMesh(mesh)
+
     const container = injectContainer()
     container?.add(mesh)
-
-    const getMesh = (): THREE.Mesh => {
-      return mesh
-    }
-    provide(injectKeyGetMesh, getMesh)
 
     const setProps = () => {
       if (mesh.castShadow !== props.castShadow) {
@@ -95,10 +83,6 @@ const Mesh = defineComponent({
       setProps()
     })
 
-    expose({
-      getMesh
-    })
-
     onBeforeUnmount(() => {
       revoke()
       mesh.clear()
@@ -112,24 +96,6 @@ const Mesh = defineComponent({
   }
 })
 
-const injectGetMesh = () => {
-  return inject<() => THREE.Mesh | undefined>(injectKeyGetMesh, () => {
-    console.warn('You should use this component under <Mesh/>.')
-    return undefined
-  })
-}
-
-type MeshVM = ComponentPublicInstance<{
-  receiveShadow: boolean
-  castShadow: boolean
-  position: Partial<{ x: number, y: number, z: number }>
-  rotation: Partial<{ x: number, y: number, z: number }>
-}, {
-  getMesh: () => THREE.Mesh
-}>
-
 export {
-  Mesh,
-  MeshVM,
-  injectGetMesh
+  Mesh
 }
