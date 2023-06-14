@@ -1,6 +1,7 @@
 import * as THREE from 'three'
-import { defineComponent, onBeforeUnmount, PropType, watch } from 'vue'
+import { defineComponent, onBeforeUnmount, PropType, watch, watchEffect } from 'vue'
 import { injectContainer } from '../providers/container'
+import { provideLight } from '../providers/light'
 
 const AmbientLight = defineComponent({
   props: {
@@ -202,9 +203,9 @@ const DirectionalLight = defineComponent({
     const revoke = watch(props, () => {
       ['x', 'y', 'z'].forEach(item => {
         const key = item as 'x' | 'y' | 'z'
-        const positionValue = props.position?.[key] ?? 0
-        if (positionValue !== light.position[key]) {
-          light.position[key] = positionValue
+        const newValue = props.position?.[key] ?? 0
+        if (newValue !== light.position[key]) {
+          light.position[key] = newValue
         }
       })
 
@@ -264,58 +265,45 @@ const HemisphereLight = defineComponent({
   name: 'HemisphereLight',
 
   props: {
-    skyColor: {
-      type: Number as PropType<number>,
-      default: 0xBBD3EA
-    },
-
-    groundColor: {
-      type: Number as PropType<number>,
-      default: 0xE8B48F
-    },
-
-    intensity: {
-      type: Number as PropType<number>,
-      default: 1
-    },
-
-    showHelper: {
-      type: Boolean as PropType<boolean>,
-      default: false
-    },
-
+    skyColor: Number as PropType<THREE.ColorRepresentation>,
+    groundColor: Number as PropType<THREE.ColorRepresentation>,
+    intensity: Number as PropType<number>,
     hide: {
       type: Boolean as PropType<boolean>,
       default: false
+    },
+    position: {
+      type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+      default: () => ({})
     }
   },
 
-  setup (props) {
+  setup (props, { slots }) {
     const light = new THREE.HemisphereLight(props.skyColor, props.groundColor, props.intensity)
-    const helper = new THREE.HemisphereLightHelper(light, 1)
 
     const container = injectContainer()
-    if (container) {
-      container.add(light)
-      container.add(helper)
-    }
+    container?.add(light)
 
-    const revoke = watch(props, () => {
-      const isGroundColorChanged = !light.groundColor.equals(new THREE.Color(props.groundColor))
-      if (isGroundColorChanged) {
-        light.groundColor.set(props.groundColor)
+    const revoke = watchEffect(() => {
+      ['x', 'y', 'z'].forEach(item => {
+        const key = item as 'x' | 'y' | 'z'
+        const newValue = props.position?.[key] ?? 0
+        if (newValue !== light.position[key]) {
+          light.position[key] = newValue
+        }
+      })
+
+      const newGroundColor = new THREE.Color(props.groundColor)
+      if (!light.groundColor.equals(newGroundColor)) {
+        light.groundColor.set(newGroundColor)
       }
 
-      const isSkyColorChanged = !light.color.equals(new THREE.Color(props.skyColor))
-      if (isSkyColorChanged) {
-        light.color.set(props.skyColor)
+      const newSkyColor = new THREE.Color(props.skyColor)
+      if (!light.color.equals(newSkyColor)) {
+        light.color.set(newSkyColor)
       }
 
-      helper.visible = props.showHelper === true
       light.visible = props.hide === false
-    }, {
-      immediate: true,
-      deep: true
     })
 
     onBeforeUnmount(() => {
@@ -323,7 +311,79 @@ const HemisphereLight = defineComponent({
     })
 
     return () => (
-      <div class='hemisphere-light' />
+      <div class='hemisphere-light'>
+        { slots.default?.() }
+      </div>
+    )
+  }
+})
+
+const RectAreaLight = defineComponent({
+  name: 'RectAreaLight',
+
+  props: {
+    intensity: Number as PropType<number>,
+    width: Number as PropType<number>,
+    height: Number as PropType<number>,
+    color: {
+      type: [Number, Object] as PropType<THREE.ColorRepresentation>,
+      default: 0xffffff
+    },
+    position: {
+      type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+      default: () => ({})
+    }
+  },
+
+  setup (props, { slots }) {
+    const light = new THREE.RectAreaLight(props.color, props.intensity, props.width, props.height)
+    provideLight(light)
+
+    const container = injectContainer()
+    container?.add(light)
+
+    const setProps = () => {
+      ['x', 'y', 'z'].forEach(item => {
+        const key = item as 'x' | 'y' | 'z'
+        const newVal = props.position?.[key] ?? 0
+        if (newVal !== light.position[key]) {
+          light.position[key] = newVal
+        }
+      })
+
+      const newColor = new THREE.Color(props.color)
+      if (!light.color.equals(newColor)) {
+        light.color = newColor
+      }
+
+      const intensity = props.intensity ?? 1
+      if (light.intensity !== intensity) {
+        light.intensity = intensity
+      }
+
+      const width = props.width ?? 10
+      if (light.width !== width) {
+        light.width = width
+      }
+
+      const height = props.height ?? 10
+      if (light.height !== height) {
+        light.height = height
+      }
+    }
+
+    const revoke = watchEffect(() => {
+      setProps()
+    })
+
+    onBeforeUnmount(() => {
+      revoke()
+    })
+
+    return () => (
+      <div class='rect-area-light'>
+        { slots.default?.() }
+      </div>
     )
   }
 })
@@ -332,5 +392,6 @@ export {
   AmbientLight,
   PointLight,
   DirectionalLight,
-  HemisphereLight
+  HemisphereLight,
+  RectAreaLight
 }
