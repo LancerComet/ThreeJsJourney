@@ -6,17 +6,19 @@ import { injectContainer } from '../providers/container'
 import { injectOnTick } from '../providers/ontick'
 import { injectRenderer } from '../providers/renderer'
 import { injectOnResize } from '../providers/resize'
+import { IQuaternion, IVector3 } from '../types'
+import { updateQuaternion, updateVector3 } from '../utils/manipulation'
 
 const PerspectiveCamera = defineComponent({
   name: 'PerspectiveCamera',
 
   props: {
     position: {
-      type: Object as PropType<{ x: number, y: number, z: number }>,
+      type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     },
     quaternion: {
-      type: Object as PropType<{ x: number, y: number, z: number, w: number }>,
+      type: Object as PropType<Partial<IQuaternion>>,
       default: () => ({})
     },
     fov: {
@@ -36,7 +38,7 @@ const PerspectiveCamera = defineComponent({
       default: 1000
     },
     lookAt: {
-      type: Object as PropType<{ x: number, y: number, z: number }>,
+      type: Object as PropType<IVector3>,
       default: () => ({})
     }
   },
@@ -64,25 +66,11 @@ const PerspectiveCamera = defineComponent({
     })
 
     const setPosition = () => {
-      ['x', 'y', 'z'].forEach(item => {
-        const key = item as 'x' | 'y' | 'z'
-        const newVal = props.position?.[key] ?? 0
-        const oldVal = camera.position[key]
-        if (newVal !== oldVal) {
-          camera.position[key] = newVal
-        }
-      })
+      updateVector3(props.position, camera.position)
     }
 
     const setQuaternion = () => {
-      ['x', 'y', 'z', 'w'].forEach(item => {
-        const key = item as 'x' | 'y' | 'z' | 'w'
-        const newVal = props.quaternion?.[key] ?? 0
-        const oldVal = camera.quaternion[key]
-        if (newVal !== oldVal) {
-          camera.quaternion[key] = newVal
-        }
-      })
+      updateQuaternion(props.quaternion, camera.quaternion)
     }
 
     const setLookAt = () => {
@@ -148,15 +136,15 @@ const OrthographicCamera = defineComponent({
       default: 2000
     },
     lookAt: {
-      type: Object as PropType<{ x: number, y: number, z: number }>,
+      type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     },
     position: {
-      type: Object as PropType<{ x: number, y: number, z: number }>,
+      type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     },
     quaternion: {
-      type: Object as PropType<{ x: number, y: number, z: number, w: number }>,
+      type: Object as PropType<Partial<IQuaternion>>,
       default: () => ({})
     }
   },
@@ -191,25 +179,11 @@ const OrthographicCamera = defineComponent({
     }
 
     const setPosition = () => {
-      ['x', 'y', 'z'].forEach(item => {
-        const key = item as 'x' | 'y' | 'z'
-        const newVal = props.position?.[key] ?? 0
-        const oldVal = camera.position[key]
-        if (newVal !== oldVal) {
-          camera.position[key] = newVal
-        }
-      })
+      updateVector3(props.position, camera.position)
     }
 
     const setQuaternion = () => {
-      ['x', 'y', 'z', 'w'].forEach(item => {
-        const key = item as 'x' | 'y' | 'z' | 'w'
-        const newVal = props.quaternion?.[key] ?? 0
-        const oldVal = camera.quaternion[key]
-        if (newVal !== oldVal) {
-          camera.quaternion[key] = newVal
-        }
-      })
+      updateQuaternion(props.quaternion, camera.quaternion)
     }
 
     const setLookAt = () => {

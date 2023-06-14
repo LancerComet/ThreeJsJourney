@@ -5,15 +5,17 @@ import { defineComponent, onBeforeUnmount, PropType, watch, watchEffect } from '
 
 import { injectContainer } from '../providers/container'
 import { injectLight } from '../providers/light'
+import { IVector3 } from '../types'
+import { updateVector3 } from '../utils/manipulation'
 
 const AxesHelper = defineComponent({
   props: {
     position: {
-      type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+      type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     },
     rotation: {
-      type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+      type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     }
   },
@@ -24,19 +26,8 @@ const AxesHelper = defineComponent({
     container?.add(axesHelper)
 
     const setProps = () => {
-      ['x', 'y', 'z'].forEach(item => {
-        const key = item as 'x' | 'y' | 'z'
-
-        const positionValue = props.position?.[key] ?? 0
-        if (positionValue !== axesHelper.position[key]) {
-          axesHelper.position[key] = positionValue
-        }
-
-        const rotationValue = props.rotation?.[key] ?? 0
-        if (rotationValue !== axesHelper.rotation[key]) {
-          axesHelper.rotation[key] = rotationValue
-        }
-      })
+      updateVector3(props.position, axesHelper.position)
+      updateVector3(props.rotation, axesHelper.rotation)
     }
 
     const revoke = watch(props, setProps, {

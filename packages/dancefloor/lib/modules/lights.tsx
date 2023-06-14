@@ -2,6 +2,8 @@ import * as THREE from 'three'
 import { defineComponent, onBeforeUnmount, PropType, watch, watchEffect } from 'vue'
 import { injectContainer } from '../providers/container'
 import { provideLight } from '../providers/light'
+import { IVector3 } from '../types'
+import { updateVector3 } from '../utils/manipulation'
 
 const AmbientLight = defineComponent({
   props: {
@@ -78,7 +80,7 @@ const PointLight = defineComponent({
       default: 1
     },
     position: {
-      type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+      type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     },
     showHelper: {
@@ -95,26 +97,17 @@ const PointLight = defineComponent({
     const pointLight = new THREE.PointLight(0xffffff, 0.5)
     const pointLightHelper = new THREE.PointLightHelper(pointLight)
 
-    const setShadow = () => {
-      pointLight.castShadow = props.castShadow === true
-      pointLight.shadow.mapSize.width = props.shadowSize ?? 512
-      pointLight.shadow.mapSize.height = props.shadowSize ?? 512
-    }
+    const revoke = watchEffect(() => {
+      updateVector3(props.position, pointLight.position)
 
-    const revoke = watch(props, () => {
-      ['x', 'y', 'z'].forEach(item => {
-        const key = item as 'x' | 'y' | 'z'
+      const shadowSize = props.shadowSize
 
-        const positionValue = props.position?.[key] ?? 0
-        if (positionValue !== pointLight.position[key]) {
-          pointLight.position[key] = positionValue
-        }
-      })
+      if (pointLight.shadow.mapSize.width !== shadowSize) {
+        pointLight.shadow.mapSize.width = shadowSize
+      }
 
-      const isShadowChanged = (pointLight.castShadow !== props.castShadow) ||
-        (pointLight.shadow.mapSize.width !== props.shadowSize)
-      if (isShadowChanged) {
-        setShadow()
+      if (pointLight.shadow.mapSize.height !== shadowSize) {
+        pointLight.shadow.mapSize.height = shadowSize
       }
 
       if (pointLight.intensity !== props.intensity) {
@@ -134,12 +127,9 @@ const PointLight = defineComponent({
         pointLight.decay = props.decay ?? 1
       }
 
+      pointLight.castShadow = props.castShadow === true
       pointLightHelper.visible = props.showHelper === true
-
       pointLight.visible = props.hide === false
-    }, {
-      deep: true,
-      immediate: true
     })
 
     const container = injectContainer()
@@ -181,7 +171,7 @@ const DirectionalLight = defineComponent({
       default: 0.5
     },
     position: {
-      type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+      type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     },
     showHelper: {
@@ -201,13 +191,7 @@ const DirectionalLight = defineComponent({
     const lightHelper = new THREE.DirectionalLightHelper(light)
 
     const revoke = watch(props, () => {
-      ['x', 'y', 'z'].forEach(item => {
-        const key = item as 'x' | 'y' | 'z'
-        const newValue = props.position?.[key] ?? 0
-        if (newValue !== light.position[key]) {
-          light.position[key] = newValue
-        }
-      })
+      updateVector3(props.position, light.position)
 
       if (light.castShadow !== props.castShadow) {
         light.castShadow = props.castShadow === true
@@ -273,7 +257,7 @@ const HemisphereLight = defineComponent({
       default: false
     },
     position: {
-      type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+      type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     }
   },
@@ -285,13 +269,7 @@ const HemisphereLight = defineComponent({
     container?.add(light)
 
     const revoke = watchEffect(() => {
-      ['x', 'y', 'z'].forEach(item => {
-        const key = item as 'x' | 'y' | 'z'
-        const newValue = props.position?.[key] ?? 0
-        if (newValue !== light.position[key]) {
-          light.position[key] = newValue
-        }
-      })
+      updateVector3(props.position, light.position)
 
       const newGroundColor = new THREE.Color(props.groundColor)
       if (!light.groundColor.equals(newGroundColor)) {
@@ -330,7 +308,7 @@ const RectAreaLight = defineComponent({
       default: 0xffffff
     },
     position: {
-      type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+      type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     }
   },
@@ -343,13 +321,7 @@ const RectAreaLight = defineComponent({
     container?.add(light)
 
     const setProps = () => {
-      ['x', 'y', 'z'].forEach(item => {
-        const key = item as 'x' | 'y' | 'z'
-        const newVal = props.position?.[key] ?? 0
-        if (newVal !== light.position[key]) {
-          light.position[key] = newVal
-        }
-      })
+      updateVector3(props.position, light.position)
 
       const newColor = new THREE.Color(props.color)
       if (!light.color.equals(newColor)) {

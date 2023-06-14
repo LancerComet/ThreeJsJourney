@@ -3,6 +3,8 @@ import { BufferGeometry, Material } from 'three'
 import { defineComponent, onBeforeUnmount, PropType, watchEffect } from 'vue'
 import { injectContainer } from '../providers/container'
 import { provideMesh } from '../providers/mesh'
+import { IVector3 } from '../types'
+import { updateVector3 } from '../utils/manipulation'
 
 const Mesh = defineComponent({
   name: 'Mesh',
@@ -13,17 +15,17 @@ const Mesh = defineComponent({
     castShadow: Boolean as PropType<boolean>,
 
     position: {
-      type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+      type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     },
 
     rotation: {
-      type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+      type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     },
 
     scale: {
-      type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+      type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     },
 
@@ -59,35 +61,19 @@ const Mesh = defineComponent({
         mesh.material = props.material
       }
 
-      ['x', 'y', 'z'].forEach(item => {
-        const key = item as 'x' | 'y' | 'z'
-
-        const positionValue = props.position?.[key] ?? 0
-        if (positionValue !== mesh.position[key]) {
-          mesh.position[key] = positionValue
-        }
-
-        const rotationValue = props.rotation?.[key] ?? 0
-        if (rotationValue !== mesh.rotation[key]) {
-          mesh.rotation[key] = rotationValue
-        }
-
-        const scaleValue = props.scale?.[key] ?? 1
-        if (scaleValue !== mesh.scale[key]) {
-          mesh.scale[key] = scaleValue
-        }
-      })
+      updateVector3(props.position, mesh.position)
+      updateVector3(props.rotation, mesh.rotation)
+      updateVector3(props.scale, mesh.scale)
     }
 
-    const revoke = watchEffect(() => {
+    const revokeWatch = watchEffect(() => {
       setProps()
     })
 
     onBeforeUnmount(() => {
-      revoke()
+      revokeWatch()
       mesh.clear()
       mesh.removeFromParent()
-      container?.remove(mesh)
     })
 
     return () => (

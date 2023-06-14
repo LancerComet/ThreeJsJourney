@@ -3,6 +3,8 @@ import { defineComponent, onBeforeUnmount, PropType, watchEffect } from 'vue'
 import { injectCamera } from '../providers/cameras'
 import { injectOnTick } from '../providers/ontick'
 import { injectRenderer } from '../providers/renderer'
+import { IVector3 } from '../types'
+import { updateVector3 } from '../utils/manipulation'
 
 const OrbitControls = defineComponent({
   name: 'OrbitControls',
@@ -21,7 +23,7 @@ const OrbitControls = defineComponent({
       default: true
     },
     target: {
-      type: Object as PropType<{ x: number, y: number, z: number }>,
+      type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     }
   },
@@ -40,13 +42,7 @@ const OrbitControls = defineComponent({
       controls.enableDamping = props.enableDamping
       controls.dampingFactor = props.dampingFactor
       controls.enabled = props.enabled
-      ;['x', 'y', 'z'].forEach(item => {
-        const key = item as 'x' | 'y' | 'z'
-        const oldVal = props.target?.[key] ?? 0
-        if (oldVal !== controls.target[key]) {
-          controls.target[key] = oldVal
-        }
-      })
+      updateVector3(props.target, controls.target)
     }
 
     const revoke = watchEffect(() => {

@@ -1,21 +1,23 @@
 import * as THREE from 'three'
 import { defineComponent, onBeforeUnmount, onMounted, PropType, watch } from 'vue'
 import { injectContainer, provideContainer } from '../providers/container'
+import { IVector3 } from '../types'
+import { updateVector3 } from '../utils/manipulation'
 
 const Group = defineComponent({
   name: 'Group',
 
   props: {
     position: {
-      type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+      type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     },
     rotation: {
-      type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+      type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     },
     scale: {
-      type: Object as PropType<{ x: number, y: number, z: number }>,
+      type: Object as PropType<IVector3>,
       default: () => ({ x: 1, y: 1, z: 1 })
     }
   },
@@ -32,24 +34,9 @@ const Group = defineComponent({
     provideContainer(group)
 
     const setProps = () => {
-      const axes = ['x', 'y', 'z'] as ('x' | 'y' | 'z')[]
-      for (const key of axes) {
-        const newPosition = props.position?.[key] ?? 0
-        const oldPosition = group.position[key]
-        if (newPosition !== oldPosition) {
-          group.position[key] = newPosition
-        }
-        const newRotation = props.rotation?.[key] ?? 0
-        const oldRotation = group.rotation[key]
-        if (newRotation !== oldRotation) {
-          group.rotation[key] = newRotation
-        }
-        const newScale = props.scale?.[key] ?? 0
-        const oldScale = group.scale[key]
-        if (newScale !== oldScale) {
-          group.scale[key] = newScale
-        }
-      }
+      updateVector3(props.position, group.position)
+      updateVector3(props.rotation, group.rotation)
+      updateVector3(props.scale, group.scale)
     }
 
     const revoke = watch(props, setProps, {

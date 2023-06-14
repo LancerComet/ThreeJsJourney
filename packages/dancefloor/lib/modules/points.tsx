@@ -3,6 +3,8 @@ import { BufferGeometry, Material } from 'three'
 import { defineComponent, onBeforeUnmount, PropType, watchEffect } from 'vue'
 import { injectContainer } from '../providers/container'
 import { provideMesh } from '../providers/mesh'
+import { IVector3 } from '../types'
+import { updateVector3 } from '../utils/manipulation'
 
 const Points = defineComponent({
   name: 'Points',
@@ -11,11 +13,11 @@ const Points = defineComponent({
     receiveShadow: Boolean as PropType<boolean>,
     castShadow: Boolean as PropType<boolean>,
     position: {
-      type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+      type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     },
     rotation: {
-      type: Object as PropType<Partial<{ x: number, y: number, z: number }>>,
+      type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     },
     geometry: {
@@ -34,19 +36,8 @@ const Points = defineComponent({
     container?.add(points)
 
     const setPositionRotation = () => {
-      ['x', 'y', 'z'].forEach(item => {
-        const key = item as 'x' | 'y' | 'z'
-
-        const positionValue = props.position?.[key] ?? 0
-        if (positionValue !== points.position[key]) {
-          points.position[key] = positionValue
-        }
-
-        const rotationValue = props.rotation?.[key] ?? 0
-        if (rotationValue !== points.rotation[key]) {
-          points.rotation[key] = rotationValue
-        }
-      })
+      updateVector3(props.position, points.position)
+      updateVector3(props.rotation, points.rotation)
     }
 
     const revoke = watchEffect(() => {
