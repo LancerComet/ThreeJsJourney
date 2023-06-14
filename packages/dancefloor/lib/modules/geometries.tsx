@@ -1,10 +1,8 @@
 import * as THREE from 'three'
 import { TextGeometry as THREETextGeometry } from 'three/examples/jsm/geometries/TextGeometry'
 import { Font } from 'three/examples/jsm/loaders/FontLoader'
-import {
-  ComponentPublicInstance, defineComponent, onBeforeUnmount,
-  PropType, watchEffect
-} from 'vue'
+import { defineComponent, onBeforeUnmount, PropType, watchEffect } from 'vue'
+
 import { provideGeometry } from '../providers/geometry'
 import { injectMesh } from '../providers/mesh'
 
@@ -95,7 +93,7 @@ const BoxGeometry = defineComponent({
     }
   },
 
-  setup (props, { expose }) {
+  setup (props) {
     let geometry: THREE.BoxGeometry
     const mesh = injectMesh()
 
@@ -128,27 +126,11 @@ const BoxGeometry = defineComponent({
       revoke()
     })
 
-    const getGeometry = () => {
-      return geometry
-    }
-
-    expose({
-      getGeometry
-    })
-
     return () => (
       <div class='box-geometry' />
     )
   }
 })
-
-type BoxGeometryComponent = ComponentPublicInstance<{
-  width?: number
-  height?: number
-  depth?: number
-}, {
-  getGeometry: () => THREE.BoxGeometry,
-}>
 
 const SphereGeometry = defineComponent({
   props: {
@@ -189,10 +171,8 @@ const SphereGeometry = defineComponent({
   }
 })
 
-type GeometryAttrs = Record<string, THREE.BufferAttribute | THREE.InterleavedBufferAttribute>
-
 const BufferGeometry = defineComponent({
-  setup (_, { expose, slots }) {
+  setup (_, { slots }) {
     const geometry = new THREE.BufferGeometry()
     provideGeometry(geometry)
 
@@ -201,40 +181,17 @@ const BufferGeometry = defineComponent({
       mesh.geometry = geometry
     }
 
-    const getGeometry = (): THREE.BufferGeometry => {
-      return geometry
-    }
-
-    const setAttributes = (attrs: Partial<GeometryAttrs>) => {
-      Object.keys(attrs).forEach(name => {
-        const value = attrs[name]
-        value && geometry.setAttribute(name, value)
-      })
-    }
-
     onBeforeUnmount(() => {
       geometry?.dispose()
     })
 
-    expose({
-      getGeometry,
-      setAttributes
-    })
-
     return () => (
-      <div class='buffer-geometry'>
+      <div class='buffer-geometry' data-uuid={geometry.uuid}>
         { slots.default?.() }
       </div>
     )
   }
 })
-
-type BufferGeometryComponent = ComponentPublicInstance<{
-  attributes: Partial<GeometryAttrs>
-}, {
-  getGeometry: () => THREE.BufferGeometry,
-  setAttributes: (attrs: Partial<GeometryAttrs>) => void
-}>
 
 const TextGeometry = defineComponent({
   name: 'TextGeometry',
@@ -365,10 +322,8 @@ const TorusGeometry = defineComponent({
 export {
   PlaneGeometry,
   BoxGeometry,
-  BoxGeometryComponent,
   SphereGeometry,
   BufferGeometry,
-  BufferGeometryComponent,
   TextGeometry,
   TorusGeometry
 }

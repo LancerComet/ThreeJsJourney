@@ -91,7 +91,7 @@ const Mesh = defineComponent({
     })
 
     return () => (
-      <div class='mesh'>{ slots.default?.() }</div>
+      <div class='mesh' data-uuid={mesh.uuid}>{ slots.default?.() }</div>
     )
   }
 })

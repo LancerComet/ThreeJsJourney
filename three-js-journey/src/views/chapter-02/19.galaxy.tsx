@@ -1,30 +1,27 @@
 import {
-  BufferGeometry, BufferGeometryComponent, PointsMaterial, Points,
-  useScene, PerspectiveCamera, OrbitControls
+  BufferGeometry, PointsMaterial, Points,
+  useScene, PerspectiveCamera, injectGeometry
 } from '@lancercomet/dancefloor'
 import GUI from 'lil-gui'
 import { AdditiveBlending, BufferAttribute, Color } from 'three'
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { useResize } from '../../hooks/resize'
 
-const Galaxy = defineComponent({
-  name: 'Galaxy',
+const galaxyConfig = {
+  size: 0.02,
+  count: 10000,
+  radius: 5,
+  branches: 3,
+  spin: 1,
+  randomness: 0.2,
+  randomnessPower: 3,
+  insideColor: '#ff6030',
+  outsideColor: '#1b3984'
+}
 
+const GalaxyModifier = defineComponent({
   setup () {
-    const { Scene, onTick, resize } = useScene()
-    const bufferGeometryRef = ref<BufferGeometryComponent>()
-
-    const galaxyConfig = {
-      size: 0.02,
-      count: 10000,
-      radius: 5,
-      branches: 3,
-      spin: 1,
-      randomness: 0.2,
-      randomnessPower: 3,
-      insideColor: '#ff6030',
-      outsideColor: '#1b3984'
-    }
+    const geometry = injectGeometry()
 
     const updateGalaxy = () => {
       const count = galaxyConfig.count
@@ -56,10 +53,8 @@ const Galaxy = defineComponent({
         colors[index + 2] = mixedColor.b
       }
 
-      bufferGeometryRef.value?.setAttributes({
-        position: new BufferAttribute(positions, 3),
-        color: new BufferAttribute(colors, 3)
-      })
+      geometry?.setAttribute('position', new BufferAttribute(positions, 3))
+      geometry?.setAttribute('color', new BufferAttribute(colors, 3))
     }
 
     // Setup GUI.
@@ -75,6 +70,20 @@ const Galaxy = defineComponent({
     gui.onChange(() => {
       updateGalaxy()
     })
+
+    updateGalaxy()
+
+    return () => (
+      <div />
+    )
+  }
+})
+
+const Galaxy = defineComponent({
+  name: 'Galaxy',
+
+  setup () {
+    const { Scene, onTick, resize } = useScene()
 
     let angle = 0
     const radius = 8
@@ -93,10 +102,6 @@ const Galaxy = defineComponent({
       resize(window.innerWidth, window.innerHeight)
     })
 
-    onMounted(() => {
-      updateGalaxy()
-    })
-
     return () => (
       <Scene>
         <PerspectiveCamera position={cameraPositionRef.value}>
@@ -104,7 +109,9 @@ const Galaxy = defineComponent({
         </PerspectiveCamera>
 
         <Points>
-          <BufferGeometry ref={bufferGeometryRef} />
+          <BufferGeometry>
+            <GalaxyModifier />
+          </BufferGeometry>
           <PointsMaterial params={{
             size: galaxyConfig.size,
             sizeAttenuation: true,

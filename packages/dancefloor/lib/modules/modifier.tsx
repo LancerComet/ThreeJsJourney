@@ -5,6 +5,23 @@ import { injectGeometry } from '../providers/geometry'
 import { injectMesh } from '../providers/mesh'
 import { injectOnTick } from '../providers/ontick'
 
+/**
+ * Modifier is a component which allows you to use the injected objects such as Mesh or Geometry.
+ *
+ * The type of injected objects depends on where it locates.
+ * You can put it anywhere you like.
+ *
+ * @example
+ * <Mesh>
+ *   <BoxGeometry>
+ *     <Modifier onTick={param => {
+ *       const clock = param.clock  // This is the global clock.
+ *       const geometry = param.geometry  // This is the BoxGeometry.
+ *     }} />
+ *   </BoxGeometry>
+ *   <StandardMaterial />
+ * </Mesh>
+ */
 const Modifier = defineComponent({
   name: 'Modifier',
 

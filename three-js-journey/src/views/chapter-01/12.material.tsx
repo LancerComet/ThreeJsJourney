@@ -2,11 +2,9 @@ import {
   AmbientLight, OrbitControls, PerspectiveCamera, useScene, PointLight,
   Mesh, SphereGeometry, PlaneGeometry, StandardMaterial, TorusGeometry, MatcapMaterial
 } from '@lancercomet/dancefloor'
-import {
-  BufferAttribute, CubeTextureLoader, DoubleSide,
-  MeshMatcapMaterial, TextureLoader
-} from 'three'
+import { BufferAttribute, CubeTextureLoader, DoubleSide, TextureLoader } from 'three'
 import { defineComponent, ref } from 'vue'
+
 import { useResize } from '../../hooks/resize'
 
 const Material = defineComponent({

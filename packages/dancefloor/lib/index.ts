@@ -16,6 +16,7 @@ export * from './modules/scene'
 
 export * from './providers/cameras'
 export * from './providers/container'
+export * from './providers/geometry'
 export * from './providers/mesh'
 export * from './providers/ontick'
 export * from './providers/renderer'

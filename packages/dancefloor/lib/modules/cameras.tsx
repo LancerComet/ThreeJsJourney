@@ -112,7 +112,7 @@ const PerspectiveCamera = defineComponent({
     })
 
     return () => (
-      <div class='perspective-camera'>
+      <div class='perspective-camera' data-uuid={camera.uuid}>
         { slots.default?.() }
       </div>
     )
@@ -238,7 +238,7 @@ const OrthographicCamera = defineComponent({
     })
 
     return () => (
-      <div class='orthographic-camera'>
+      <div class='orthographic-camera' data-uuid={camera.uuid}>
         {slots.default?.()}
       </div>
     )
