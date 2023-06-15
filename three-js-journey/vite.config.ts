@@ -4,19 +4,9 @@ import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { defineConfig } from 'vite'
 
-const isProd = process.env.NODE_ENV === 'production'
-
 // https://vitejs.dev/config/
 export default defineConfig({
-  define: {
-    'process.env': {
-      NODE_ENV: process.env.NODE_ENV
-    }
-  },
-
-  base: isProd
-    ? '/'
-    : '/',
+  base: '/',
 
   resolve: {
     alias: {

@@ -9,7 +9,7 @@
     "dist/"
   ],
   "scripts": {
-    "build": "rimraf ./dist && cross-env NODE_ENV=production vite build"
+    "build": "vite build"
   },
   "maintainers": [
     {
@@ -37,13 +37,11 @@
     "@vitejs/plugin-vue-jsx": "^3.0.1",
     "@vue/compiler-sfc": "^3.2.47",
     "babel-plugin-transform-typescript-metadata": "^0.3.2",
-    "cross-env": "^7.0.3",
     "eslint": "^8.42.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-n": "^16.0.0",
     "eslint-plugin-promise": "^6.1.1",
-    "rimraf": "^3.0.2",
     "three": "^0.152.1",
     "three.modifiers": "^2.5.7",
     "tslib": "^2.5.0",

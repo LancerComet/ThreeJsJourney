@@ -1,12 +1,10 @@
 import {
   Group, AxesHelper, useScene,
-  AmbientLight, PointLight,
-  OrbitControls, OrthographicCamera,
-  injectCamera, injectRenderer, injectOnTick
+  AmbientLight, PointLight
 } from '@lancercomet/dancefloor'
 import CameraControls from 'camera-controls'
 import * as THREE from 'three'
-import { computed, defineComponent, onBeforeUnmount, onMounted, PropType, ref } from 'vue'
+import { computed, defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { useResize } from '../../../hooks/resize'
 import { ActionBar } from './components/action-bar'
@@ -19,7 +17,7 @@ import { useMangaImages } from './modules/manga'
 import { IEpisodeOption } from './types'
 import { clampNumber, sleep } from './utils'
 
-const isProd = process.env.NODE_ENV === 'production'
+const isProd = import.meta.env.PROD
 const cubicBezier = new CubicBezier(0.22, 0.58, 0.12, 0.98)
 
 const EXAMPLE_EPISODES: IEpisodeOption[] = [
