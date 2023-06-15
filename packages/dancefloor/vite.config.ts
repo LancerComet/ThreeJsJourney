@@ -33,9 +33,9 @@ export default defineConfig({
     assetsInlineLimit: 8192,
     lib: {
       entry: path.resolve(__dirname, './lib/index.ts'),
-      name: 'Dancefloor',
+      formats: ['cjs', 'es'],
       fileName: (format) => {
-        return format === 'umd'
+        return format === 'cjs'
           ? 'index.js'
           : `index.${format}.js`
       }

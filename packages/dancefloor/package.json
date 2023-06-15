@@ -9,9 +9,7 @@
     "dist/"
   ],
   "scripts": {
-    "dev": "cross-env NODE_ENV=development vite",
-    "build": "npm run rmdist && cross-env NODE_ENV=production vite build",
-    "rmdist": "rimraf ./dist"
+    "build": "rimraf ./dist && cross-env NODE_ENV=production vite build"
   },
   "maintainers": [
     {

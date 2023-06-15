@@ -29,21 +29,13 @@ export default defineConfig({
     host: '0.0.0.0'
   },
 
-  resolve: {
-    alias: {
-      '@lancercomet/dancefloor': path.resolve(__dirname, '../dancefloor/lib'),
-      three: path.resolve(__dirname, 'node_modules/three'),
-      'three.modifiers': path.resolve(__dirname, 'node_modules/three.modifiers')
-    }
-  },
-
   build: {
     assetsInlineLimit: 8192,
     lib: {
       entry: path.resolve(__dirname, './lib/index.ts'),
-      name: 'Dancefloor',
+      formats: ['cjs', 'es'],
       fileName: (format) => {
-        return format === 'umd'
+        return format === 'cjs'
           ? 'index.js'
           : `index.${format}.js`
       }
@@ -51,14 +43,7 @@ export default defineConfig({
     rollupOptions: {
       external: [
         'vue',
-        'three',
-        'three.modifiers',
-        'three/examples/jsm/geometries/TextGeometry',
-        'three/src/materials/MeshStandardMaterial',
-        'three/examples/jsm/loaders/MTLLoader',
-        'three/examples/jsm/loaders/OBJLoader',
-        'three/examples/jsm/controls/OrbitControls',
-        'three/examples/jsm/loaders/SVGLoader'
+        'three.modifiers'
       ],
       output: {
         globals: {
