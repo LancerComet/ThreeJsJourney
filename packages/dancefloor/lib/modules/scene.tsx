@@ -1,11 +1,7 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { isNumber } from '@lancercomet/utils/types'
-import {
-  Color,
-  Scene, WebGLRenderer,
-  ShadowMapType, PCFSoftShadowMap, Clock, Texture
-} from 'three'
-import { defineComponent, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue'
+import { Color, Scene, WebGLRenderer, ShadowMapType, PCFSoftShadowMap, Clock, Texture } from 'three'
+import { defineComponent, onBeforeUnmount, onMounted, PropType, ref, watchEffect } from 'vue'
+
 import { provideClock } from '../providers/clock'
 import { provideContainer } from '../providers/container'
 import { provideOnTick } from '../providers/ontick'
@@ -23,16 +19,11 @@ const useScene = (param?: {
   let height = param?.height ?? window.innerHeight
 
   const clock = new Clock()
-  provideClock(clock)
-
   const scene = new Scene()
-  provideContainer(scene)
 
   const renderer = new WebGLRenderer({
     antialias: param?.antialias === true
   })
-  provideRenderer(renderer)
-
   const useShadow = param?.useShadow === true
   if (useShadow) {
     renderer.shadowMap.enabled = true
@@ -41,6 +32,8 @@ const useScene = (param?: {
   renderer.setSize(width, height)
 
   const onResizeCallback: Array<(width: number, height: number) => void> = []
+  const onTickCallbacks: (() => void)[] = []
+
   const onResize = (callback: (width: number, height: number) => void) => {
     if (!onResizeCallback.includes(callback)) {
       onResizeCallback.push(callback)
@@ -55,11 +48,12 @@ const useScene = (param?: {
   provideOnResize(onResize)
 
   const doResize = () => {
-    onResizeCallback.forEach(item => item(width, height))
+    for (const func of onResizeCallback) {
+      func(width, height)
+    }
     renderer.setSize(width, height)
   }
 
-  const onTickCallbacks: (() => void)[] = []
   const onTick = (callback: () => void) => {
     if (!onTickCallbacks.includes(callback)) {
       onTickCallbacks.push(callback)
@@ -80,19 +74,21 @@ const useScene = (param?: {
       background: {
         type: [Object, Number] as PropType<Color | Texture | number>,
         default: () => new Color(0)
-      },
-      onTick: {
-        type: Function as PropType<() => void>
       }
     },
 
     setup (props, { slots }) {
+      provideClock(clock)
+      provideContainer(scene)
+      provideRenderer(renderer)
+
       let isTickStart = true
       const element = ref<HTMLElement>()
 
       const tick = () => {
-        props.onTick?.()
-        onTickCallbacks.forEach(item => item())
+        for (const func of onTickCallbacks) {
+          func()
+        }
         if (isTickStart) {
           requestAnimationFrame(tick)
         }
@@ -113,17 +109,12 @@ const useScene = (param?: {
 
         const isBackgroundChanged = scene.background !== newBackground
         if (isBackgroundChanged) {
-          scene.background = newBackground ?? null
+          scene.background = newBackground
         }
       }
 
-      const setProps = () => {
+      const revokeWatch = watchEffect(() => {
         setBackground()
-      }
-
-      const revoke = watch(props, setProps, {
-        deep: true,
-        immediate: true
       })
 
       onMounted(() => {
@@ -133,8 +124,8 @@ const useScene = (param?: {
 
       onBeforeUnmount(() => {
         isTickStart = false
+        revokeWatch()
         clock.stop()
-        revoke()
       })
 
       return () => (

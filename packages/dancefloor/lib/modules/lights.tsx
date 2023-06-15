@@ -264,6 +264,7 @@ const HemisphereLight = defineComponent({
 
   setup (props, { slots }) {
     const light = new THREE.HemisphereLight(props.skyColor, props.groundColor, props.intensity)
+    provideLight(light)
 
     const container = injectContainer()
     container?.add(light)
