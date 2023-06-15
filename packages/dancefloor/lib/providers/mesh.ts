@@ -1,4 +1,4 @@
-import { Mesh, Points } from 'three'
+import type { Mesh, Points } from 'three'
 import { provide, inject } from 'vue'
 
 const INJECT_KEY = 'three:mesh'

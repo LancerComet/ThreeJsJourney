@@ -2,37 +2,36 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "allowJs": true,
     "moduleResolution": "node",
     "strict": true,
     "jsx": "preserve",
-    "useDefineForClassFields": false,
-    "sourceMap": true,
+    "sourceMap": false,
+    "allowSyntheticDefaultImports": true,
     "importHelpers": true,
     "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "isolatedModules": false,
     "noEmitHelpers": false,
+    "declaration": true,
+    "declarationDir": "dist",
     "lib": [
-      "esnext", "dom"
+      "ES5", "ES2015", "ES2016", "ES2017", "ES2018",
+      "ES2019", "ES2020", "ES2021", "ESNext", "DOM"
     ],
-    "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "types": [
       "vite/client",
       "node"
     ],
-    "paths": {
-      "@lancercomet/dancefloor": ["../packages/dancefloor/lib"],
-      "@lancercomet/dancefloor.modifiers": ["../packages/dancefloor.modifiers/lib"]
-    }
+    "outDir": "dist"
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue"
+    "./lib/**/*"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }

@@ -1,4 +1,4 @@
-import { BufferGeometry } from 'three'
+import type { BufferGeometry } from 'three'
 import { inject, provide } from 'vue'
 
 const INJECT_KEY = 'three:geometry'

@@ -1,4 +1,4 @@
-import { Clock } from 'three'
+import type { Clock } from 'three'
 import { inject, provide } from 'vue'
 
 const INJECT_KEY = 'three:clock'

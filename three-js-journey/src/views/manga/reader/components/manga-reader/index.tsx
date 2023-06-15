@@ -1,4 +1,5 @@
-import { PlaneGeometry, ShaderMaterial, Mesh, BendModifier, BendModifierVM, MeshModifierSlack } from '@lancercomet/dancefloor'
+import { PlaneGeometry, ShaderMaterial, Mesh } from '@lancercomet/dancefloor'
+import { MeshModifierSlack, BendModifier } from '@lancercomet/dancefloor.modifiers'
 import * as THREE from 'three'
 import { ComponentPublicInstance, defineComponent, PropType, ref } from 'vue'
 
@@ -54,7 +55,7 @@ const MangaPage = defineComponent({
       y: 0,
       z: 0
     })
-    const bendRef = ref<BendModifierVM>()
+    const forceRef = ref(0)
 
     const uniforms = THREE.UniformsUtils.merge([
       THREE.UniformsLib.lights,
@@ -118,7 +119,7 @@ const MangaPage = defineComponent({
         })
       },
       setForce: force => {
-        bendRef.value?.setForce(force)
+        forceRef.value = force
       }
     })
 
@@ -158,8 +159,9 @@ const MangaPage = defineComponent({
 
         <MeshModifierSlack>
           <BendModifier
-            ref={bendRef}
-            offset={0.5} angel={(90 / 180) * Math.PI}
+            offset={0.5}
+            angel={(90 / 180) * Math.PI}
+            force={forceRef.value}
           />
         </MeshModifierSlack>
       </Mesh>

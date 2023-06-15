@@ -2,6 +2,14 @@ import * as THREE from 'three'
 import { defineComponent, onBeforeUnmount, PropType, watchEffect } from 'vue'
 import { injectGeometry } from '../providers/geometry'
 
+/**
+ * BufferAttribute is used for setting buffer attributes for geometries.
+ *
+ * @example
+ * <BufferGeometry>
+ *   <BufferAttribute name='position' array={positions} itemSize={3} />
+ * </BufferGeometry>
+ */
 const BufferAttribute = defineComponent({
   name: 'BufferAttribute',
 

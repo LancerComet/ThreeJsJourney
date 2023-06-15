@@ -1,4 +1,4 @@
-import { Camera } from 'three'
+import type { Camera } from 'three'
 import { inject, provide } from 'vue'
 
 const INJECT_KEY = 'three:camera'

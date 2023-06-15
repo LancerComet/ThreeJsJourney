@@ -1,4 +1,4 @@
-import { Renderer } from 'three'
+import type { Renderer } from 'three'
 import { inject, provide } from 'vue'
 
 const INJECT_KEY = 'three:renderer'

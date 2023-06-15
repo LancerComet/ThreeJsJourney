@@ -21,8 +21,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@lancercomet/dancefloor': path.resolve(__dirname, '../packages/dancefloor/lib'),
-      three: path.resolve(__dirname, 'node_modules/three'),
-      'three.modifiers': path.resolve(__dirname, 'node_modules/three.modifiers')
+      '@lancercomet/dancefloor.modifiers': path.resolve(__dirname, '../packages/dancefloor.modifiers/lib'),
+      three: path.resolve(__dirname, 'node_modules/three')
     }
   },
 

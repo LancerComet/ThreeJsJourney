@@ -1,4 +1,4 @@
-import { Light } from 'three'
+import type { Light } from 'three'
 import { inject, provide } from 'vue'
 
 const INJECT_KEY = 'three:light'

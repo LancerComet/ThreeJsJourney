@@ -9,6 +9,14 @@ import { injectOnResize } from '../providers/resize'
 import { IQuaternion, IVector3 } from '../types'
 import { updateQuaternion, updateVector3 } from '../utils/manipulation'
 
+/**
+ * Perspective camera.
+ *
+ * @example
+ * <Scene>
+ *   <PerspectiveCamera />
+ * </Scene>
+ */
 const PerspectiveCamera = defineComponent({
   name: 'PerspectiveCamera',
 
@@ -107,6 +115,14 @@ const PerspectiveCamera = defineComponent({
   }
 })
 
+/**
+ * Orthographic camera.
+ *
+ * @example
+ * <Scene>
+ *   <OrthographicCamera />
+ * </Scene>
+ */
 const OrthographicCamera = defineComponent({
   name: 'OrthographicCamera',
 

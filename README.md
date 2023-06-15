@@ -5,13 +5,21 @@
 This project comes with two parts:
 
  - My practice codes for the course **ThreeJS Journey**, but not all chapters are included.
- - A package named **DanceFloor**, it's a Vue binding for ThreeJS.
+ - A series of packages named **DanceFloor** under `packages` folders. In short, this is the Vue version of React Three Fiber.
 
-## DanceFloor
+## Packages
 
-DanceFloor is located in `packages/dancefloor`. It was built with Vue 3, but in theory it compatible with Vue 2.7+.
+### DanceFloor
+
+DanceFloor was built with Vue 3, but in theory it compatible with Vue 2.7+.
 
 This package is published to npm as the name `@lancercomet/dancefloor`.
+
+### DanceFloor Modifiers
+
+This is a Vue wrapper of [three.modifiers](https://github.com/drawcall/threejs-mesh-modifiers).
+
+This package is published to npm as the name `@lancercomet/dancefloor.modifiers`.
 
 ## ThreeJS Journey
 
@@ -19,5 +27,4 @@ ThreeJS Journey is located in `three-js-journey`.
 
 How to start:
 
- - Build package DanceFloor.
  - Run `npm run dev` in `three-js-journey` folder.

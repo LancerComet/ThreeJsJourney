@@ -1,4 +1,4 @@
-import { Object3D } from 'three'
+import type { Object3D } from 'three'
 import { inject, provide } from 'vue'
 
 const CONTAINER_INJECT_KEY = 'three:container'
