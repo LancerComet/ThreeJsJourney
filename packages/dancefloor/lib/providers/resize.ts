@@ -11,7 +11,7 @@ const provideOnResize = (onResize: OnResizeFunc) => {
 
 const injectOnResize = () => {
   return inject<OnResizeFunc | undefined>(INJECT_KEY, () => {
-    console.warn('[Warn] You should use this injection under <Scene />.')
+    console.warn('[Warn] You should use injectOnResize under a <Scene />.')
     return () => {
       return () => {
         // ...

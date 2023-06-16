@@ -9,7 +9,7 @@ const provideCamera = (camera: Camera) => {
 
 const injectCamera = () => {
   return inject<Camera | undefined>(INJECT_KEY, () => {
-    console.warn('[Warn] You should use this under a container object.')
+    console.warn('[Warn] You should inject a camera under a camera object.')
     return undefined
   }, true)
 }

@@ -9,7 +9,7 @@ const provideClock = (clock: Clock) => {
 
 const injectClock = () => {
   return inject<Clock | undefined>(INJECT_KEY, () => {
-    console.warn('[Warn] You should use this injection under <Scene />.')
+    console.warn('[Warn] You should use inject a clock under a <Scene />.')
     return undefined
   }, true)
 }

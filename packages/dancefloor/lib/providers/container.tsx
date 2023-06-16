@@ -9,7 +9,7 @@ const provideContainer = (container: Object3D) => {
 
 const injectContainer = () => {
   return inject<Object3D | undefined>(CONTAINER_INJECT_KEY, () => {
-    console.warn('[Warn] You should use this under a container object.')
+    console.warn('[Warn] You should inject a container under a container object.')
     return undefined
   }, true)
 }

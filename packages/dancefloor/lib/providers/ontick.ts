@@ -10,7 +10,7 @@ const provideOnTick = (onTick: OnTickFunc) => {
 
 const injectOnTick = () => {
   return inject<OnTickFunc | undefined>(INJECT_KEY, () => {
-    console.warn('[Warn] You should use this injection under <Scene />.')
+    console.warn('[Warn] You should inject a Tick object under a <Scene />.')
     return undefined
   }, true)
 }

@@ -9,7 +9,7 @@ const provideGeometry = (geometry: BufferGeometry) => {
 
 const injectGeometry = () => {
   return inject<BufferGeometry | undefined>(INJECT_KEY, () => {
-    console.warn('[Warn] You should use this under a Geometry object.')
+    console.warn('[Warn] You should inject a geometry under that object.')
     return undefined
   }, true)
 }
