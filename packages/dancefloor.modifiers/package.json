@@ -1,6 +1,6 @@
 {
   "name": "@lancercomet/dancefloor.modifiers",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Use three.modifier with Vue.",
   "main": "./dist/index.js",
   "module": "./dist/index.es.js",
@@ -18,7 +18,6 @@
     }
   ],
   "peerDependencies": {
-    "three": "^0.152.1",
     "three.modifiers": "^2.5.7"
   },
   "dependencies": {

@@ -1,6 +1,6 @@
 {
   "name": "@lancercomet/dancefloor",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "Use Three with Vue.",
   "main": "./dist/index.js",
   "module": "./dist/index.es.js",
@@ -17,9 +17,6 @@
       "email": "chw644@hotmail.com"
     }
   ],
-  "peerDependencies": {
-    "three": "^0.152.1"
-  },
   "dependencies": {
     "@lancercomet/utils": "^1.0.0"
   },
