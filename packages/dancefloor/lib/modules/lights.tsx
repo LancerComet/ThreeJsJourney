@@ -8,7 +8,7 @@ import { updateVector3 } from '../utils/manipulation'
 const AmbientLight = defineComponent({
   props: {
     color: {
-      type: Number as PropType<number>,
+      type: [Number, String, THREE.Color] as PropType<THREE.ColorRepresentation>,
       default: 0xffffff
     },
     intensity: {
@@ -64,7 +64,7 @@ const PointLight = defineComponent({
       default: 512
     },
     color: {
-      type: Number as PropType<number>,
+      type: [Number, String, THREE.Color] as PropType<THREE.ColorRepresentation>,
       default: 0xffffff
     },
     intensity: {
@@ -163,7 +163,7 @@ const DirectionalLight = defineComponent({
       default: 512
     },
     color: {
-      type: Number as PropType<number>,
+      type: [Number, String, THREE.Color] as PropType<THREE.ColorRepresentation>,
       default: 0xffffff
     },
     intensity: {
@@ -305,7 +305,7 @@ const RectAreaLight = defineComponent({
     width: Number as PropType<number>,
     height: Number as PropType<number>,
     color: {
-      type: [Number, Object] as PropType<THREE.ColorRepresentation>,
+      type: [Number, String, THREE.Color] as PropType<THREE.ColorRepresentation>,
       default: 0xffffff
     },
     position: {
