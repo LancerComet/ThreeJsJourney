@@ -1,6 +1,6 @@
 {
   "name": "@lancercomet/dancefloor",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "Use Three with Vue.",
   "main": "./dist/index.js",
   "module": "./dist/index.es.js",
