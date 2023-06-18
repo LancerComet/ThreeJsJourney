@@ -1,4 +1,12 @@
-import { BoxGeometry, BasicMaterial, Mesh, useScene, PerspectiveCamera, OrbitControls } from '@lancercomet/dancefloor'
+import {
+  BoxGeometry,
+  BasicMaterial,
+  Mesh,
+  useScene,
+  PerspectiveCamera,
+  OrbitControls,
+  TransformControls, AxesHelper, GridHelper
+} from '@lancercomet/dancefloor'
 import * as THREE from 'three'
 import { MeshBasicMaterialParameters } from 'three/src/materials/MeshBasicMaterial'
 import { defineComponent, ref } from 'vue'
@@ -9,6 +17,7 @@ const Textures = defineComponent({
   setup () {
     const { Scene, resize } = useScene()
     const materialParamsRef = ref<MeshBasicMaterialParameters>({})
+    const isOrbitControlEnabled = ref(true)
 
     const textureLoader = new THREE.TextureLoader()
     textureLoader.loadAsync('/textures/door/color.jpg')
@@ -32,13 +41,22 @@ const Textures = defineComponent({
     return () => (
       <Scene>
         <PerspectiveCamera position={{ x: 5, y: 5, z: 5 }}>
-          <OrbitControls />
+          <OrbitControls enabled={isOrbitControlEnabled.value} />
+          <Mesh>
+            <BoxGeometry width={1} height={1} depth={1} />
+            <BasicMaterial params={materialParamsRef.value} />
+            <TransformControls
+              mode='rotate'
+              onDraggingChanged={event => {
+                const isInDragging = event.value
+                isOrbitControlEnabled.value = !isInDragging
+              }}
+            />
+          </Mesh>
         </PerspectiveCamera>
 
-        <Mesh>
-          <BoxGeometry width={1} height={1} depth={1} />
-          <BasicMaterial params={materialParamsRef.value} />
-        </Mesh>
+        <AxesHelper />
+        <GridHelper />
       </Scene>
     )
   }
