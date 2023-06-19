@@ -9,7 +9,7 @@ import {
 } from '@lancercomet/dancefloor'
 import * as THREE from 'three'
 import { MeshBasicMaterialParameters } from 'three/src/materials/MeshBasicMaterial'
-import { defineComponent, ref } from 'vue'
+import { defineComponent, onBeforeUnmount, ref } from 'vue'
 import { useResize } from '../../hooks/resize'
 
 const Textures = defineComponent({
@@ -18,6 +18,22 @@ const Textures = defineComponent({
     const { Scene, resize } = useScene()
     const materialParamsRef = ref<MeshBasicMaterialParameters>({})
     const isOrbitControlEnabled = ref(true)
+    const controlModeRef = ref<'translate' | 'scale' | 'rotate'>('translate')
+
+    const onKeyUp = (event: KeyboardEvent) => {
+      const key = event.key
+      switch (key) {
+        case 't':
+          controlModeRef.value = 'translate'
+          break
+        case 's':
+          controlModeRef.value = 'scale'
+          break
+        case 'r':
+          controlModeRef.value = 'rotate'
+          break
+      }
+    }
 
     const textureLoader = new THREE.TextureLoader()
     textureLoader.loadAsync('/textures/door/color.jpg')
@@ -38,6 +54,12 @@ const Textures = defineComponent({
       resize(window.innerWidth, window.innerHeight)
     })
 
+    window.addEventListener('keyup', onKeyUp)
+
+    onBeforeUnmount(() => {
+      window.removeEventListener('keyup', onKeyUp)
+    })
+
     return () => (
       <Scene>
         <PerspectiveCamera position={{ x: 5, y: 5, z: 5 }}>
@@ -46,7 +68,7 @@ const Textures = defineComponent({
             <BoxGeometry width={1} height={1} depth={1} />
             <BasicMaterial params={materialParamsRef.value} />
             <TransformControls
-              mode='rotate'
+              mode={controlModeRef.value}
               onDraggingChanged={event => {
                 const isInDragging = event.value
                 isOrbitControlEnabled.value = !isInDragging

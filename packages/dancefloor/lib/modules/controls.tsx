@@ -1,6 +1,6 @@
 import { OrbitControls as ThreeOribitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { TransformControls as ThreeTransformControls } from 'three/examples/jsm/controls/TransformControls'
-import { defineComponent, onBeforeUnmount, PropType, watchEffect } from 'vue'
+import { defineComponent, onBeforeUnmount, PropType, toRef, watch, watchEffect } from 'vue'
 import { injectCamera } from '../providers/cameras'
 import { injectContainer } from '../providers/container'
 import { injectMesh } from '../providers/mesh'
@@ -107,6 +107,15 @@ const TransformControls = defineComponent({
       emit('draggingChanged', event)
     }
 
+    if (camera && renderer) {
+      controls = new ThreeTransformControls(camera, renderer.domElement)
+      controls.mode = props.mode
+      controls.size = props.size
+      mesh && controls.attach(mesh)
+      container && container.add(controls)
+      controls.addEventListener('dragging-changed', onDraggingChanged as any)
+    }
+
     const revokeWatch = watchEffect(() => {
       if (!controls) {
         return
@@ -120,15 +129,6 @@ const TransformControls = defineComponent({
         controls.size = props.size
       }
     })
-
-    if (camera && renderer) {
-      controls = new ThreeTransformControls(camera, renderer.domElement)
-      controls.mode = props.mode
-      controls.size = props.size
-      mesh && controls.attach(mesh)
-      container && container.add(controls)
-      controls.addEventListener('dragging-changed', onDraggingChanged as any)
-    }
 
     onBeforeUnmount(() => {
       revokeWatch()
