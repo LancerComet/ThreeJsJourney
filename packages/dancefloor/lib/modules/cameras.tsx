@@ -63,7 +63,7 @@ const PerspectiveCamera = defineComponent({
     const renderer = injectRenderer()
 
     const onTick = injectOnTick()
-    const disposeOnTick = onTick?.(() => {
+    onTick?.(() => {
       scene && renderer?.render(scene, camera)
     })
 
@@ -103,7 +103,6 @@ const PerspectiveCamera = defineComponent({
     onBeforeUnmount(() => {
       removeWatch()
       removeOnResize?.()
-      disposeOnTick?.()
       scene?.remove(camera)
     })
 
@@ -178,7 +177,7 @@ const OrthographicCamera = defineComponent({
     const renderer = injectRenderer()
 
     const onTick = injectOnTick()
-    const disposeOnTick = onTick?.(() => {
+    onTick?.(() => {
       scene && renderer?.render(scene, camera)
     })
 
@@ -223,7 +222,6 @@ const OrthographicCamera = defineComponent({
     onBeforeUnmount(() => {
       removeWatch()
       removeOnResize?.()
-      disposeOnTick?.()
       scene?.remove(camera)
     })
 

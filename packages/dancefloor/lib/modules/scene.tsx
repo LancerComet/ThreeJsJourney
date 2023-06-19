@@ -58,12 +58,13 @@ const useScene = (param?: {
     if (!onTickCallbacks.includes(callback)) {
       onTickCallbacks.push(callback)
     }
-    return () => {
+    const revoke = () => {
       const index = onTickCallbacks.indexOf(callback)
       if (index > -1) {
         onTickCallbacks.splice(index, 1)
       }
     }
+    onBeforeUnmount(revoke)
   }
   provideOnTick(onTick)
 

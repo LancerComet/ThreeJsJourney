@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { defineComponent, onBeforeUnmount, PropType } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import { injectClock } from '../providers/clock'
 import { injectGeometry } from '../providers/geometry'
 import { injectMesh } from '../providers/mesh'
@@ -41,16 +41,12 @@ const Modifier = defineComponent({
     const onTick = injectOnTick()
     const clock = injectClock()
 
-    const removeOnTick = onTick?.(() => {
+    onTick?.(() => {
       props.onTick?.({
         geometry,
         mesh,
         clock
       })
-    })
-
-    onBeforeUnmount(() => {
-      removeOnTick?.()
     })
 
     return () => (

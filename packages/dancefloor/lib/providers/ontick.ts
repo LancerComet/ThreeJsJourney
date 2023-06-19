@@ -2,7 +2,7 @@ import { inject, provide } from 'vue'
 
 const INJECT_KEY = 'three:ontick'
 
-type OnTickFunc = (callback: () => void) => () => void
+type OnTickFunc = (callback: () => void) => void
 
 const provideOnTick = (onTick: OnTickFunc) => {
   provide(INJECT_KEY, onTick)

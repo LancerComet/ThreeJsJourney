@@ -38,7 +38,7 @@ const OrbitControls = defineComponent({
     const onTick = injectOnTick()
     const controls = new ThreeOribitControls(camera!, renderer?.domElement)
 
-    const disposeOnTick = onTick?.(() => {
+    onTick?.(() => {
       controls.update()
     })
 
@@ -61,7 +61,6 @@ const OrbitControls = defineComponent({
 
     onBeforeUnmount(() => {
       revoke()
-      disposeOnTick?.()
       controls.dispose()
     })
 
