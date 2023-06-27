@@ -1,5 +1,4 @@
 import * as path from 'path'
-import legacy from '@vitejs/plugin-legacy'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { defineConfig } from 'vite'
@@ -12,7 +11,8 @@ export default defineConfig({
     alias: {
       '@lancercomet/dancefloor': path.resolve(__dirname, '../packages/dancefloor/lib'),
       '@lancercomet/dancefloor.modifiers': path.resolve(__dirname, '../packages/dancefloor.modifiers/lib'),
-      three: path.resolve(__dirname, 'node_modules/three')
+      three: path.resolve(__dirname, 'node_modules/three'),
+      'three.modifiers': path.resolve(__dirname, 'node_modules/three.modifiers')
     }
   },
 
@@ -24,9 +24,6 @@ export default defineConfig({
         ['@babel/plugin-proposal-decorators', { legacy: true }],
         ['@babel/plugin-proposal-class-properties', { loose: true }]
       ]
-    }),
-    legacy({
-      targets: 'defaults'
     })
   ],
 

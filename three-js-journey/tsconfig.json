@@ -26,7 +26,8 @@
     ],
     "paths": {
       "@lancercomet/dancefloor": ["../packages/dancefloor/lib"],
-      "@lancercomet/dancefloor.modifiers": ["../packages/dancefloor.modifiers/lib"]
+      "@lancercomet/dancefloor.modifiers": ["../packages/dancefloor.modifiers/lib"],
+      "three.modifiers": ["./node_modules/three.modifiers"]
     }
   },
   "include": [
