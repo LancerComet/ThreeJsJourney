@@ -19,11 +19,24 @@ const Textures = defineComponent({
     const materialParamsRef = ref<MeshBasicMaterialParameters>({})
     const isOrbitControlEnabled = ref(true)
     const controlModeRef = ref<'translate' | 'scale' | 'rotate'>('translate')
+    const controlSpaceRef = ref<'local' | 'world'>('local')
+    const snapRef = ref<{ t: null | number, s: null | number, r: null | number }>({ t: null, s: null, r: null })
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      const key = event.key
+      if (key === 'Shift') {
+        snapRef.value = {
+          t: 1,
+          s: 1,
+          r: THREE.MathUtils.degToRad(45)
+        }
+      }
+    }
 
     const onKeyUp = (event: KeyboardEvent) => {
       const key = event.key
       switch (key) {
-        case 't':
+        case 'v':
           controlModeRef.value = 'translate'
           break
         case 's':
@@ -31,6 +44,16 @@ const Textures = defineComponent({
           break
         case 'r':
           controlModeRef.value = 'rotate'
+          break
+        case 'q':
+          controlSpaceRef.value = controlSpaceRef.value === 'local'
+            ? 'world'
+            : 'local'
+          break
+        case 'Shift':
+          snapRef.value = {
+            t: null, s: null, r: null
+          }
           break
       }
     }
@@ -54,9 +77,11 @@ const Textures = defineComponent({
       resize(window.innerWidth, window.innerHeight)
     })
 
+    window.addEventListener('keydown', onKeyDown)
     window.addEventListener('keyup', onKeyUp)
 
     onBeforeUnmount(() => {
+      window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('keyup', onKeyUp)
     })
 
@@ -69,6 +94,8 @@ const Textures = defineComponent({
             <BasicMaterial params={materialParamsRef.value} />
             <TransformControls
               mode={controlModeRef.value}
+              space={controlSpaceRef.value}
+              snap={snapRef.value}
               onDraggingChanged={event => {
                 const isInDragging = event.value
                 isOrbitControlEnabled.value = !isInDragging
