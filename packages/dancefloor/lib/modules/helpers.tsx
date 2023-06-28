@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { RectAreaLightHelper as ThreeRectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper'
-import { defineComponent, onBeforeUnmount, PropType, watch, watchEffect } from 'vue'
+import { defineComponent, onBeforeUnmount, PropType, watchEffect } from 'vue'
 
 import { injectContainer } from '../providers/container'
 import { injectLight } from '../providers/light'
@@ -20,21 +20,25 @@ const AxesHelper = defineComponent({
   },
 
   setup (props) {
-    const axesHelper = new THREE.AxesHelper()
+    const helper = new THREE.AxesHelper()
     const container = injectContainer()
-    container?.add(axesHelper)
+    container?.add(helper)
 
-    const setProps = () => {
-      updateVector3(props.position, axesHelper.position)
-      updateVector3(props.rotation, axesHelper.rotation)
-    }
-
-    const revoke = watch(props, setProps, {
-      deep: true,
-      immediate: true
+    const revokeWatch = watchEffect(() => {
+      updateVector3(props.position, helper.position)
+      updateVector3(props.rotation, helper.rotation)
     })
 
-    onBeforeUnmount(revoke)
+    const dispose = () => {
+      helper.clear()
+      helper.removeFromParent()
+      helper.dispose()
+    }
+
+    onBeforeUnmount(() => {
+      revokeWatch()
+      dispose()
+    })
 
     return () => (
       <div class='axes-helper' />
@@ -70,6 +74,7 @@ const GridHelper = defineComponent({
     }
 
     const dispose = () => {
+      helper?.clear()
       helper?.removeFromParent()
       helper?.dispose()
       helper = undefined
