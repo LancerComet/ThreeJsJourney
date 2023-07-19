@@ -5,11 +5,14 @@
   "main": "./dist/index.js",
   "module": "./dist/index.es.js",
   "license": "Apache-2.0",
-  "files": [
-    "dist/"
-  ],
-  "scripts": {
-    "build": "vite build"
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:LancerComet/ThreeJsJourney.git"
+  },
+  "homepage": "https://github.com/LancerComet/ThreeJsJourney",
+  "author": {
+    "name": "LancerComet",
+    "email": "chw644@hotmail.com"
   },
   "maintainers": [
     {
@@ -17,6 +20,16 @@
       "email": "chw644@hotmail.com"
     }
   ],
+  "directories": {
+    "lib": "lib"
+  },
+  "files": [
+    "dist/",
+    "lib/"
+  ],
+  "scripts": {
+    "build": "vite build"
+  },
   "dependencies": {
     "@lancercomet/utils": "^1.0.0"
   },
