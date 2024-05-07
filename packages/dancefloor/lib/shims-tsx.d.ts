@@ -6,7 +6,6 @@ declare global {
   namespace JSX {
     interface IntrinsicAttributes extends HTMLAttributes {
       type?: string
-      color?: any
     }
   }
 }

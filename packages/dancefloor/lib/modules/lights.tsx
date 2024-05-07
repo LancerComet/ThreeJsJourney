@@ -1,9 +1,11 @@
 import * as THREE from 'three'
-import { defineComponent, onBeforeUnmount, PropType, watch, watchEffect } from 'vue'
+import { defineComponent, inject, onBeforeUnmount, PropType, provide, watch, watchEffect } from 'vue'
 import { injectContainer } from '../providers/container'
 import { provideLight } from '../providers/light'
 import { IVector3 } from '../types'
 import { updateVector3 } from '../utils/manipulation'
+
+const PROVIDE_KEY_DIRECTIONAL_LIGHT = 'three:directional-light'
 
 const AmbientLight = defineComponent({
   props: {
@@ -31,21 +33,22 @@ const AmbientLight = defineComponent({
       }
     }
 
-    const revoke = watch(props, setProps, {
+    const revokeWatch = watch(props, setProps, {
       deep: true,
       immediate: true
-    })
-
-    onBeforeUnmount(() => {
-      ambientLight.dispose()
-      container?.remove(ambientLight)
-      revoke()
     })
 
     const container = injectContainer()
     if (container) {
       container.add(ambientLight)
     }
+
+    onBeforeUnmount(() => {
+      revokeWatch()
+
+      ambientLight.dispose()
+      container?.remove(ambientLight)
+    })
 
     return () => (
       <div class='ambient-light' />
@@ -83,19 +86,33 @@ const PointLight = defineComponent({
       type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     },
+    hide: {
+      type: Boolean as PropType<boolean>,
+      default: false
+    },
     showHelper: {
       type: Boolean as PropType<boolean>,
       default: false
     },
-    hide: {
-      type: Boolean as PropType<boolean>,
-      default: false
+    /**
+     * LightHelper config.
+     * Please notice this object is not reactive.
+     */
+    helper: {
+      type: Object as PropType<{
+        size?: number
+        color?: THREE.ColorRepresentation
+      }>
     }
   },
 
   setup (props) {
     const pointLight = new THREE.PointLight(0xffffff, 0.5)
-    const pointLightHelper = new THREE.PointLightHelper(pointLight)
+    const pointLightHelper = new THREE.PointLightHelper(
+      pointLight,
+      props.helper?.size,
+      props.helper?.color
+    )
 
     const revoke = watchEffect(() => {
       updateVector3(props.position, pointLight.position)
@@ -127,9 +144,11 @@ const PointLight = defineComponent({
         pointLight.decay = props.decay ?? 1
       }
 
-      pointLight.castShadow = props.castShadow === true
-      pointLightHelper.visible = props.showHelper === true
-      pointLight.visible = props.hide === false
+      pointLight.castShadow = props.castShadow
+      pointLight.visible = !props.hide
+
+      pointLightHelper.visible = props.showHelper
+      pointLightHelper.update()
     })
 
     const container = injectContainer()
@@ -139,6 +158,8 @@ const PointLight = defineComponent({
     }
 
     onBeforeUnmount(() => {
+      pointLightHelper.dispose()
+      container?.remove(pointLightHelper)
       pointLight.dispose()
       container?.remove(pointLight)
       revoke()
@@ -158,58 +179,88 @@ const DirectionalLight = defineComponent({
       type: Boolean as PropType<boolean>,
       default: false
     },
-    shadowSize: {
-      type: Number as PropType<number>,
-      default: 512
+
+    shadow: {
+      type: Object as PropType<{
+        mapSize?: { width?: number, height?: number }
+        camera?: { near?: number, far?: number }
+      }>,
+      default: () => ({
+        mapSize: { width: 512, height: 512 },
+        camera: { near: 0.5, far: 500 }
+      })
     },
+
     color: {
       type: [Number, String, THREE.Color] as PropType<THREE.ColorRepresentation>,
       default: 0xffffff
     },
+
     intensity: {
       type: Number as PropType<number>,
       default: 0.5
     },
+
     position: {
       type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     },
+
     showHelper: {
       type: Boolean as PropType<boolean>,
       default: false
     },
-    shadowCamera: {
-      type: Object as PropType<Partial<{
-        near: number, far: number
-        // top: number, left: number, right: number, bottom: number
-      }>>
+
+    /**
+     * LightHelper config.
+     * Please notice this object is not reactive.
+     */
+    helper: {
+      type: Object as PropType<{
+        size?: number
+        color?: THREE.ColorRepresentation
+      }>
     }
   },
 
-  setup (props) {
+  setup (props, { slots }) {
     const light = new THREE.DirectionalLight(0xffffff, 0.5)
-    const lightHelper = new THREE.DirectionalLightHelper(light)
+    const lightHelper = new THREE.DirectionalLightHelper(
+      light,
+      props.helper?.size,
+      props.helper?.color
+    )
 
-    const revoke = watch(props, () => {
+    provide(PROVIDE_KEY_DIRECTIONAL_LIGHT, {
+      light,
+      lightHelper
+    })
+
+    const setProps = () => {
       updateVector3(props.position, light.position)
 
       if (light.castShadow !== props.castShadow) {
-        light.castShadow = props.castShadow === true
+        light.castShadow = props.castShadow
       }
 
-      if (light.shadow.mapSize.width !== props.shadowSize) {
-        light.shadow.mapSize.width = props.shadowSize ?? 512
-        light.shadow.mapSize.height = props.shadowSize ?? 512
+      const shadowWidth = props.shadow?.mapSize?.width ?? 512
+      if (light.shadow.mapSize.width !== shadowWidth) {
+        light.shadow.mapSize.width = shadowWidth
       }
 
-      const near = props.shadowCamera?.near ?? 0.1
-      if (near !== light.shadow.camera.near) {
-        light.shadow.camera.near = near
+      const shadowHeight = props.shadow?.mapSize?.height ?? 512
+      if (light.shadow.mapSize.height !== shadowHeight) {
+        light.shadow.mapSize.height = shadowHeight
       }
 
-      const far = props.shadowCamera?.far ?? 2000
-      if (far !== light.shadow.camera.far) {
-        light.shadow.camera.far = far
+      const cameraNear = props.shadow?.camera?.near ?? 0.5
+      if (cameraNear !== light.shadow.camera.near) {
+        light.shadow.camera.near = cameraNear
+      }
+
+      const cameraFar = props.shadow?.camera?.far ?? 500
+      if (cameraFar !== light.shadow.camera.far) {
+        light.shadow.camera.far = cameraFar
       }
 
       if (light.intensity !== props.intensity) {
@@ -219,10 +270,13 @@ const DirectionalLight = defineComponent({
       const newColor = new THREE.Color(props.color)
       if (!light.color.equals(newColor)) {
         light.color = newColor
+        lightHelper.update() // Update the helper's color.
       }
 
-      lightHelper.visible = props.showHelper === true
-    }, {
+      lightHelper.visible = props.showHelper
+    }
+
+    const revokeSetProps = watch(props, setProps, {
       deep: true,
       immediate: true
     })
@@ -234,13 +288,66 @@ const DirectionalLight = defineComponent({
     }
 
     onBeforeUnmount(() => {
+      revokeSetProps()
+
+      lightHelper.dispose()
+      container?.remove(lightHelper)
+
       light.dispose()
       container?.remove(light)
-      revoke()
     })
 
     return () => (
-      <div class='directional-light' />
+      <div class='directional-light'>{ slots.default?.() }</div>
+    )
+  }
+})
+
+const DirectionalLightTarget = defineComponent({
+  name: 'DirectionalLightTarget',
+
+  props: {
+    position: {
+      type: Object as PropType<Partial<IVector3>>,
+      default: () => ({})
+    }
+  },
+
+  setup (props) {
+    const { light, lightHelper } = inject(PROVIDE_KEY_DIRECTIONAL_LIGHT) as {
+      light: THREE.DirectionalLight
+      lightHelper: THREE.DirectionalLightHelper
+    }
+    const obj = new THREE.Object3D()
+
+    const container = injectContainer()
+    if (container) {
+      container.add(obj)
+    }
+
+    const setProps = () => {
+      updateVector3(props.position, obj.position)
+
+      if (light && light.target !== obj) {
+        light.target = obj
+      }
+
+      // Need to update the light helper to make changes take effect.
+      lightHelper.update()
+    }
+
+    const revokeWatch = watch(props, setProps, {
+      deep: true,
+      immediate: true
+    })
+
+    onBeforeUnmount(() => {
+      revokeWatch()
+      obj.removeFromParent()
+    })
+
+    return () => (
+      <div class='directional-light-target' />
     )
   }
 })
@@ -269,7 +376,7 @@ const HemisphereLight = defineComponent({
     const container = injectContainer()
     container?.add(light)
 
-    const revoke = watchEffect(() => {
+    const revokeWatch = watchEffect(() => {
       updateVector3(props.position, light.position)
 
       const newGroundColor = new THREE.Color(props.groundColor)
@@ -282,11 +389,14 @@ const HemisphereLight = defineComponent({
         light.color.set(newSkyColor)
       }
 
-      light.visible = props.hide === false
+      light.visible = !props.hide
     })
 
     onBeforeUnmount(() => {
-      revoke()
+      revokeWatch()
+
+      container?.remove(light)
+      light.dispose()
     })
 
     return () => (
@@ -351,6 +461,9 @@ const RectAreaLight = defineComponent({
 
     onBeforeUnmount(() => {
       revoke()
+
+      container?.remove(light)
+      light.dispose()
     })
 
     return () => (
@@ -365,6 +478,7 @@ export {
   AmbientLight,
   PointLight,
   DirectionalLight,
+  DirectionalLightTarget,
   HemisphereLight,
   RectAreaLight
 }
