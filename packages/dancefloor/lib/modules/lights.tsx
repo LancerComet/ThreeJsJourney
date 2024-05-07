@@ -162,6 +162,9 @@ const DirectionalLight = defineComponent({
       type: Number as PropType<number>,
       default: 512
     },
+    shadowCamera: {
+      type: Object as PropType<Partial<{ near: number, far: number }>>
+    },
     color: {
       type: [Number, String, THREE.Color] as PropType<THREE.ColorRepresentation>,
       default: 0xffffff
@@ -178,11 +181,9 @@ const DirectionalLight = defineComponent({
       type: Boolean as PropType<boolean>,
       default: false
     },
-    shadowCamera: {
-      type: Object as PropType<Partial<{
-        near: number, far: number
-        // top: number, left: number, right: number, bottom: number
-      }>>
+    target: {
+      type: Object as PropType<Partial<IVector3>>,
+      default: () => ({})
     }
   },
 
@@ -192,9 +193,10 @@ const DirectionalLight = defineComponent({
 
     const revoke = watch(props, () => {
       updateVector3(props.position, light.position)
+      updateVector3(props.target, light.target.position)
 
       if (light.castShadow !== props.castShadow) {
-        light.castShadow = props.castShadow === true
+        light.castShadow = props.castShadow
       }
 
       if (light.shadow.mapSize.width !== props.shadowSize) {
@@ -221,7 +223,7 @@ const DirectionalLight = defineComponent({
         light.color = newColor
       }
 
-      lightHelper.visible = props.showHelper === true
+      lightHelper.visible = props.showHelper
     }, {
       deep: true,
       immediate: true
@@ -282,7 +284,7 @@ const HemisphereLight = defineComponent({
         light.color.set(newSkyColor)
       }
 
-      light.visible = props.hide === false
+      light.visible = !props.hide
     })
 
     onBeforeUnmount(() => {
