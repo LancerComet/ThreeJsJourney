@@ -1,7 +1,7 @@
 import {
   BoxGeometry, PlaneGeometry,
   AmbientLight, DirectionalLight, PointLight,
-  StandardMaterial, Mesh, useScene, PerspectiveCamera, OrbitControls
+  StandardMaterial, Mesh, useScene, PerspectiveCamera, OrbitControls, DirectionalLightTarget
 } from '@lancercomet/dancefloor'
 import { defineComponent } from 'vue'
 import { useResize } from '../../hooks/resize'
@@ -65,15 +65,20 @@ const Shadow = defineComponent({
         <Cube2 />
         <Cube3 />
         <AmbientLight color={0xffffff} intensity={0.5} />
-        <PointLight
-          color={0xffd9a0} intensity={0.5} distance={10} decay={1}
-          castShadow position={{ x: -4, y: 2, z: 4 }} showHelper
-        />
+
         <DirectionalLight
+          position={{ x: 4, y: 4, z: 4 }}
           color={0xb6e5fb} intensity={0.3}
-          castShadow position={{ x: 4, y: 4, z: 4 }}
-          shadowSize={2048} showHelper shadowCamera={{ near: 1, far: 10 }}
-        />
+          castShadow
+          shadow={{
+            mapSize: { width: 2048, height: 2048 },
+            camera: { near: 1, far: 10 }
+          }}
+          showHelper helper={{ color: 0xff0000 }}
+        >
+          <DirectionalLightTarget position={{ x: 3, y: 0, z: 3 }} />
+        </DirectionalLight>
+
         <Ground />
       </Scene>
     )
