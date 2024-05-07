@@ -33,21 +33,22 @@ const AmbientLight = defineComponent({
       }
     }
 
-    const revoke = watch(props, setProps, {
+    const revokeWatch = watch(props, setProps, {
       deep: true,
       immediate: true
-    })
-
-    onBeforeUnmount(() => {
-      ambientLight.dispose()
-      container?.remove(ambientLight)
-      revoke()
     })
 
     const container = injectContainer()
     if (container) {
       container.add(ambientLight)
     }
+
+    onBeforeUnmount(() => {
+      revokeWatch()
+
+      ambientLight.dispose()
+      container?.remove(ambientLight)
+    })
 
     return () => (
       <div class='ambient-light' />
@@ -85,19 +86,33 @@ const PointLight = defineComponent({
       type: Object as PropType<Partial<IVector3>>,
       default: () => ({})
     },
+    hide: {
+      type: Boolean as PropType<boolean>,
+      default: false
+    },
     showHelper: {
       type: Boolean as PropType<boolean>,
       default: false
     },
-    hide: {
-      type: Boolean as PropType<boolean>,
-      default: false
+    /**
+     * LightHelper config.
+     * Please notice this object is not reactive.
+     */
+    helper: {
+      type: Object as PropType<{
+        size?: number
+        color?: THREE.ColorRepresentation
+      }>
     }
   },
 
   setup (props) {
     const pointLight = new THREE.PointLight(0xffffff, 0.5)
-    const pointLightHelper = new THREE.PointLightHelper(pointLight)
+    const pointLightHelper = new THREE.PointLightHelper(
+      pointLight,
+      props.helper?.size,
+      props.helper?.color
+    )
 
     const revoke = watchEffect(() => {
       updateVector3(props.position, pointLight.position)
@@ -129,9 +144,11 @@ const PointLight = defineComponent({
         pointLight.decay = props.decay ?? 1
       }
 
-      pointLight.castShadow = props.castShadow === true
-      pointLightHelper.visible = props.showHelper === true
-      pointLight.visible = props.hide === false
+      pointLight.castShadow = props.castShadow
+      pointLight.visible = !props.hide
+
+      pointLightHelper.visible = props.showHelper
+      pointLightHelper.update()
     })
 
     const container = injectContainer()
@@ -141,6 +158,8 @@ const PointLight = defineComponent({
     }
 
     onBeforeUnmount(() => {
+      pointLightHelper.dispose()
+      container?.remove(pointLightHelper)
       pointLight.dispose()
       container?.remove(pointLight)
       revoke()
@@ -270,8 +289,12 @@ const DirectionalLight = defineComponent({
 
     onBeforeUnmount(() => {
       revokeSetProps()
-      container?.remove(light)
+
+      lightHelper.dispose()
+      container?.remove(lightHelper)
+
       light.dispose()
+      container?.remove(light)
     })
 
     return () => (
@@ -353,7 +376,7 @@ const HemisphereLight = defineComponent({
     const container = injectContainer()
     container?.add(light)
 
-    const revoke = watchEffect(() => {
+    const revokeWatch = watchEffect(() => {
       updateVector3(props.position, light.position)
 
       const newGroundColor = new THREE.Color(props.groundColor)
@@ -370,7 +393,10 @@ const HemisphereLight = defineComponent({
     })
 
     onBeforeUnmount(() => {
-      revoke()
+      revokeWatch()
+
+      container?.remove(light)
+      light.dispose()
     })
 
     return () => (
@@ -435,6 +461,9 @@ const RectAreaLight = defineComponent({
 
     onBeforeUnmount(() => {
       revoke()
+
+      container?.remove(light)
+      light.dispose()
     })
 
     return () => (
